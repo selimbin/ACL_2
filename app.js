@@ -1,10 +1,10 @@
 const express = require('express')
-const user_routes = require('./routes/user_routes')
+const staff_routes = require('./routes/staff_routes')
 const jwt=require('jsonwebtoken')
 const { nextTick } = require('process')
 const app =express()
 app.use(express.json())
-app.use('',user_routes)
+app.use('',staff_routes)
 require('dotenv').config()
 
 app.use((req,res,next)=>{
@@ -12,13 +12,13 @@ app.use((req,res,next)=>{
 
     const result = jwt.verify(token,process.env.TOKEN_SECRET)
     console.log(result)
-    req.user=result
+    req.staff=result
     next()
 })
 
-app.get('/students',(req,res)=>{
-    if(req.user.role=='admin'){
-        res.send('students !')
+app.get('/staff',(req,res)=>{
+    if(req.staff.role=='admin'){
+        res.send('staff !')
     }
     else{
         res.status(403).send('Access Denied')
