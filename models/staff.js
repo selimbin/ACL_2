@@ -12,6 +12,9 @@ const courseSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
+    teachingSlot:{
+        type:Number
+    },
     department:departmentSchema,
     lecturer:[staffSchema],
     TA:[staffSchema]
