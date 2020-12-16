@@ -1,24 +1,5 @@
 const mongoose = require('mongoose')
 
-const courseSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        minlength:3,
-        required:true
-    },
-    code:{
-        type:String,
-        minlength:3,
-        required:true,
-        unique:true
-    },
-    teachingSlot:{
-        type:Number
-    },
-    department:departmentSchema,
-    lecturer:[staffSchema],
-    TA:[staffSchema]
-})
 const facultySchema = new mongoose.Schema({
     name:{
         type:String,
@@ -26,8 +7,6 @@ const facultySchema = new mongoose.Schema({
         required:true,
         unique:true
     },
-    departments:[departmentSchema],
-    dean:staffSchema
 })
 const departmentSchema = new mongoose.Schema({
     name:{
@@ -36,8 +15,7 @@ const departmentSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
-    head:staffSchema,
-    TA:[staffSchema]
+    faculty:[facultySchema],
 })
 const locationSchema = new mongoose.Schema({
     name:{
@@ -98,11 +76,29 @@ const staffSchema = new mongoose.Schema({
         type:Number
     },
     department:[departmentSchema],
-    course:[courseSchema]
 },
 {
     strict:false,
     timestamps:true
+})
+const courseSchema = new mongoose.Schema({
+    name:{
+        type:String,
+        minlength:3,
+        required:true
+    },
+    code:{
+        type:String,
+        minlength:3,
+        required:true,
+        unique:true
+    },
+    teachingSlot:{
+        type:Number
+    },
+    department:departmentSchema,
+    lecturer:[staffSchema],
+    TA:[staffSchema]
 })
 module.exports = mongoose.model('Staff', staffSchema)
 module.exports= mongoose.model('Department', departmentSchema)
