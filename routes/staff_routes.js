@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const { readdirSync } = require('fs');
 require('dotenv').config()
+
 router.route('/register')
 .post(async (req, res)=>{
     const salt = await bcrypt.genSalt(10)
