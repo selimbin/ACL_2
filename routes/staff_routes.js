@@ -1,6 +1,5 @@
 const express = require('express');
-const staff_model=require('../models/staff')
-// const product_model=require('../models/products')
+const staff_model= require('../models/staff')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');

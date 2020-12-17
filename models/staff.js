@@ -1,21 +1,14 @@
 const mongoose = require('mongoose')
 
-const facultySchema = new mongoose.Schema({
-    name:{
-        type:String,
-        minlength:3,
-        required:true,
-        unique:true
-    },
-})
-const departmentSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        minlength:3,
-        required:true,
-        unique:true
-    },
-    faculty:[facultySchema],
+const SigninSchema = new mongoose.Schema({
+    Signin:{
+        type:Number,
+        required:true
+    } ,
+       capacity:{
+        type:Number,
+        required:true
+    }
 })
 const locationSchema = new mongoose.Schema({
     name:{
@@ -36,6 +29,26 @@ const locationSchema = new mongoose.Schema({
         type:Number,
         required:true
     }
+})
+const AttendanceSchema = new mongoose.Schema({
+    Day:{
+        type:number,
+        unique:true
+    },
+    Attended:{
+        type:String,
+        minlength:3,
+        required:true,
+    }
+})
+const facultySchema = new mongoose.Schema({
+    name:{
+        type:String,
+        minlength:3,
+        required:true,
+        unique:true
+    },
+    departments:[departmentSchema],
 })
 const staffSchema = new mongoose.Schema({
     name:{
@@ -75,7 +88,20 @@ const staffSchema = new mongoose.Schema({
     accumelatedHours:{
         type:Number
     },
-    department:[departmentSchema],
+    locationname:{
+        type:String,
+        minlength:2,
+        required:true,
+        unique:true
+    },
+    departmentname:{
+        type:String,
+        minlength:2,
+        required:true,
+        unique:true
+    },
+    Signin:[SigninSchema],
+    Attendance:[AttendanceSchema],
 },
 {
     strict:false,
