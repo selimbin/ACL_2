@@ -1,5 +1,13 @@
 const express = require('express');
-const staff_model= require('../models/staff')
+const mongoose = require('mongoose')
+const staff_model=require('../models/staff')
+const faculty_model=require('../models/academics')
+const {departmentSchema} = require('../models/academics.js') 
+const {courseSchema} = require('../models/academics.js') 
+const department_model = mongoose.model('Department', departmentSchema)
+const course_model = mongoose.model('Course', courseSchema)
+const faculties = mongoose.model('Faculty');
+
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
@@ -20,6 +28,35 @@ router.route('/register')
     res.send(newStaff)
 })
 
+router.route('/createFaculty')
+.post(async (req, res)=>{
+    const newFaculty = new faculty_model({name: req.body.name
+    })
+    await newFaculty.save()
+    res.send(newFaculty)
+})
+router.route('/createDepartment')
+.post(async (req, res)=>{
+    const newDepartment = new department_model({name: req.body.name
+    })
+    await newDepartment.save()
+    const faculty = await faculties.findOne({name:req.body.faculty})
+    faculty.departments.push(newDepartment)
+
+    await faculty.save()
+    res.send(newDepartment)
+})
+router.route('/addCourse')
+.post(async (req, res)=>{
+    const newCourse = new course_model({name: req.body.name
+    })
+    await newCourse.save()
+    const department = await department_model.findOne({name:req.body.department})
+    department.courses.push(newCourse)
+
+    await department.save()
+    res.send(newCourse)
+})
 router.route('/login')
 .post(async (req,res)=>{
     const result = await staff_model.findOne({email:req.body.email})
