@@ -2,11 +2,15 @@ const express = require('express');
 const mongoose = require('mongoose')
 const staff_model=require('../models/staff')
 const faculty_model=require('../models/academics')
+// Department Schema and model ----------------------------------------
 const {departmentSchema} = require('../models/academics.js') 
-const {courseSchema} = require('../models/academics.js') 
 const department_model = mongoose.model('Department', departmentSchema)
+// Course Schema and model ----------------------------------------
+const {courseSchema} = require('../models/academics.js') 
 const course_model = mongoose.model('Course', courseSchema)
-const faculties = mongoose.model('Faculty');
+// Faculty Schema and model ----------------------------------------
+const {facultySchema} = require('../models/academics.js') 
+const Faculty_model = mongoose.model('Faculty', facultySchema)
 
 const router = express.Router()
 const bcrypt = require('bcrypt')
@@ -40,7 +44,7 @@ router.route('/createDepartment')
     const newDepartment = new department_model({name: req.body.name
     })
     await newDepartment.save()
-    const faculty = await faculties.findOne({name:req.body.faculty})
+    const faculty = await Faculty_model.findOne({name:req.body.faculty})
     faculty.departments.push(newDepartment)
 
     await faculty.save()
