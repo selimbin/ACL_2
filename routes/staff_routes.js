@@ -78,7 +78,7 @@ router.route('/login')
     }
     const correctPassword= await bcrypt.compare(req.body.password, result.password)
     if(correctPassword){
-        const token=jwt.sign({_id:result._id, role:result.role}, 
+        const token=jwt.sign({id:result.id, role:result.role}, 
             process.env.TOKEN_SECRET)
         res.header('token',token).send(token)
     }
@@ -93,7 +93,8 @@ router.route('/logout')
 })
 router.route('/viewProfile')
 .get(async(req,res)=>{
-    const result= await staff_model.find()
+    // res.send(req.user)
+    const result= await staff_model.findOne({id:req.user.id})
     // res.send({ "id": result.id,"name":result.name,"role":result.role,"email":result.email,"salary":result.salary})
     res.send(result)
 })

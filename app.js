@@ -19,7 +19,8 @@ app.use((req, res, next)=>{
     }
     try{
         const verified= jwt.verify(token, process.env.TOKEN_SECRET)
-        req.staff= verified
+        // res.send(verified)
+        req.user= verified
         next()
     }
     catch(err){
@@ -36,5 +37,5 @@ app.use((req, res, next)=>{
 //     }
     
 // })
-app.use('' ,staff_routes)
+app.use('/staff' ,staff_routes)
 module.exports.app = app
