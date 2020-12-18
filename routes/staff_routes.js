@@ -283,18 +283,23 @@ router.route('/addCourse')
 
 router.route('/login')
 .post(async (req,res)=>{
-    const result = await staff_model.findOne({email:req.body.email})
-    if(!result){
-        return res.send('You need to sign up first')
-    }
-    const correctPassword= await bcrypt.compare(req.body.password, result.password)
-    if(correctPassword){
-        const token=jwt.sign({_id:result._id, role:result.role}, 
-            process.env.TOKEN_SECRET)
-        res.header('token',token).send(token)
-    }
-    else{
-        res.send('Incorrect Password')
+    try {
+        const result = await staff_model.findOne({email:req.body.email})
+        if(!result){
+            return res.send('You need to sign up first')
+        }
+        const correctPassword= await bcrypt.compare(req.body.password, result.password)
+        if(correctPassword){
+            const token=jwt.sign({_id:result._id, role:result.role}, 
+                process.env.TOKEN_SECRET)
+            res.header('token',token).send(token)
+        }
+        else{
+            res.send('Incorrect Password')
+        }
+    }     
+    catch (error) {
+        res.status(500).json({error:error.message});
     }
 })
 router.route('/logout')
