@@ -1,35 +1,39 @@
 const mongoose = require('mongoose')
+const {departmentSchema} = require('../models/academics.js') 
+const {courseSchema} = require('../models/academics.js') 
 
-
-// const locationSchema = new mongoose.Schema({
-//     name:{
-//         type:String,
-//         minlength:2,
-//         required:true,
-//         unique:true
-//     },
-//     building:{
-//         type:String,
-//         required:true
-//     },
-//     type:{
-//         type:String,
-//         required:true
-//     },
-//     capacity:{
-//         type:Number,
-//         required:true
-//     }
-// })
+const locationSchema = new mongoose.Schema({
+    name:{
+        type:String,
+        minlength:2,
+        required:true,
+        unique:true
+    },
+    building:{
+        type:String,
+        required:true
+    },
+    type:{
+        type:String,
+        required:true
+    },
+    capacity:{
+        type:Number,
+        required:true
+    }
+})
+module.exports = mongoose.model('Location',locationSchema)
+module.exports.locationSchema=locationSchema  
 const staffSchema = new mongoose.Schema({
     name:{
         type:String,
         minlength:3,
-        required:true
+        required:true,
+        auto:true
 
     },
     id:{
-        type:Number,
+        type:String,
         required:true,
         unique:true
     },
@@ -58,9 +62,18 @@ const staffSchema = new mongoose.Schema({
     },
     accumelatedHours:{
         type:Number
+    },
+    department:{
+        type:[departmentSchema]
+    },
+    course:{
+        type:[courseSchema]
+    },
+    officeLocation:{
+        type:String,
+        // required:true,
+        minlength:4
     }
-    // department:[departmentSchema],
-    // course:[courseSchema]
 },
 {
     strict:false,

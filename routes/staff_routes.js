@@ -23,7 +23,8 @@ router.route('/register')
         email: req.body.email,
         password: newPassword,
         role: req.body.role,
-        id: req.body.id
+        id: req.body.id,
+        salary:req.body.salary
     })
     await newStaff.save()
     res.send(newStaff)
@@ -36,6 +37,17 @@ router.route('/createFaculty')
     await newFaculty.save()
     res.send(newFaculty)
 })
+// router.route('/createStaff')
+// .post(async (req, res)=>{
+//     const newStaff = new staff_model({name: req.body.name,
+//         id:req.body.id,
+//         email:req.body.email,
+//         role:req.body.role,
+//         salary:req.body.salary
+//     })
+//     await newStaff.save()
+//     res.send(newStaff)
+// })
 router.route('/createDepartment')
 .post(async (req, res)=>{
     const newDepartment = new department_model({name: req.body.name
@@ -76,12 +88,14 @@ router.route('/login')
 })
 router.route('/logout')
 .post(async(req,res)=>{
-    const token=null
+    const token = null
+    res.header('token',token).send(token)
 })
-
-router.route('/view')
-.post(async (req,res)=>{
-
+router.route('/viewProfile')
+.get(async(req,res)=>{
+    const result= await staff_model.find()
+    // res.send({ "id": result.id,"name":result.name,"role":result.role,"email":result.email,"salary":result.salary})
+    res.send(result)
 })
 
 
