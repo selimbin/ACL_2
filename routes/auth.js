@@ -37,7 +37,7 @@ router.route('/login')
     if(!correctpassword){
         return res.status(400).send('Invalid Password')
     }
-    const token= jwt.sign({_id: user._id,
+    const token= jwt.sign({_id: staff._id,
     role: staff.role}, process.env.TOKEN_SECRET)
     res.header('auth-token', token).send(token)
 })
