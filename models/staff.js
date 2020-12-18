@@ -1,26 +1,29 @@
 const mongoose = require('mongoose')
 
 
-// const locationSchema = new mongoose.Schema({
-//     name:{
-//         type:String,
-//         minlength:2,
-//         required:true,
-//         unique:true
-//     },
-//     building:{
-//         type:String,
-//         required:true
-//     },
-//     type:{
-//         type:String,
-//         required:true
-//     },
-//     capacity:{
-//         type:Number,
-//         required:true
-//     }
-// })
+const locationSchema = new mongoose.Schema({
+    id:{
+        type:String,
+        minlength:2,
+        required:true,
+        unique:true
+    },
+    building:{
+        type:String,
+        required:true
+    },
+    type:{
+        type:String,
+        required:true
+    },
+    capacity:{
+        type:Number,
+        required:true
+    }
+})
+module.exports.Location = locationSchema
+module.exports = mongoose.model('Location', locationSchema)
+
 const staffSchema = new mongoose.Schema({
     name:{
         type:String,
