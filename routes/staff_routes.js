@@ -41,8 +41,7 @@ router.route('/AddLocation')
 .post(async (req, res)=>{
     const {ID,Building,Type,Capacity}=req.body;
     try {
-        const token = req.header('token');
-        if (token.role == "HR") {
+        if (req.user.role == "HR") {
             if(!ID){
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
@@ -75,8 +74,7 @@ router.route('/UpdateLocation')
 .post(async (req, res)=>{
     const {ID,newID,Building,Type,Capacity}=req.body;
     try {
-        const token = req.header('token');
-        if (token.role == "HR") {
+        if (req.user.role  == "HR") {
             if(!ID){
                 return res.status(400).json({msg:"Please enter a valid Location id"});
             }
@@ -114,8 +112,7 @@ router.route('/DeleteLocation')
 .post(async (req, res)=>{
     const {ID}=req.body;
     try {
-        const token = req.header('token');
-        if (token.role == "HR") {
+        if (req.user.role  == "HR") {
             if(!ID){
                 return res.status(400).json({msg:"Please enter a valid Location id"});
             }
@@ -138,8 +135,7 @@ router.route('/AddFaculty')
 .post(async (req, res)=>{
     const {Name}=req.body;
     try {
-        const token = req.header('token');
-        if (token.role == "HR") {
+        if (req.user.role  == "HR") {
             if(!Name){
                 return res.status(400).json({msg:"Please enter a valid Faculty name"});
             }
@@ -163,8 +159,7 @@ router.route('/UpdateFaculty')
 .post(async (req, res)=>{
     const {Name,newName}=req.body;
     try {
-        const token = req.header('token');
-        if (token.role == "HR") {
+        if (req.user.role  == "HR") {
             if(!Name){
                 return res.status(400).json({msg:"Please enter a valid Faculty name"});
             }
@@ -192,8 +187,7 @@ router.route('/DeleteFaculty')
 .post(async (req, res)=>{
     const {Name}=req.body;
     try {
-        const token = req.header('token');
-        if (token.role == "HR") {
+        if (req.user.role  == "HR") {
             if(!Name){
                 return res.status(400).json({msg:"Please enter a valid Faculty name"});
             }
@@ -216,8 +210,7 @@ router.route('/AddDepartment')
 .post(async (req, res)=>{
     const {facultyName,DepartmentName}=req.body;
     try {
-        const token = req.header('token');
-        if (token.role == "HR") {
+        if (req.user.role  == "HR") {
             if(!facultyName||!DepartmentName){
                 return res.status(400).json({msg:"Please enter a valid Faculty and department names"});
             }
