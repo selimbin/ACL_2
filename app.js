@@ -19,7 +19,6 @@ app.use((req, res, next)=>{
     }
     try{
         const verified= jwt.verify(token, process.env.TOKEN_SECRET)
-        // res.send(verified)
         req.user= verified
         next()
     }
