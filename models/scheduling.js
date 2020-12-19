@@ -10,12 +10,18 @@ const attendanceSchema = new mongoose.Schema({
         minlength:3,
         required:true
     },
-    signIn:{
-        type:Timestamp,
+    date:{
+        type:String,
         required:true
     },
+    day:{
+        type:String
+    },
+    signIn:{
+        type:[Date]
+    },
     signOut:{
-        type:Timestamp
+        type:[Date]
     }
 })
 module.exports.attendanceSchema = attendanceSchema
@@ -28,13 +34,13 @@ const slotSchema = new mongoose.Schema({
         required:true
     },
     course:{
-        type:courseSchema
+        type:[courseSchema]
     },
     location:{
-        type:locationSchema
+        type:[locationSchema]
     },
     staff:{
-        type:staffSchema
+        type:[staffSchema]
     }
 })
 module.exports.slotSchema = slotSchema
