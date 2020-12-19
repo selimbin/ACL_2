@@ -3,7 +3,7 @@ const {departmentSchema} = require('../models/academics.js')
 const {courseSchema} = require('../models/academics.js') 
 
 const locationSchema = new mongoose.Schema({
-    name:{
+    code:{
         type:String,
         minlength:2,
         required:true,
@@ -64,14 +64,14 @@ const staffSchema = new mongoose.Schema({
         type:Number
     },
     department:{
-        type:[departmentSchema]
+        type:String
     },
     course:{
         type:[courseSchema]
     },
     officeLocation:{
         type:String,
-        // required:true,
+        required:true,
         minlength:4
     }
 },
