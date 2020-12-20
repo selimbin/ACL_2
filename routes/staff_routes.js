@@ -7,6 +7,9 @@ const {courseSchema} = require('../models/academics.js')
 const department_model = mongoose.model('Department', departmentSchema)
 const course_model = mongoose.model('Course', courseSchema)
 const faculties = mongoose.model('Faculty');
+const schedule_model = mongoose.model('Schedule', scheduleSchema)
+const IRS_model=mongoose.model('IRS',internalreqestsschema)
+
 
 // const course_model=require('../models/course')
 // const product_model=require('../models/products')
@@ -19,6 +22,8 @@ const {attendanceSchema} = require('../models/scheduling.js');
 const attendance_model = mongoose.model('Attendance',attendanceSchema)
 const { timeStamp } = require('console');
 const { stringify } = require('querystring');
+const scheduling = require('../models/scheduling.js');
+const { Router } = require('express');
 require('dotenv').config()
 // router.route('/register')
 // .post(async (req, res)=>{
@@ -162,5 +167,58 @@ router.route('/resetPassword')
     }
 
 })
-
+router.route('/viewschedule')
+.get(async(req,res)=>{
+    const user= await staff_model.findById(req.user._id)
+    const Schedule= await schedule_model.findOne({"Schedule":user.id})
+    res.send(Schedule)
+})
+/*router.route('/viewReplaceReq')
+.get(async(req,res)=>{
+    const Schedule= await scheduleSchema.findById(req.user._id)
+    res.send(Schedule)
+})*/
+Router.ROUTE('/changeDayOff')
+.post(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const hod = await staff_model.findOne(req.body._id)
+    const newreqest = await new IRS_model({type:req.body,requester:user,reciever:hod,status:"Pending"})
+    res.send(newreqest)
+})//all other send reqests of diffrent types such as leaves are copy paste from this with if conditionals if needed and a new dbs
+router.route('/Notification')
+.get(async(req,res)=>{
+    const reqests = await IRS_model.findOne(req.body._id)
+    if(reqests.Status!="pending"){
+        res.send("requests that have been approved or denied",reqests)
+    }
+})
+router.route('/viewAcceptedRequests')
+.get(async(req,res)=>{
+    const reqests = await IRS_model.findById(req.body._id)
+    if(reqests.Status=="Accepted"){
+        res.send("requests that have been approved",reqests)
+    }
+})
+router.route('/viewPendingRequests')
+.get(async(req,res)=>{
+    const reqests = await IRS_model.findById(req.body._id)
+    if(reqests.Status=="Pending"){
+        res.send("requests that have been pending",reqests)
+    }
+})
+router.route('/viewRejectedRequests')
+.get(async(req,res)=>{
+    const reqests = await IRS_model.findById(req.body._id)
+    if(reqests.Status=="Rejected"){
+        res.send("requests that have been denied",reqests)
+    }
+})
+router.route('/cancelRequests')
+.post(async(req,res)=>{
+    const reqests = await IRS_model.findById(req.body._id)
+    if(reqests.Status=="Pending"||requests.Date!=Date.now){
+        const cancelRequests = reqests.deleteOne(reqests)
+        res.send("request cancled")
+    }
+})
 module.exports=router;
