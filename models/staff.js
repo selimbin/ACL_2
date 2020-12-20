@@ -80,8 +80,15 @@ const staffSchema = new mongoose.Schema({
     accumelatedHours:{
         type:Number
     },
+    missedHours:{
+        type:String
+    },
+    misseddays:{
+        type:String
+    },
     department:{
-        type:[departmentSchema]
+        type:String,
+        minlength:3,
     },
     course:{
         type:[courseSchema]

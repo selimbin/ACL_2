@@ -283,25 +283,20 @@ router.route('/UpdateDepartment')
             }
             if(!newFacultyname){
                 UpdateFaculty = FacultyName;
-                UpdatedDepartment = await department_model.findByIdAndUpdate(existingdepartment1._id,{facultyname:UpdateFaculty,name:newDepartmentName})
-                await UpdatedDepartment.save()
-                res.send(UpdatedDepartment)
             }
-            else{
-                const prevfaculty = await Faculty_model.findOne({name:FacultyName})
-                await prevfaculty.departments.pull(existingdepartment1);
-                await prevfaculty.save()
+            const prevfaculty = await Faculty_model.findOne({name:FacultyName})
+            await prevfaculty.departments.pull(existingdepartment1);
+            await prevfaculty.save()
 
-                const newfaculty = await Faculty_model.findOne({name:UpdateFaculty})
-                UpdatedDepartment = await department_model.findByIdAndUpdate(existingdepartment1._id,{facultyname:UpdateFaculty,name:newDepartmentName},{new:true})
-                await UpdatedDepartment.save()
-                if(!newfaculty){
-                    return res.status(400).json({msg:"The entered Faculty doesn't exist"});
-                }
-                await newfaculty.departments.push(UpdatedDepartment)
-                await newfaculty.save()
-                res.send(UpdatedDepartment)
+            const newfaculty = await Faculty_model.findOne({name:UpdateFaculty})
+            UpdatedDepartment = await department_model.findByIdAndUpdate(existingdepartment1._id,{facultyname:UpdateFaculty,name:newDepartmentName},{new:true})
+            await UpdatedDepartment.save()
+            if(!newfaculty){
+                return res.status(400).json({msg:"The entered Faculty doesn't exist"});
             }
+            await newfaculty.departments.push(UpdatedDepartment)
+            await newfaculty.save()
+            res.send(UpdatedDepartment)
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -410,7 +405,6 @@ router.route('/UpdateCourse')
             if(existingcourse1.departmentname != Departmentname){
                 return res.status(400).json({msg:"please enter a vlaid department for this course"});
             }
-            let change = "true";
             let UpdateCode = newCode, UpdateCoverage = Coverage, UpdateCoordinator = Coordinator, UpdateDepartment = newDepartmentname;
             if(!newCode){
                 UpdateCode = Code;
@@ -423,21 +417,13 @@ router.route('/UpdateCourse')
             }
             if(!UpdateDepartment){
                 UpdateDepartment = Departmentname;
-                change = "false";
             }
-            if(change == "false"){
-                UpdatedCourse = await course_model.findByIdAndUpdate(existingcourse1._id,{code:UpdateCode,departmentname:UpdateDepartment,
-                    coverage:UpdateCoverage,courseCoordinator:UpdateCoordinator},{new:true})
-                await UpdatedCourse.save()
-            }
-            else{
-                UpdatedCourse = await course_model.findByIdAndUpdate(existingcourse1._id,{code:UpdateCode,departmentname:UpdateDepartment,
-                    coverage:UpdateCoverage,courseCoordinator:UpdateCoordinator},{new:true})
-                await UpdatedCourse.save()
-                await existingdepartment1.courses.pull(existingcourse1)
-                const existingdepartment2 = await department_model.findOne({name:UpdateDepartment});
-                await existingdepartment2.courses.push(UpdatedCourse)
-            }
+            const UpdatedCourse = await course_model.findByIdAndUpdate(existingcourse1._id,{code:UpdateCode,departmentname:UpdateDepartment,
+                coverage:UpdateCoverage,courseCoordinator:UpdateCoordinator},{new:true})
+            await UpdatedCourse.save()
+            await existingdepartment1.courses.pull(existingcourse1)
+            const existingdepartment2 = await department_model.findOne({name:UpdateDepartment});
+            await existingdepartment2.courses.push(UpdatedCourse)
             const newCourse = await course_model.findOne({code:UpdateCode});
             if(Lecturer){
                 const existinglecturer = await Staff_model.findOne({id:Lecturer})
@@ -498,7 +484,7 @@ router.route('/DeleteCourse')
 // Add a staff member ----------------------------------------------
 router.route('/AddStaff')
 .post(async (req,res)=>{
-    const {name,email,salary,officelocation,role,dayoff}=req.body;
+    const {name,email,salary,officelocation,role,dayoff,department}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(role == "HR"){
@@ -542,7 +528,8 @@ router.route('/AddStaff')
                 const UpdatedStaffcount = await Staffcount_model.findByIdAndUpdate(newStaffcount._id,{Academic:Updatedcount},{new:true});
                 await UpdatedStaffcount.save();
             }
-            const newStaff = new Staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayoff,officeLocation:officelocation})
+            const newStaff = new Staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayoff,officeLocation:officelocation,department:department,
+            misseddays:"0",missedHours:"0"});
             await newStaff.save();
             const newCapacity = existinglocation.capacity - 1;
             const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation._id,{capacity:newCapacity},{new:true});
@@ -557,10 +544,223 @@ router.route('/AddStaff')
     }
 })
 //--------------------------------------------------------------------
+// Update a staff member ---------------------------------------------
+router.route('/Updatetaff')
+.post(async (req,res)=>{
+    const {id,name,email,officelocation,role,dayoff,department}=req.body;
+    try {
+        if (req.user.role  == "HR") {
+            let Updatename = name,Updateemail = email,Updaterole = role,Updatelocation = officelocation,Updatedayoff = dayoff,Updatedepartment = department;
+            const existingstaff = await Staff_model.findOne({id:id})
+            if(!existingstaff){
+                return res.status(400).json({msg:"Please enter a valid id"});
+            }
+            if(dayoff){
+                if(dayoff != "Saturday" && (existingstaff.role == "HR" || role == "HR")){
+                    return res.status(400).json({msg:"HR dayoff can only be saturday!"});
+                }
+                else if(dayoff != "Saturday" && dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thuresday"){
+                    return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
+                }
+            }
+            else{
+                Updatedayoff = existingstaff.dayOff;
+            }
+            if(officelocation){
+                const existinglocation1 = await Location_model.findOne({Code:existingstaff.officeLocation})
+                const Updatedcapacity1 = existinglocation1.capacity + 1;
+                const Updatedlocation1 = await Location_model.findByIdAndUpdate(existinglocation1._id,{capacity:Updatedcapacity1});
+                Updatedlocation1.save();
+                const existinglocation2 = await Location_model.findOne({code:officelocation})
+                if(!existinglocation2){
+                    return res.status(400).json({msg:"Please enter a valid location"});
+                }
+                if(existinglocation2.capacity == 0){
+                    return res.status(400).json({msg:"This office is full, please assign a different one"});
+                }
+                if(existinglocation2.type != "office"){
+                    return res.status(400).json({msg:"The assigned location must be an office"});
+                }
+                const Updatedcapacity2 = existinglocation2.capacity - 1;
+                const Updatedlocation2 = await Location_model.findByIdAndUpdate(existinglocation._id,{capacity:Updatedcapacity2});
+                Updatedlocation2.save();
+            }
+            else{
+                Updatelocation = existingstaff.officeLocation;
+            }
+            if(email){
+                const existingstaff = await Staff_model.findOne({email:email})
+                if(existingstaff){
+                    return res.status(400).json({msg:"This email is already taken"});
+                }
+                var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                if(!email.match(mailformat)){
+                    return res.status(400).json({msg:"This email is invalid"});
+                }
+            }
+            else{
+                Updateemail = email;
+            }
+            if(!name){
+                Updatename = existingstaff.name;
+            }
+            if(!role){
+                Updaterole = existingstaff.role;
+            }
+            if(!department){
+                Updatedepartment = existingstaff.department;
+            }
+            const UpdatedStaff = await Staff_model.findByIdAndUpdate(existingstaff._id,{name:Updatename,email:Updateemail,role:Updaterole,
+            department:Updatedepartment,officelocation:Updatelocation,dayOff:Updatedayoff},{new:true});
+            await UpdatedStaff.save();
+            res.send(UpdatedStaff);
+        
+        } else {
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }     
+    catch (error) {
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
+// Delete a staff member ---------------------------------------------
+router.route('/Deletetaff')
+.post(async (req,res)=>{
+    const {id}=req.body;
+    try {
+        if (req.user.role  == "HR") {
+            const existingstaff = await Staff_model.findOne({id:id});
+            const existinglocation = await Location_model.findOne({Code:existingstaff.officeLocation})
+            const Updatedcapacity = existinglocation.capacity + 1;
+            const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation._id,{capacity:Updatedcapacity});
+            Updatedlocation.save();
+            const newStaffcount = await Staffcount_model.findOne({id:"1"});
+            if(existingstaff.role != "HR"){
+                const Updatedcount = newStaffcount.Academic - 1;
+                const UpdatedStaffcount = await Staffcount_model.findByIdAndUpdate(newStaffcount._id,{Academic:Updatedcount},{new:true});
+                await UpdatedStaffcount.save();
+            }
+            else{
+                const Updatedcount = newStaffcount.HR - 1;
+                const UpdatedStaffcount = await Staffcount_model.findByIdAndUpdate(newStaffcount._id,{HR:Updatedcount},{new:true});
+                await UpdatedStaffcount.save();
+            }
+            if(!existingstaff){
+                return res.status(400).json({msg:"Please enter a valid id"});
+            }
+            for(var i = 0; i < existingstaff.course.length;i++){
+                var currentcourse = existingstaff.course[i];
+                var existingcourse = await course_model.findById(currentcourse._id);
+                await existingcourse.Lecturer.pull(existingstaff);
+                await existingcourse.TA.pull(existingstaff);
+            }
+            const deletedstaff = await Staff_model.findByIdAndDelete(existingstaff._id);
+            res.send(deletedstaff);
+        } else {
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }     
+    catch (error) {
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
+// Update Salary -----------------------------------------------------
+router.route('/UpdateSalary')
+.post(async (req,res)=>{
+    const {id,newSalary}=req.body;
+    try {
+        if (req.user.role  == "HR") {
+            const existingstaff = await Staff_model.findOne({id:id});
+            if(!existingstaff){
+                return res.status(400).json({msg:"Please enter a valid id"});
+            }
+            if(!newSalary){
+                return res.status(400).json({msg:"Please enter a valid salary"});
+            }
+            const Updatedstaff = await Staff_model.findByIdAndUpdate(existingstaff._id,{salary:newSalary},{new:true});
+            await Updatedstaff.save();
+            res.send(Updatedstaff);
+        } else {
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }     
+    catch (error) {
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
+// Add Sign in/out record --------------------------------------------
+router.route('/AddSigninAndOut')
+.post(async (req,res)=>{
+    const {id}=req.body;
+    try {
+        if (req.user.role  == "HR") {
+            const existingstaff = await Staff_model.findOne({id:id});
+            if(!existingstaff){
+                return res.status(400).json({msg:"Please enter a valid id"});
+            }
+            if(existingstaff._id == req.header._id){
+                return res.status(400).json({msg:"Can't add sign in/out for yourself!"});
+            }
+        } else {
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }     
+    catch (error) {
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
+// view staff attendance ---------------------------------------------
+router.route('/ViewAttendance')
+.post(async (req,res)=>{
+    const {id}=req.body;
+    try {
+        if (req.user.role  == "HR") {
+            const existingstaff = await Staff_model.findOne({id:id});
+            if(!existingstaff){
+                return res.status(400).json({msg:"Please enter a valid id"});
+            }
+            res.send(existingstaff.Attendance);
+        } else {
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }     
+    catch (error) {
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
+// View staff with missed days or hours ------------------------------
+router.route('/Viewmissed')
+.post(async (req,res)=>{
+    try {
+        if (req.user.role  == "HR") {
+            const existingstaff1 = await Staff_model.find({missedHours:"1"});
+            const existingstaff2 = await Staff_model.find({misseddays:"1"});
+            if(!existingstaff1){
+                res.send(existingstaff2)
+            }
+            if(!existingstaff2){
+                res.send(existingstaff1)
+            }
+            const existingstaff3 = existingstaff1 + existingstaff2;
+            res.send(existingstaff3)
+        } else {
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }     
+    catch (error) {
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
 router.route('/login')
 .post(async (req,res)=>{
     try {
-        const result = await staff_model.findOne({email:req.body.email})
+        const result = await Staff_model.findOne({email:req.body.email})
         if(!result){
             return res.send('You need to sign up first')
         }
