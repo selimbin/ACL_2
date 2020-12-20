@@ -8,33 +8,25 @@ app.use('',staff_routes)
 require('dotenv').config()
 
 const AuthenticationRoutes= require('./routes/auth')
-const verify= require('./routes/tokenverification')
 app.use('', AuthenticationRoutes)
 
 app.use((req, res, next)=>{
-    const token= req.headers.token
-    if(!token)  
-    {
-        return res.status(401).status('Access deined')
-    }
     try{
+        const token= req.headers.token
+        if(!token)  
+        {
+            res.status(401).status('Access deined')
+        }
         const verified= jwt.verify(token, process.env.TOKEN_SECRET)
+        if(!verified){
+            return res.status(401).json({msg:"unauthorized"});
+        }
         req.user= verified
         next()
     }
     catch(err){
-        res.status(400).send('Invalid Request')
+        res.status(500).json({error:error.message});
     }
 })
-
-// app.get('/staff',(req,res)=>{
-//     if(req.staff.role=='admin'){
-//         res.send('staff !')
-//     }
-//     else{
-//         res.status(403).send('Access Denied')
-//     }
-    
-// })
 app.use('/staff' ,staff_routes)
 module.exports.app = app

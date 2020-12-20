@@ -2,9 +2,26 @@ const mongoose = require('mongoose')
 const {departmentSchema} = require('../models/academics.js') 
 const {courseSchema} = require('../models/academics.js') 
 
+const staffcountSchema = new mongoose.Schema({
+    id:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    HR:{
+        type:Number,
+        required:true
+    },
+    Academic:{
+        type:Number,
+        required:true
+    }
+})
+module.exports.Staffcount = staffcountSchema
+module.exports = mongoose.model('Staffcount', staffcountSchema)
 
 const locationSchema = new mongoose.Schema({
-    id:{
+    code:{
         type:String,
         minlength:2,
         required:true,
@@ -27,24 +44,22 @@ module.exports.Location = locationSchema
 module.exports = mongoose.model('Location', locationSchema)
 
 const staffSchema = new mongoose.Schema({
-    name:{
+    id:{
         type:String,
         minlength:3,
         required:true,
         auto:true
 
     },
-    id:{
+    name:{
         type:String,
         required:true,
-        unique:true
     },
     email:{
         type:String,
         required:true,
         unique:true
     },
-
     password:{
         type:String,
         required:true
@@ -73,7 +88,7 @@ const staffSchema = new mongoose.Schema({
     },
     officeLocation:{
         type:String,
-        // required:true,
+        required:true,
         minlength:4
     }
 },
