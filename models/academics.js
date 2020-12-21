@@ -26,7 +26,7 @@ const courseSchema = new mongoose.Schema({
         type:String
     }
 })
-module.exports.Course = courseSchema
+module.exports.courseSchema = courseSchema
 module.exports = mongoose.model('Course', courseSchema)
 
 const departmentSchema = new mongoose.Schema({

@@ -1,7 +1,6 @@
 const bcrypt= require('bcrypt')
 const jwt= require('jsonwebtoken')
 
-
 const express= require('express');
 const router= express.Router()
 const staff_model=require('../models/staff')
@@ -27,19 +26,20 @@ router.route('/register')
 })
 
 router.route('/login')
-.post(async (req, res)=>{
-    const staff= await staffSchema.findOne({email : req.body.email})
-    if(staff == null){
-        return res.send('You must sign up first')
+.post(async (req,res)=>{
+    const result = await staff_model.findOne({email:req.body.email})
+    if(!result){
+        return res.send('You need to sign up first')
     }
-    const correctpassword= await bcrypt.compare(req.body.password, staff.password)
-
-    if(!correctpassword){
-        return res.status(400).send('Invalid Password')
+    const correctPassword= await bcrypt.compare(req.body.password, result.password)
+    if(correctPassword){
+        const token=jwt.sign({_id:result._id, role:result.role}, 
+            process.env.TOKEN_SECRET)
+        res.header('token',token).send(token)
     }
-    const token= jwt.sign({_id: staff._id,
-    role: staff.role}, process.env.TOKEN_SECRET)
-    res.header('auth-token', token).send(token)
+    else{
+        res.send('Incorrect Password')
+    }
 })
 
 module.exports= router
