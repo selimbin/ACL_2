@@ -20,6 +20,12 @@ const Staff_model = mongoose.model('Staff', staffSchema)
 // Staffcount Schema and model --------------------------------------
 const {staffcountSchema} = require('../models/staff.js') 
 const Staffcount_model = mongoose.model('Staffcount', staffcountSchema)
+// scheduleAttendance Schema and model --------------------------------------
+const {scheduleAttendance} = require('../models/scheduling.js') 
+const scheduleAttendance_model = mongoose.model('ScheduleAttendance', scheduleAttendance)
+// attendanceSchema Schema and model --------------------------------------
+const {attendanceSchema} = require('../models/scheduling.js') 
+const attendance_model = mongoose.model('Attendance', attendanceSchema)
 
 const router = express.Router()
 const bcrypt = require('bcrypt')
@@ -32,20 +38,6 @@ const { timeStamp } = require('console');
 const { stringify } = require('querystring');
 require('dotenv').config()
 
-router.route('/register')
-.post(async (req, res)=>{
-    const salt = await bcrypt.genSalt(10)
-    const newPassword= await bcrypt.hash(req.body.password, salt)
-    const newStaff = new staff_model({name: req.body.name,
-        email: req.body.email,
-        password: newPassword,
-        role: req.body.role,
-        id: req.body.id,
-        salary:req.body.salary
-    })
-    await newStaff.save()
-    res.send(newStaff)
-})
 //------------------------------------------------------------------
 // Add a location --------------------------------------------------
 router.route('/AddLocation')
@@ -104,11 +96,31 @@ router.route('/UpdateLocation')
             if(!Type){
                 Updatetype = existinglocation1.type;
             }
+            else if(existinglocation1.type == "office" && Type != "office"){
+                if(existinglocation1 != 0){
+                    return res.status(400).json({msg:"The office needs to be empty before it can be changed!"});
+                }
+            }
             if(!Capacity){
                 Updatecapacity = existinglocation1.capacity;
             }
             if(!newCode){
                 UpdateCode = Code;
+            }
+            let stafflocation = await Staff_model.findOne({officeLocation:existinglocation1.code})
+            let updatedstaff;
+            while(stafflocation){
+                if(Updatecapacity == 0){
+                    updatedstaff = await Staff_model.findByIdAndUpdate(stafflocation._id,{officeLocation:""},{new:true});
+                    await updatedstaff.save();
+                    stafflocation = await Staff_model.findOne({officeLocation:existinglocation1.code});
+                }
+                else{
+                    Updatecapacity = Updatecapacity - 1;
+                    updatedstaff = await Staff_model.findByIdAndUpdate(stafflocation._id,{officeLocation:newCode},{new:true});
+                    await updatedstaff.save();
+                    stafflocation = await Staff_model.findOne({officeLocation:existinglocation1.code});
+                }
             }
             const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation1._id,
                 {code:UpdateCode,building:Updatebuilding,type:Updatetype,capacity:Updatecapacity},{new:true});
@@ -134,6 +146,13 @@ router.route('/DeleteLocation')
             const existinglocation = await Location_model.findOne({code:Code});
             if(!existinglocation){
                 return res.status(400).json({msg:"This Location doesn't exist"});
+            }
+            let stafflocation = await Staff_model.findOne({officeLocation:existinglocation.code})
+            let updatedstaff;
+            while(stafflocation){
+                updatedstaff = await Staff_model.findByIdAndUpdate(stafflocation._id,{officeLocation:""},{new:true});
+                await updatedstaff.save();
+                stafflocation = await Staff_model.findOne({officeLocation:existinglocation.code});
             }
             const deletedlocation = await Location_model.findByIdAndDelete(existinglocation._id);
             res.send(deletedlocation);
@@ -190,6 +209,13 @@ router.route('/UpdateFaculty')
             if(!newName){
                 UpdateName = existingfaculty1.name;
             }
+            let departmentfaculty = await department_model.findOne({facultyname:Name})
+            let updateddepartment;
+            while(departmentfaculty){
+                updateddepartment = await department_model.findByIdAndUpdate(departmentfaculty._id,{facultyname:newName},{new:true});
+                await updateddepartment.save();
+                departmentfaculty = await department_model.findOne({facultyname:Name})
+            }
             const Updatedfaculty = await Faculty_model.findByIdAndUpdate(existingfaculty1._id,{name:UpdateName},{new:true});
             await Updatedfaculty.save();
             res.send(Updatedfaculty);
@@ -228,7 +254,7 @@ router.route('/DeleteFaculty')
 // Add a department under a faculty ---------------------------------
 router.route('/AddDepartment')
 .post(async (req, res)=>{
-    const {FacultyName,DepartmentName}=req.body;
+    const {FacultyName,DepartmentName,Head}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(!FacultyName||!DepartmentName){
@@ -238,7 +264,13 @@ router.route('/AddDepartment')
             if(existingdepartment){
                 return res.status(400).json({msg:"This Department already exists"});
             }
-            const newDepartment = new department_model({facultyname:FacultyName,name:DepartmentName})
+            if(Head){
+                const existingstaff = await Staff_model.findOne({id:Head,department:DepartmentName})
+                if(!existingstaff){
+                    return res.status(400).json({msg:"Please assign a valid HOD"});
+                }
+            }
+            const newDepartment = new department_model({facultyname:FacultyName,name:DepartmentName,head:Head})
             await newDepartment.save()
             const existingfaculty = await Faculty_model.findOne({name:FacultyName})
             if(!existingfaculty){
@@ -258,7 +290,7 @@ router.route('/AddDepartment')
 // Update a department under a faculty ------------------------------
 router.route('/UpdateDepartment')
 .post(async (req, res)=>{
-    const {FacultyName,DepartmentName,newDepartmentName,newFacultyname}=req.body;
+    const {FacultyName,DepartmentName,newDepartmentName,newFacultyname,newHead}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(!DepartmentName || !FacultyName){
@@ -282,25 +314,41 @@ router.route('/UpdateDepartment')
             if(existingdepartment1.facultyname != FacultyName){
                 return res.status(400).json({msg:"please enter a vlaid faculty for this department"});
             }
-            let UpdateDepartment = newDepartmentName, UpdateFaculty = newFacultyname;
+            let UpdateDepartment = newDepartmentName, UpdateFaculty = newFacultyname,UpdateHead = newHead;
             if(!newDepartmentName){
                 UpdateDepartment = DepartmentName;
             }
             if(!newFacultyname){
                 UpdateFaculty = FacultyName;
             }
+            if(newHead){
+                const existingstaff = await Staff_model.findOne({id:newHead,department:newDepartmentName})
+                if(!existingstaff){
+                    return res.status(400).json({msg:"Please assign a valid HOD"});
+                }
+            }
+            else{
+                UpdateHead = existingdepartment1.head;
+            }
             const prevfaculty = await Faculty_model.findOne({name:FacultyName})
             await prevfaculty.departments.pull(existingdepartment1);
             await prevfaculty.save()
 
             const newfaculty = await Faculty_model.findOne({name:UpdateFaculty})
-            UpdatedDepartment = await department_model.findByIdAndUpdate(existingdepartment1._id,{facultyname:UpdateFaculty,name:newDepartmentName},{new:true})
+            const UpdatedDepartment = await department_model.findByIdAndUpdate(existingdepartment1._id,{facultyname:UpdateFaculty,name:UpdateDepartment,head:UpdateHead},{new:true})
             await UpdatedDepartment.save()
             if(!newfaculty){
                 return res.status(400).json({msg:"The entered Faculty doesn't exist"});
             }
             await newfaculty.departments.push(UpdatedDepartment)
             await newfaculty.save()
+            let coursedepartment = await course_model.findOne({departmentname:DepartmentName})
+            let updatedcourse;
+            while(coursedepartment){
+                updatedcourse = await course_model.findByIdAndUpdate(coursedepartment._id,{departmentname:newDepartmentName},{new:true});
+                await updatedcourse.save();
+                coursedepartment = await course_model.findOne({departmentname:DepartmentName})
+            }
             res.send(UpdatedDepartment)
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -330,6 +378,10 @@ router.route('/DeleteDepartment')
             if(existingdepartment.facultyname != FacultyName){
                 return res.status(400).json({msg:"This Department isn't in the choosen"});
             }
+            await course_model.deleteMany({departmentname:Name});
+            const existingstaff = await course_model.findOne({id:existingdepartment.head});
+            const updatedstaff = await course_model.findByIdAndUpdate(existingstaff._id,{role:""},{new:true});
+            await updatedstaff.save();
             const deleteddepartment = await department_model.findByIdAndDelete(existingdepartment._id);
             await existingfaculty.departments.pull(existingdepartment);
             await existingfaculty.save();
@@ -363,19 +415,21 @@ router.route('/AddCourse')
             }
             await existingdepartment.courses.push(newCourse)
             await existingdepartment.save()
-            if(Lecturer){
-                const existinglecturer = await Staff_model.findOne({id:Lecturer})
+            while(Lecturer){
+                const existinglecturer = await Staff_model.findOne({id:Lecturer.shift()})
                 if(!existinglecturer){
                     return res.status(400).json({msg:"This Staff doesn't exist"});
                 }
-                await newCourse.lecturer.push(existinglecturer)
+                await newCourse.lecturer.push(existinglecturer);
+                await existinglecturer.course.push(Code);
             }
-            if(TA){
-                const existingTA = await Staff_model.findOne({id:TA})
+            while(TA){
+                const existingTA = await Staff_model.findOne({id:TA.shift()})
                 if(!existingTA){
                     return res.status(400).json({msg:"This Staff doesn't exist"});
                 }
-                await newCourse.TA.push(existingTA)
+                await newCourse.TA.push(existingTA);
+                await existingTA.course.push(Code);
             }
             res.send(newCourse)
         } else {
@@ -497,6 +551,9 @@ router.route('/AddStaff')
                     return res.status(400).json({msg:"HR dayoff can only be saturday!"});
                 }
             }
+            if(!department){
+                return res.status(400).json({msg:"Please enter a valid department"});
+            }
             if(dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thuresday"){
                 return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
             }
@@ -533,8 +590,8 @@ router.route('/AddStaff')
                 const UpdatedStaffcount = await Staffcount_model.findByIdAndUpdate(newStaffcount._id,{Academic:Updatedcount},{new:true});
                 await UpdatedStaffcount.save();
             }
-            const newStaff = new Staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayoff,officeLocation:officelocation,department:department,
-            misseddays:"0",missedHours:"0"});
+            const newStaff = new Staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayoff,officeLocation:officelocation,
+            misseddays:0,missedHours:0,department:department});
             await newStaff.save();
             const newCapacity = existinglocation.capacity - 1;
             const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation._id,{capacity:newCapacity},{new:true});
@@ -570,6 +627,15 @@ router.route('/Updatetaff')
             }
             else{
                 Updatedayoff = existingstaff.dayOff;
+            }
+            if(department){
+                const existingdepartment = await department_model.findOne({name:department});
+                if(!existingdepartment){
+                    return res.status(400).json({msg:"This department doesn't exist"});
+                }
+            }
+            else{
+                Updatedepartment = existingstaff.department;
             }
             if(officelocation){
                 const existinglocation1 = await Location_model.findOne({Code:existingstaff.officeLocation})
@@ -612,11 +678,8 @@ router.route('/Updatetaff')
             if(!role){
                 Updaterole = existingstaff.role;
             }
-            if(!department){
-                Updatedepartment = existingstaff.department;
-            }
             const UpdatedStaff = await Staff_model.findByIdAndUpdate(existingstaff._id,{name:Updatename,email:Updateemail,role:Updaterole,
-            department:Updatedepartment,officelocation:Updatelocation,dayOff:Updatedayoff},{new:true});
+            officelocation:Updatelocation,dayOff:Updatedayoff,department:Updatedepartment},{new:true});
             await UpdatedStaff.save();
             res.send(UpdatedStaff);
         
@@ -674,17 +737,31 @@ router.route('/Deletetaff')
 // Update Salary -----------------------------------------------------
 router.route('/UpdateSalary')
 .post(async (req,res)=>{
-    const {id,newSalary}=req.body;
+    const {id,promotion}=req.body;
     try {
         if (req.user.role  == "HR") {
             const existingstaff = await Staff_model.findOne({id:id});
             if(!existingstaff){
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
-            if(!newSalary){
-                return res.status(400).json({msg:"Please enter a valid salary"});
+            let newsalary = existingstaff.salary,missedhours = existingstaff.missedHours - 3,misseddays = existingstaff.misseddays;
+            while(misseddays != 0){
+                newsalary = newsalary/60;
+                misseddays = misseddays -1;
             }
-            const Updatedstaff = await Staff_model.findByIdAndUpdate(existingstaff._id,{salary:newSalary},{new:true});
+            while(missedhours > 1){
+                newsalary = newsalary/180;
+                missedhours = missedhours - 1;
+            }
+            missedhours = (missedhours*100) * 60;
+            while(missedhours != 0){
+                newsalary = (newsalary/180) * 60;
+                missedhours = missedhours - 1;
+            }
+            if(promotion){
+                newsalary = newsalary + promotion
+            }
+            const Updatedstaff = await Staff_model.findByIdAndUpdate(existingstaff._id,{salary:newsalary},{new:true});
             await Updatedstaff.save();
             res.send(Updatedstaff);
         } else {
@@ -699,9 +776,21 @@ router.route('/UpdateSalary')
 // Add Sign in/out record --------------------------------------------
 router.route('/AddSigninAndOut')
 .post(async (req,res)=>{
-    const {id}=req.body;
+    const {id,Date,Timein,Timeout}=req.body;
     try {
         if (req.user.role  == "HR") {
+            if(!id){
+                return res.status(400).json({msg:"Please enter a valid id"});
+            }
+            if(!Date){
+                return res.status(400).json({msg:"Please enter a valid Date"});
+            }
+            if(!Timein){
+                return res.status(400).json({msg:"Please enter a valid Timein"});
+            }
+            if(!Timeout){
+                return res.status(400).json({msg:"Please enter a valid Timeout"});
+            }
             const existingstaff = await Staff_model.findOne({id:id});
             if(!existingstaff){
                 return res.status(400).json({msg:"Please enter a valid id"});
@@ -709,6 +798,21 @@ router.route('/AddSigninAndOut')
             if(existingstaff._id == req.header._id){
                 return res.status(400).json({msg:"Can't add sign in/out for yourself!"});
             }
+            const attendanceRecord = await attendance_model.findOne({date:Date});
+            if(!attendanceRecord){
+                return res.status(400).json({msg:"No record exists for such a date"});
+            }
+            let newTimein = Date + "T" + Timein + "Z";
+            let newTimeout = Date + "T" + Timeout + "Z";
+            newTimein = new Date('newTimein');
+            newTimeout = new Date('newTimeout');
+            const now = new Date();
+            if(newTimein > now || newTimeout > now){
+                return res.status(400).json({msg:"You cant access a date that is in the future!"});
+            }
+            await attendanceRecord.signIn.push(newTimein);
+            await attendanceRecord.signOut.push(newTimeout);
+            await attendanceReccord.save();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -728,7 +832,8 @@ router.route('/ViewAttendance')
             if(!existingstaff){
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
-            res.send(existingstaff.Attendance);
+            const staffAttendance = await scheduleAttendance_model.findOne({id:id});
+            res.send(staffAttendance.days);
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -743,16 +848,8 @@ router.route('/Viewmissed')
 .post(async (req,res)=>{
     try {
         if (req.user.role  == "HR") {
-            const existingstaff1 = await Staff_model.find({missedHours:"1"});
-            const existingstaff2 = await Staff_model.find({misseddays:"1"});
-            if(!existingstaff1){
-                res.send(existingstaff2)
-            }
-            if(!existingstaff2){
-                res.send(existingstaff1)
-            }
-            const existingstaff3 = existingstaff1 + existingstaff2;
-            res.send(existingstaff3)
+            const existingstaff = await Staff_model.find({missedHours:{$gte:1},misseddays:{$gte:1}});
+            res.send(existingstaff)
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
