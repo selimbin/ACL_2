@@ -28,8 +28,7 @@ const staffSchema = new mongoose.Schema({
     name:{
         type:String,
         minlength:3,
-        required:true,
-        auto:true
+        required:true
 
     },
     id:{
@@ -81,7 +80,3 @@ const staffSchema = new mongoose.Schema({
 })
 module.exports = mongoose.model('Staff', staffSchema)
 module.exports.staffSchema=staffSchema
-// module.exports= mongoose.model('Department', departmentSchema)
-// module.exports = mongoose.model('Faculty', facultySchema)
-// module.exports= mongoose.model('Course', courseSchema)
-// module.exports= mongoose.model('Location', locationSchema)
