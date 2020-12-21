@@ -820,7 +820,7 @@ router.route('/AddSigninAndOut')
             if(existingstaff._id == req.header._id){
                 return res.status(400).json({msg:"Can't add sign in/out for yourself!"});
             }
-            const attendanceRecord = await attendance_model.findOne({date:(Date.substring(5,7)+"/"+Date.substring(8,10)+"/"+Date.substring(0,4))});
+            const attendanceRecord = await attendance_model.findOne({date:Date});
             if(!attendanceRecord){
                 return res.status(400).json({msg:"No record exists for such a date"});
             }
@@ -832,9 +832,11 @@ router.route('/AddSigninAndOut')
             if(newTimein > now || newTimeout > now){
                 return res.status(400).json({msg:"You cant access a date that is in the future!"});
             }
-            await attendanceRecord.signIn.push(newTimein);
-            await attendanceRecord.signOut.push(newTimeout);
-            await attendance_model.findOneAndUpdate({date:(Date.substring(5,7)+"/"+Date.substring(8,10)+"/"+Date.substring(0,4))},attendanceRecord);
+            attendanceRecord.signIn.push(newTimein);
+            attendanceRecord.signOut.push(newTimeout);
+            attendanceRecord.day = newTimein.toUTCString().substring(0,3)
+            
+            await attendance_model.findOneAndUpdate({date:Date},attendanceRecord);
             res.send(attendanceRecord)
         } else {
             return res.status(401).json({msg:"unauthorized"});
