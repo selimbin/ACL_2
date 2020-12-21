@@ -57,8 +57,12 @@ router.route('/addCourse')
 
 router.route('/logout')
 .post(async(req,res)=>{
-    const token = null
-    res.header('token',token).send(token)
+    
+    const user=await staff_model.findById(req.user._id);
+    user.token = null
+    await staff_model.findOneAndUpdate({_id:req.user._id},user)
+    res.send("loged out")
+    
 })
 router.route('/viewProfile')
 .get(async(req,res)=>{

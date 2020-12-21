@@ -36,6 +36,11 @@ const departmentSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
+    facultyname:{
+        type:String,
+        minlength:3,
+        required:true
+    },
     head:{
         type:String,
         minlength:3

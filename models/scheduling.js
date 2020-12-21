@@ -34,13 +34,13 @@ const slotSchema = new mongoose.Schema({
         required:true
     },
     course:{
-        type:[courseSchema]
+        type:String
     },
     location:{
-        type:[locationSchema]
+        type:String
     },
     staff:{
-        type:[staffSchema]
+        type:[String]
     }
 })
 module.exports.slotSchema = slotSchema
@@ -50,7 +50,10 @@ const daySchema = new mongoose.Schema({
     id:{
         type:String,
         minlength:3,
-        required:true
+        auto:true
+    },
+    month:{
+        type:String
     },
     first:{
         type:Boolean
