@@ -30,12 +30,12 @@ module.exports.courseSchema = courseSchema
 module.exports = mongoose.model('Course', courseSchema)
 
 const departmentSchema = new mongoose.Schema({
-    facultyname:{
+    name:{
         type:String,
         minlength:3,
         required:true,
     },
-    name:{
+    facultyname:{
         type:String,
         minlength:3,
         required:true,
