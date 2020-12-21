@@ -835,6 +835,7 @@ router.route('/AddSigninAndOut')
             await attendanceRecord.signIn.push(newTimein);
             await attendanceRecord.signOut.push(newTimeout);
             await attendance_model.findOneAndUpdate({date:(Date.substring(5,7)+"/"+Date.substring(8,10)+"/"+Date.substring(0,4))},attendanceRecord);
+            res.send(attendanceRecord)
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
