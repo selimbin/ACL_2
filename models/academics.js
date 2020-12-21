@@ -3,10 +3,15 @@ const mongoose = require('mongoose')
 const {staffSchema} = require('../models/staff.js') 
 
 const courseSchema = new mongoose.Schema({
-    name:{
+    code:{
         type:String,
         minlength:3,
         required:true
+    },
+    departmentname:{
+        type:String,
+        minlength:3,
+        required:true,
     },
     coverage:{
         type:Number

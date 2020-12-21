@@ -6,11 +6,13 @@ const faculty_model=require('../models/academics')
 const {departmentSchema} = require('../models/academics.js') 
 const {courseSchema} = require('../models/academics.js') 
 const {internalRequestSchema} = require('../models/requests.js') 
+const {scheduleSchema} = require('../models/scheduling.js') 
 
 const department_model = mongoose.model('Department', departmentSchema)
 const course_model = mongoose.model('Course', courseSchema)
 const request_model = mongoose.model('IRS', internalRequestSchema)
 const faculties = mongoose.model('Faculty');
+const schedule_model=mongoose.model("Schedule",scheduleSchema)
 
 const router = express.Router()
 const bcrypt = require('bcrypt')
@@ -373,7 +375,13 @@ router.route('/viewCoverage')
     const user= await staff_model.findById(req.user._id)
     const department = await department_model.findOne({name:user.department})
     if(department.head==user.id){
-        
+        const coverage = await course_model.find({departmentname:user.department},'code coverage')
+        if(coverage==null){
+            res.send("No courses in your department")
+        }
+        else{
+            res.send(coverage)
+        }
     }
     else{
         res.send("You are not authorized to access this page")
@@ -384,7 +392,26 @@ router.route('/viewAssignments')
     const user= await staff_model.findById(req.user._id)
     const department = await department_model.findOne({name:user.department})
     if(department.head==user.id){
-        
+        const course = null
+
+        for(var i=0;i<i<department.courses.length;i++){
+            if(department.courses[i].code==req.body.course){
+                course=department.courses[i]
+            }
+        }
+
+        if(course==null){
+            res.send("There is no corresponding course")
+        }
+        else{
+            const schedule = await schedule_model.findOne({id:course.code})
+            if(schedule==null){
+                res.send("Course does not yet have a schedule")
+            }
+            else{
+                res.send(schedule)
+            }
+        }
     }
     else{
         res.send("You are not authorized to access this page")
