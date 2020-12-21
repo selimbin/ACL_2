@@ -418,7 +418,7 @@ router.route('/DeleteDepartment')
 // Add a Course under a department ---------------------------------
 router.route('/AddCourse')
 .post(async (req, res)=>{
-    const {Departmentname,Code,Coverage,Coordinator}=req.body;
+    const {Departmentname,Code,Coverage}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(!Departmentname||!Code){
@@ -428,7 +428,7 @@ router.route('/AddCourse')
             if(existingcourse){
                 return res.status(400).json({msg:"This Course exists already"});
             }
-            const newCourse = new course_model({code:Code,departmentname:Departmentname,coverage:Coverage,courseCoordinator:Coordinator})
+            const newCourse = new course_model({code:Code,departmentname:Departmentname,coverage:Coverage})
             await newCourse.save()
             const existingdepartment= await department_model.findOne({name:Departmentname})
             if(!existingdepartment){
@@ -448,7 +448,7 @@ router.route('/AddCourse')
 // Update a Course under a department -------------------------------
 router.route('/UpdateCourse')
 .post(async (req, res)=>{
-    const {Departmentname,Code,newDepartmentname,newCode,Coverage,Coordinator}=req.body;
+    const {Departmentname,Code,newDepartmentname,newCode,Coverage}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(!Departmentname || !Code){
@@ -469,21 +469,18 @@ router.route('/UpdateCourse')
             if(existingcourse1.departmentname != Departmentname){
                 return res.status(400).json({msg:"please enter a vlaid department for this course"});
             }
-            let UpdateCode = newCode, UpdateCoverage = Coverage, UpdateCoordinator = Coordinator, UpdateDepartment = newDepartmentname;
+            let UpdateCode = newCode, UpdateCoverage = Coverage, UpdateDepartment = newDepartmentname;
             if(!newCode){
                 UpdateCode = Code;
             }
             if(!UpdateCoverage){
                 UpdateCoverage = existingcourse1.coverage;
             }
-            if(!UpdateCoordinator){
-                UpdateCoordinator = existingcourse1.courseCoordinator;
-            }
             if(!UpdateDepartment){
                 UpdateDepartment = Departmentname;
             }
             const UpdatedCourse = await course_model.findByIdAndUpdate(existingcourse1._id,{code:UpdateCode,departmentname:UpdateDepartment,
-                coverage:UpdateCoverage,courseCoordinator:UpdateCoordinator},{new:true})
+                coverage:UpdateCoverage},{new:true})
             await UpdatedCourse.save()
             await existingdepartment1.courses.pull(existingcourse1)
             const existingdepartment2 = await department_model.findOne({name:UpdateDepartment});
