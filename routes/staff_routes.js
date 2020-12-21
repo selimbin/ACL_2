@@ -537,6 +537,20 @@ router.route('/DeleteCourse')
             if(existingcourse.departmentname != Departmentname){
                 return res.status(400).json({msg:"please enter a vlaid department for this course"});
             }
+            let deletedcourseLect = await existingcourse.lecturer.shift();
+            while(deletedcourseLect){
+                const existingstaff = await course_model.findById(deletedcourseLect._id);
+                await existingstaff.course.pull(Code);
+                await existingstaff.save();
+                deletedcourseLect = await existingcourse.lecturer.shift();
+            }
+            let deletedcourseTA = await existingcourse.TA.shift();
+            while(deletedcourseTA){
+                const existingstaff = await course_model.findById(deletedcourseTA._id);
+                await existingstaff.course.pull(Code);
+                await existingstaff.save();
+                deletedcourseTA = await existingcourse.TA.shift();
+            }
             const deletedCourse = await course_model.findByIdAndDelete(existingcourse._id);
             await existingdepartment.courses.pull(existingcourse);
             await existingdepartment.save();
@@ -726,11 +740,13 @@ router.route('/Deletetaff')
             if(!existingstaff){
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
-            for(var i = 0; i < existingstaff.course.length;i++){
-                var currentcourse = existingstaff.course[i];
-                var existingcourse = await course_model.findById(currentcourse._id);
+            let currentcourse = existingstaff.course.shift();
+            while(currentcourse){
+                const existingcourse = await course_model.findOne({code:currentcourse});
                 await existingcourse.Lecturer.pull(existingstaff);
                 await existingcourse.TA.pull(existingstaff);
+                await existingcourse.save();
+                currentcourse = existingstaff.course.shift();
             }
             const deletedstaff = await Staff_model.findByIdAndDelete(existingstaff._id);
             res.send(deletedstaff);
