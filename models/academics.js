@@ -3,10 +3,15 @@ const mongoose = require('mongoose')
 const {staffSchema} = require('../models/staff.js') 
 
 const courseSchema = new mongoose.Schema({
-    name:{
+    code:{
         type:String,
         minlength:3,
         required:true
+    },
+    departmentname:{
+        type:String,
+        minlength:3,
+        required:true,
     },
     coverage:{
         type:Number
@@ -25,11 +30,15 @@ module.exports.courseSchema = courseSchema
 module.exports = mongoose.model('Course', courseSchema)
 
 const departmentSchema = new mongoose.Schema({
+    facultyname:{
+        type:String,
+        minlength:3,
+        required:true,
+    },
     name:{
         type:String,
         minlength:3,
         required:true,
-        unique:true
     },
     courses:[courseSchema]
 })
