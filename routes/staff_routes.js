@@ -1002,9 +1002,10 @@ router.route('/viewschedule')
 router.route('/sendReplacmentReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    if(await staff_model.findOne(req.body.reciever)){
-    const newreqest = await new IRS_model({type:req.body.type,requester:user,reciever:req.body.reciever,reason:req.body.reason,status:"Pending"})
-    res.send(newreqest)
+    const reciver=await staff_model.findOne(req.body.reciever)
+    if(reciver!=null&&user.department==reciver.department){
+        const newreqest = await new request_model({type:req.body.type,requester:user,reciever:reciver,reason:req.body.reason})
+        res.send(newreqest)
     }else{
         res.send("pls insert a valid recipient")
     }
@@ -1013,58 +1014,82 @@ Router.ROUTE('/changeDayOffReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     const hod = await staff_model.findOne(user.department.head)
-    const newreqest = await new IRS_model({type:req.body.type,requester:user,reciever:hod,reason:req.body,status:"Pending"})
+    const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod,newDay:req.body.newDay})
     res.send(newreqest)
 })//all other send reqests of diffrent types such as leaves are copy paste from this with if conditionals if needed and a new dbs
 Router.ROUTE('/leaveReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     const hod = await staff_model.findOne(user.department.head)
-    if(req.body.type=="CompensationLeave"){
-        const newreqest = await new IRS_model({type:req.body.type,requester:user,reciever:hod,reason:req.body.reason,status:"Pending"})
+    if(req.body.type=="CompensationLeave"&&req.body.reason!=null){
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
         res.send(newreqest)
     }else{
-        const newreqest = await new IRS_model({type:req.body.type,requester:user,reciever:hod,reason:req.body.reason,status:"Pending"})
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
         res.send(newreqest)
     }
     
 })
-/*router.route('/Notification')
-.get(async(req,res)=>{
-    const reqests = await IRS_model.findOne(req.body._id)
-    if(reqests.Status!="pending"){
-        res.send("requests that have been approved or denied",reqests)
-    }
-})
+// router.route('/Notification')
+// .get(async(req,res)=>{
+//     const reqests = await IRS_model.findOne(req.body._id)
+//     if(reqests.Status!="pending"){
+//         res.send("requests that have been approved or denied",reqests)
+//     }
+// })
 router.route('/viewAcceptedRequests')
 .get(async(req,res)=>{
-    const reqests = await IRS_model.findById(req.body._id)
-    if(reqests.Status=="Accepted"){
-        res.send("requests that have been approved",reqests)
+    const user = await staff_model.findById(req.user._id)
+    const reqests = await request_model.find({requester:user.id,status:"accepted"})
+    if(reqests==null){
+        res.send("No accepted Requests")
+    }
+    else{
+        res.send(reqests)
     }
 })
 router.route('/viewPendingRequests')
 .get(async(req,res)=>{
-    const reqests = await IRS_model.findById(req.body._id)
-    if(reqests.Status=="Pending"){
-        res.send("requests that have been pending",reqests)
+    const user = await staff_model.findById(req.user._id)
+    const reqests = await request_model.find({requester:user.id,status:"pending"})
+    if(reqests==null){
+        res.send("No Pending Requests")
+    }
+    else{
+        res.send(reqests)
     }
 })
 router.route('/viewRejectedRequests')
 .get(async(req,res)=>{
-    const reqests = await IRS_model.findById(req.body._id)
-    if(reqests.Status=="Rejected"){
-        res.send("requests that have been denied",reqests)
+    const user = await staff_model.findById(req.user._id)
+    const reqests = await request_model.find({requester:user.id,status:"rejected"})
+    if(reqests==null){
+        res.send("No Rejected Requests")
+    }
+    else{
+        res.send(reqests)
     }
 })
 router.route('/cancelRequests')
 .post(async(req,res)=>{
-    const reqests = await IRS_model.findById(req.body._id)
-    if(reqests.Status=="Pending"||requests.Date!=Date.now){
-        const cancelRequests = reqests.deleteOne(reqests)
-        res.send("request cancled")
+    const user = await staff_model.findById(req.user._id)
+    const requests = await request_model.findOne({id:req.body.id})
+    if(requests==null){
+        res.send("Incorrect request id")
     }
-})*/
+    if(requests.requester==user.id){
+        if(requests.Status=="pending"||requests.Date>=Date.now()){
+            const cancelRequests = request_model.findByIdAndDelete(requests._id)
+            res.send("Request Canceled")
+        }
+        else{
+            res.send("You cannot cancel this requests")
+        }
+    }
+    else{
+        res.send("You cannot cancel another staff members request")
+    }
+})
 
 router.route('/assignInstructor')
 .post(async(req,res)=>{
