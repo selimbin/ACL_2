@@ -864,27 +864,29 @@ router.route('/Viewmissed')
     }
 })
 //--------------------------------------------------------------------
-router.route('/login')
-.post(async (req,res)=>{
-    try {
-        const result = await Staff_model.findOne({email:req.body.email})
-        if(!result){
-            return res.send('You need to sign up first')
-        }
-        const correctPassword= await bcrypt.compare(req.body.password, result.password)
-        if(correctPassword){
-            const token=jwt.sign({_id:result._id, role:result.role}, 
-                process.env.TOKEN_SECRET)
-            res.header('token',token).send(token)
-        }
-        else{
-            res.send('Incorrect Password')
-        }
-    }     
-    catch (error) {
-        res.status(500).json({error:error.message});
-    }
-})
+// router.route('/login')
+// .post(async (req,res)=>{
+//     try {
+//         const result = await Staff_model.findOne({email:req.body.email})
+//         if(!result){
+//             return res.send('You need to sign up first')
+//         }
+//         const correctPassword= await bcrypt.compare(req.body.password, result.password)
+//         if(correctPassword){
+//             const token=jwt.sign({_id:result._id, role:result.role}, 
+//                 process.env.TOKEN_SECRET)
+//             res.header('token',token).send(token)
+//         }
+//         else{
+//             res.send('Incorrect Password')
+//         }
+//     }     
+//     catch (error) {
+//         res.status(500).json({error:error.message});
+//     }
+// })
+//--------------------------------------------------------------------
+// logout ------------------------------------------------------------
 router.route('/logout')
 .post(async(req,res)=>{
     
@@ -894,11 +896,17 @@ router.route('/logout')
     res.send("loged out")
     
 })
+//--------------------------------------------------------------------
+// view profile ------------------------------------------------------
+
 router.route('/viewProfile')
 .get(async(req,res)=>{
     const result= await staff_model.findById(req.user._id)
     res.send(result)
 })
+//--------------------------------------------------------------------
+// update profile ----------------------------------------------------
+
 router.route('/updateProfile')
 .post(async(req,res)=>{
     const user= await staff_model.findById(req.user._id)
@@ -915,10 +923,13 @@ router.route('/updateProfile')
     res.send(user)
 
 })
+//--------------------------------------------------------------------
+// sign In -----------------------------------------------------------
 
 router.route('/signIn')
 .post(async(req,res)=>{
     const today =  new Date()
+    res.send(today.toUTCString())
     const user= await staff_model.findById(req.user._id)
     // res.send(today.toUTCString())
     const attendance= await attendance_model.findOne({"id":user.id,"date":today.toUTCString().substring(5,16)})
@@ -948,6 +959,9 @@ router.route('/signIn')
         res.send(attendance)
     }
 })
+//--------------------------------------------------------------------
+// sign Out ----------------------------------------------------------
+
 router.route('/signOut')
 .post(async(req,res)=>{
     const today =  new Date()
@@ -969,6 +983,8 @@ router.route('/signOut')
         res.send(attendance)
     }
 })
+//--------------------------------------------------------------------
+// reset Password ----------------------------------------------------
 
 router.route('/resetPassword')
 .post(async(req,res)=>{
@@ -985,12 +1001,16 @@ router.route('/resetPassword')
     }
 
 })
+
+//--------------------------------------------------------------------
+// view Schedule -----------------------------------------------------
 router.route('/viewschedule')
 .get(async(req,res)=>{
     const user= await staff_model.findById(req.user._id)
     const Schedule= await schedule_model.findOne({"Schedule":user.id})
     res.send(Schedule)
 })
+
 /*router.route('/viewReplaceReq')
 .get(async(req,res)=>{
     const Schedule= await scheduleSchema.findById(req.user._id)
@@ -1007,14 +1027,14 @@ router.route('/sendReplacmentReq')
         res.send("pls insert a valid recipient")
     }
 })
-Router.ROUTE('/changeDayOffReq')
+router.route('/changeDayOffReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     const hod = await staff_model.findOne(user.department.head)
     const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod,newDay:req.body.newDay})
     res.send(newreqest)
 })//all other send reqests of diffrent types such as leaves are copy paste from this with if conditionals if needed and a new dbs
-Router.ROUTE('/leaveReq')
+router.route('/leaveReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     const hod = await staff_model.findOne(user.department.head)
@@ -1087,6 +1107,8 @@ router.route('/cancelRequests')
         res.send("You cannot cancel another staff members request")
     }
 })
+//--------------------------------------------------------------------
+// HOD assign instructor ---------------------------------------------
 
 router.route('/assignInstructor')
 .post(async(req,res)=>{
@@ -1109,6 +1131,8 @@ router.route('/assignInstructor')
         res.send("You are not authorized to access this page")
     }
 })
+//--------------------------------------------------------------------
+// HOD remove instructor ---------------------------------------------
 
 router.route('/removeInstructor')
 .post(async(req,res)=>{
@@ -1153,6 +1177,8 @@ router.route('/removeInstructor')
         res.send("You are not authorized to access this page")
     }
 })
+//--------------------------------------------------------------------
+// HOD view staff ----------------------------------------------------
 
 router.route('/viewStaff')
 .get(async(req,res)=>{
@@ -1187,6 +1213,8 @@ router.route('/viewStaff')
         res.send("You are not authorized to access this page")
     }
 })
+//--------------------------------------------------------------------
+// HOD view dayOff ---------------------------------------------------
 
 router.route('/viewDayOff')
 .get(async(req,res)=>{
@@ -1210,6 +1238,8 @@ router.route('/viewDayOff')
         res.send("You are not authorized to access this page")
     }
 })
+//--------------------------------------------------------------------
+// HOD view change dayOff --------------------------------------------
 
 router.route('/viewChangeDayOff')
 .get(async(req,res)=>{
@@ -1223,6 +1253,8 @@ router.route('/viewChangeDayOff')
         res.send("You are not authorized to access this page")
     }
 })
+//--------------------------------------------------------------------
+// HOD accept request ------------------------------------------------
 
 router.route('/acceptRequest')
 .post(async(req,res)=>{
@@ -1236,6 +1268,7 @@ router.route('/acceptRequest')
         else{
             request.status="accepted"
             await request_model.findOneAndUpdate({id:req.body.id},request)
+
             res.send(request)
         }
     }
@@ -1243,6 +1276,8 @@ router.route('/acceptRequest')
         res.send("You are not authorized to access this page")
     }
 })
+//--------------------------------------------------------------------
+// HOD reject request ------------------------------------------------
 
 router.route('/rejectRequest')
 .post(async(req,res)=>{
@@ -1263,6 +1298,8 @@ router.route('/rejectRequest')
         res.send("You are not authorized to access this page")
     }
 })
+//--------------------------------------------------------------------
+// HOD view course Coverage ------------------------------------------
 
 router.route('/viewCoverage')
 .get(async(req,res)=>{
@@ -1281,6 +1318,9 @@ router.route('/viewCoverage')
         res.send("You are not authorized to access this page")
     }
 })
+
+//--------------------------------------------------------------------
+// HOD view course Assignments ---------------------------------------
 router.route('/viewAssignments')
 .get(async(req,res)=>{
     const user= await staff_model.findById(req.user._id)
