@@ -7,7 +7,7 @@ const staff_model=require('../models/staff')
 const {staffSchema} = require('../models/staff.js') 
 
 
-router.route('/register')
+/*router.route('/register')
 .post(async (req, res)=>{
     if(! req.body.email){
         res.send('You must sign up with email')
@@ -23,7 +23,7 @@ router.route('/register')
     req.body.password = await bcrypt.hash(req.body.password, salt) 
     const newUser= await staff_model(req.body).save()
     res.send(newUser)
-})
+})*/
 
 router.route('/login')
 .post(async (req,res)=>{
@@ -35,6 +35,9 @@ router.route('/login')
     if(correctPassword){
         const token=jwt.sign({_id:result._id, role:result.role}, 
             process.env.TOKEN_SECRET)
+        // result=token;
+        result.token = token
+        await staff_model.findOneAndUpdate({"_id":result._id},result)
         res.header('token',token).send(token)
     }
     else{

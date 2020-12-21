@@ -89,6 +89,10 @@ const staffSchema = new mongoose.Schema({
     department:{
         type:String,
     },
+    leaveBalance:{
+        type:Number,
+        default:2.5
+    },
     course:{
         type:[String]
     },
@@ -98,7 +102,9 @@ const staffSchema = new mongoose.Schema({
         minlength:4
     },
     token:{
-        type:String
+        type:String,
+        default:null
+
     }
 },
 {

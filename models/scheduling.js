@@ -34,17 +34,58 @@ const slotSchema = new mongoose.Schema({
         required:true
     },
     course:{
-        type:[courseSchema]
+        type:String
     },
     location:{
-        type:[locationSchema]
+        type:String
     },
     staff:{
-        type:[staffSchema]
+        type:[String]
     }
 })
 module.exports.slotSchema = slotSchema
 module.exports = mongoose.model('Slot', slotSchema)
+
+const daySchema = new mongoose.Schema({
+    id:{
+        type:String,
+        minlength:3,
+        auto:true
+    },
+    month:{
+        type:String
+    },
+    first:{
+        type:Boolean
+    },
+    second:{
+        type:Boolean
+    },
+    third:{
+        type:Boolean
+    },
+    fourth:{
+        type:Boolean
+    },
+    fifth:{
+        type:Boolean
+    }
+})
+module.exports.daySchema = daySchema
+module.exports = mongoose.model('Day', daySchema)
+
+const scheduleAttendance = new mongoose.Schema({
+    id:{
+        type:String,
+        minlength:3,
+        required:true
+    },
+    days:{
+        type:[daySchema]
+    }
+})
+module.exports.scheduleAttendance = scheduleAttendance
+module.exports = mongoose.model('ScheduleAttendance', scheduleAttendance)
 
 const scheduleSchema = new mongoose.Schema({
     id:{
