@@ -34,5 +34,6 @@ app.use(async(req, res, next)=>{
         res.status(400).send('Invalid Request')
     }
 })
+
 app.use('/staff' ,staff_routes)
 module.exports.app = app
