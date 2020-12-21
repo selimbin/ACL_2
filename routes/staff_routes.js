@@ -44,6 +44,8 @@ const { readdirSync } = require('fs');
 
 const { timeStamp } = require('console');
 const { stringify } = require('querystring');
+const scheduling = require('../models/scheduling.js');
+const { Router } = require('express');
 require('dotenv').config()
 
 
@@ -982,6 +984,108 @@ router.route('/resetPassword')
         res.send("wrong insertion")
     }
 
+})
+router.route('/viewschedule')
+.get(async(req,res)=>{
+    const user= await staff_model.findById(req.user._id)
+    const Schedule= await schedule_model.findOne({"Schedule":user.id})
+    res.send(Schedule)
+})
+/*router.route('/viewReplaceReq')
+.get(async(req,res)=>{
+    const Schedule= await scheduleSchema.findById(req.user._id)
+    res.send(Schedule)
+})*/
+router.route('/sendReplacmentReq')
+.post(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const reciver=await staff_model.findOne(req.body.reciever)
+    if(reciver!=null&&user.department==reciver.department){
+        const newreqest = await new request_model({type:req.body.type,requester:user,reciever:reciver,reason:req.body.reason})
+        res.send(newreqest)
+    }else{
+        res.send("pls insert a valid recipient")
+    }
+})
+Router.ROUTE('/changeDayOffReq')
+.post(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const hod = await staff_model.findOne(user.department.head)
+    const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod,newDay:req.body.newDay})
+    res.send(newreqest)
+})//all other send reqests of diffrent types such as leaves are copy paste from this with if conditionals if needed and a new dbs
+Router.ROUTE('/leaveReq')
+.post(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const hod = await staff_model.findOne(user.department.head)
+    if(req.body.type=="CompensationLeave"&&req.body.reason!=null){
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
+        res.send(newreqest)
+    }else{
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
+        res.send(newreqest)
+    }
+    
+})
+// router.route('/Notification')
+// .get(async(req,res)=>{
+//     const reqests = await IRS_model.findOne(req.body._id)
+//     if(reqests.Status!="pending"){
+//         res.send("requests that have been approved or denied",reqests)
+//     }
+// })
+router.route('/viewAcceptedRequests')
+.get(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const reqests = await request_model.find({requester:user.id,status:"accepted"})
+    if(reqests==null){
+        res.send("No accepted Requests")
+    }
+    else{
+        res.send(reqests)
+    }
+})
+router.route('/viewPendingRequests')
+.get(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const reqests = await request_model.find({requester:user.id,status:"pending"})
+    if(reqests==null){
+        res.send("No Pending Requests")
+    }
+    else{
+        res.send(reqests)
+    }
+})
+router.route('/viewRejectedRequests')
+.get(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const reqests = await request_model.find({requester:user.id,status:"rejected"})
+    if(reqests==null){
+        res.send("No Rejected Requests")
+    }
+    else{
+        res.send(reqests)
+    }
+})
+router.route('/cancelRequests')
+.post(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const requests = await request_model.findOne({id:req.body.id})
+    if(requests==null){
+        res.send("Incorrect request id")
+    }
+    if(requests.requester==user.id){
+        if(requests.Status=="pending"||requests.Date>=Date.now()){
+            const cancelRequests = request_model.findByIdAndDelete(requests._id)
+            res.send("Request Canceled")
+        }
+        else{
+            res.send("You cannot cancel this requests")
+        }
+    }
+    else{
+        res.send("You cannot cancel another staff members request")
+    }
 })
 
 router.route('/assignInstructor')

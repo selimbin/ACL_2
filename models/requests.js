@@ -32,6 +32,9 @@ const internalRequestSchema= new mongoose.Schema({
     },
     date:{
         type:Date
+    },
+    newDay:{
+        type:String
     }
 })
 module.exports.internalRequestSchema = internalRequestSchema
