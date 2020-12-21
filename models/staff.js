@@ -2,6 +2,24 @@ const mongoose = require('mongoose')
 const {departmentSchema} = require('../models/academics.js') 
 const {courseSchema} = require('../models/academics.js') 
 
+const staffcountSchema = new mongoose.Schema({
+    id:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    HR:{
+        type:Number,
+        required:true
+    },
+    Academic:{
+        type:Number,
+        required:true
+    }
+})
+module.exports.Staffcount = staffcountSchema
+module.exports = mongoose.model('Staffcount', staffcountSchema)
+
 const locationSchema = new mongoose.Schema({
     code:{
         type:String,
@@ -22,8 +40,9 @@ const locationSchema = new mongoose.Schema({
         required:true
     }
 })
-module.exports = mongoose.model('Location',locationSchema)
-module.exports.locationSchema=locationSchema  
+module.exports.Location = locationSchema
+module.exports = mongoose.model('Location', locationSchema)
+
 const staffSchema = new mongoose.Schema({
     name:{
         type:String,
@@ -41,7 +60,6 @@ const staffSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
-
     password:{
         type:String,
         required:true
@@ -62,15 +80,21 @@ const staffSchema = new mongoose.Schema({
     accumelatedHours:{
         type:Number
     },
+    missedHours:{
+        type:Number
+    },
+    misseddays:{
+        type:Number
+    },
     department:{
-        type:String
+        type:String,
     },
     leaveBalance:{
         type:Number,
         default:2.5
     },
     course:{
-        type:[courseSchema]
+        type:[String]
     },
     officeLocation:{
         type:String,
@@ -80,6 +104,7 @@ const staffSchema = new mongoose.Schema({
     token:{
         type:String,
         default:null
+
     }
 },
 {

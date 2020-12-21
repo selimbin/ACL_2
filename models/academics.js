@@ -30,11 +30,19 @@ module.exports.courseSchema = courseSchema
 module.exports = mongoose.model('Course', courseSchema)
 
 const departmentSchema = new mongoose.Schema({
+    facultyname:{
+        type:String,
+        minlength:3,
+        required:true,
+    },
     name:{
         type:String,
         minlength:3,
         required:true,
-        unique:true
+    },
+    head:{
+        type:String,
+        minlength:3
     },
     facultyname:{
         type:String,
@@ -59,5 +67,6 @@ const facultySchema = new mongoose.Schema({
     },
     departments:[departmentSchema]
 })
+
 module.exports.facultySchema = facultySchema
 module.exports = mongoose.model('Faculty', facultySchema)

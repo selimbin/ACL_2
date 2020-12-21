@@ -34,16 +34,5 @@ app.use(async(req, res, next)=>{
         res.status(400).send('Invalid Request')
     }
 })
-
-
-// app.get('/staff',(req,res)=>{
-//     if(req.staff.role=='admin'){
-//         res.send('staff !')
-//     }
-//     else{
-//         res.status(403).send('Access Denied')
-//     }
-    
-// })
 app.use('/staff' ,staff_routes)
 module.exports.app = app
