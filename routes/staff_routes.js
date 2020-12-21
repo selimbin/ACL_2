@@ -354,9 +354,15 @@ router.route('/UpdateDepartment')
             let coursedepartment = await course_model.findOne({departmentname:DepartmentName})
             let updatedcourse;
             while(coursedepartment){
-                updatedcourse = await course_model.findByIdAndUpdate(coursedepartment._id,{departmentname:newDepartmentName},{new:true});
+                updatedcourse = await course_model.findByIdAndUpdate(coursedepartment._id,{departmentname:UpdateDepartment},{new:true});
                 await updatedcourse.save();
                 coursedepartment = await course_model.findOne({departmentname:DepartmentName})
+            }
+            let staffindepartment = await Staff_model.findOne({department:Name});
+            while(staffindepartment){
+                const updatestaffindepartment = await Staff_model.findByIdAndUpdate(staffindepartment._id,{department:UpdateDepartment},{new:true});
+                await updatestaffindepartment.save();
+                staffindepartment = await Staff_model.findOne({department:Name});   
             }
             res.send(UpdatedDepartment)
         } else {
@@ -394,6 +400,12 @@ router.route('/DeleteDepartment')
             const deleteddepartment = await department_model.findByIdAndDelete(existingdepartment._id);
             await existingfaculty.departments.pull(existingdepartment);
             await existingfaculty.save();
+            let staffindepartment = await Staff_model.findOne({department:Name});
+            while(staffindepartment){
+                const updatestaffindepartment = await Staff_model.findByIdAndUpdate(staffindepartment._id,{department:""},{new:true});
+                await updatestaffindepartment.save();
+                staffindepartment = await Staff_model.findOne({department:Name});   
+            }
             res.send(deleteddepartment);
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -406,7 +418,7 @@ router.route('/DeleteDepartment')
 // Add a Course under a department ---------------------------------
 router.route('/AddCourse')
 .post(async (req, res)=>{
-    const {Departmentname,Code,Coverage,Coordinator,Lecturer,TA}=req.body;
+    const {Departmentname,Code,Coverage,Coordinator}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(!Departmentname||!Code){
@@ -424,22 +436,6 @@ router.route('/AddCourse')
             }
             await existingdepartment.courses.push(newCourse)
             await existingdepartment.save()
-            while(Lecturer){
-                const existinglecturer = await Staff_model.findOne({id:Lecturer.shift()})
-                if(!existinglecturer){
-                    return res.status(400).json({msg:"This Staff doesn't exist"});
-                }
-                await newCourse.lecturer.push(existinglecturer);
-                await existinglecturer.course.push(Code);
-            }
-            while(TA){
-                const existingTA = await Staff_model.findOne({id:TA.shift()})
-                if(!existingTA){
-                    return res.status(400).json({msg:"This Staff doesn't exist"});
-                }
-                await newCourse.TA.push(existingTA);
-                await existingTA.course.push(Code);
-            }
             res.send(newCourse)
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -452,7 +448,7 @@ router.route('/AddCourse')
 // Update a Course under a department -------------------------------
 router.route('/UpdateCourse')
 .post(async (req, res)=>{
-    const {Departmentname,Code,newDepartmentname,newCode,Coverage,Coordinator,Lecturer,TA}=req.body;
+    const {Departmentname,Code,newDepartmentname,newCode,Coverage,Coordinator}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(!Departmentname || !Code){
@@ -492,22 +488,7 @@ router.route('/UpdateCourse')
             await existingdepartment1.courses.pull(existingcourse1)
             const existingdepartment2 = await department_model.findOne({name:UpdateDepartment});
             await existingdepartment2.courses.push(UpdatedCourse)
-            const newCourse = await course_model.findOne({code:UpdateCode});
-            if(Lecturer){
-                const existinglecturer = await Staff_model.findOne({id:Lecturer})
-                if(!existinglecturer){
-                    return res.status(400).json({msg:"This Staff doesn't exist"});
-                }
-                await newCourse.lecturer.push(existinglecturer)
 
-            }
-            if(TA){
-                const existingTA = await Staff_model.findOne({id:TA})
-                if(!existingTA){
-                    return res.status(400).json({msg:"This Staff doesn't exist"});
-                }
-                await newCourse.TA.push(existingTA)
-            }
             res.send(UpdatedCourse)
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -536,6 +517,20 @@ router.route('/DeleteCourse')
             }
             if(existingcourse.departmentname != Departmentname){
                 return res.status(400).json({msg:"please enter a vlaid department for this course"});
+            }
+            let deletedcourseLect = await existingcourse.lecturer.shift();
+            while(deletedcourseLect){
+                const existingstaff = await course_model.findById(deletedcourseLect._id);
+                await existingstaff.course.pull(Code);
+                await existingstaff.save();
+                deletedcourseLect = await existingcourse.lecturer.shift();
+            }
+            let deletedcourseTA = await existingcourse.TA.shift();
+            while(deletedcourseTA){
+                const existingstaff = await course_model.findById(deletedcourseTA._id);
+                await existingstaff.course.pull(Code);
+                await existingstaff.save();
+                deletedcourseTA = await existingcourse.TA.shift();
             }
             const deletedCourse = await course_model.findByIdAndDelete(existingcourse._id);
             await existingdepartment.courses.pull(existingcourse);
@@ -726,11 +721,13 @@ router.route('/Deletetaff')
             if(!existingstaff){
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
-            for(var i = 0; i < existingstaff.course.length;i++){
-                var currentcourse = existingstaff.course[i];
-                var existingcourse = await course_model.findById(currentcourse._id);
+            let currentcourse = existingstaff.course.shift();
+            while(currentcourse){
+                const existingcourse = await course_model.findOne({code:currentcourse});
                 await existingcourse.Lecturer.pull(existingstaff);
                 await existingcourse.TA.pull(existingstaff);
+                await existingcourse.save();
+                currentcourse = existingstaff.course.shift();
             }
             const deletedstaff = await Staff_model.findByIdAndDelete(existingstaff._id);
             res.send(deletedstaff);
