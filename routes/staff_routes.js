@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose')
 const staff_model=require('../models/staff')
-const faculty_model=require('../models/academics')
 
 const {internalRequestSchema} = require('../models/requests.js') 
 const request_model = mongoose.model('IRS', internalRequestSchema)
@@ -16,7 +15,6 @@ const department_model = mongoose.model('Department', departmentSchema)
 const {courseSchema} = require('../models/academics.js') 
 const course_model = mongoose.model('Course', courseSchema)
 
-const faculties = mongoose.model('Faculty');
 // Faculty Schema and model ----------------------------------------
 const {facultySchema} = require('../models/academics.js') 
 const Faculty_model = mongoose.model('Faculty', facultySchema)
@@ -48,9 +46,6 @@ const scheduling = require('../models/scheduling.js');
 const { Router } = require('express');
 require('dotenv').config()
 
-
-//------------------------------------------------------------------
-// Add a location --------------------------------------------------
 router.route('/AddLocation')
 .post(async (req, res)=>{
     const {Code,Building,Type,Capacity}=req.body;
