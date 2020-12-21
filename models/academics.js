@@ -38,7 +38,7 @@ const departmentSchema = new mongoose.Schema({
     facultyname:{
         type:String,
         minlength:3,
-        required:true,
+        required:true
     },
     head:{
         type:String,
