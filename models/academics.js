@@ -40,6 +40,10 @@ const departmentSchema = new mongoose.Schema({
         minlength:3,
         required:true,
     },
+    head:{
+        type:String,
+        minlength:3
+    },
     courses:[courseSchema]
 })
 module.exports= mongoose.model('Department', departmentSchema)

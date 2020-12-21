@@ -44,16 +44,16 @@ module.exports.Location = locationSchema
 module.exports = mongoose.model('Location', locationSchema)
 
 const staffSchema = new mongoose.Schema({
-    id:{
-        type:String,
-        minlength:3,
-        required:true,
-        auto:true
-
-    },
     name:{
         type:String,
+        minlength:3,
+        required:true
+
+    },
+    id:{
+        type:String,
         required:true,
+        unique:true
     },
     email:{
         type:String,
@@ -81,22 +81,24 @@ const staffSchema = new mongoose.Schema({
         type:Number
     },
     missedHours:{
-        type:String
+        type:Number
     },
     misseddays:{
-        type:String
+        type:Number
     },
     department:{
         type:String,
-        minlength:3,
     },
     course:{
-        type:[courseSchema]
+        type:[String]
     },
     officeLocation:{
         type:String,
         required:true,
         minlength:4
+    },
+    token:{
+        type:String
     }
 },
 {
@@ -105,7 +107,3 @@ const staffSchema = new mongoose.Schema({
 })
 module.exports = mongoose.model('Staff', staffSchema)
 module.exports.staffSchema=staffSchema
-// module.exports= mongoose.model('Department', departmentSchema)
-// module.exports = mongoose.model('Faculty', facultySchema)
-// module.exports= mongoose.model('Course', courseSchema)
-// module.exports= mongoose.model('Location', locationSchema)
