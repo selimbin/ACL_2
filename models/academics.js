@@ -30,15 +30,15 @@ module.exports.courseSchema = courseSchema
 module.exports = mongoose.model('Course', courseSchema)
 
 const departmentSchema = new mongoose.Schema({
-    facultyname:{
-        type:String,
-        minlength:3,
-        required:true,
-    },
     name:{
         type:String,
         minlength:3,
         required:true,
+    },
+    facultyname:{
+        type:String,
+        minlength:3,
+        required:true
     },
     head:{
         type:String,
