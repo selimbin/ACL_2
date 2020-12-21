@@ -27,8 +27,8 @@ const Location_model = mongoose.model('Location', locationSchema)
 const {staffSchema} = require('../models/staff.js') 
 const Staff_model = mongoose.model('Staff', staffSchema)
 // Staffcount Schema and model --------------------------------------
-const {staffcountSchema} = require('../models/staff.js') 
-const Staffcount_model = mongoose.model('Staffcount', staffcountSchema)
+const {staffcount} = require('../models/staff.js') 
+const Staffcount_model = mongoose.model('Staffcount', staffcount)
 // scheduleAttendance Schema and model --------------------------------------
 const {scheduleAttendance} = require('../models/scheduling.js') 
 const scheduleAttendance_model = mongoose.model('ScheduleAttendance', scheduleAttendance)
@@ -1280,6 +1280,7 @@ router.route('/acceptRequest')
             res.send("No corresponding request")
         }
         else{
+
             request.status="accepted"
             await request_model.findOneAndUpdate({id:req.body.id},request)
 
