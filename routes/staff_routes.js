@@ -25,35 +25,6 @@ const { timeStamp } = require('console');
 const { stringify } = require('querystring');
 require('dotenv').config()
 
-router.route('/createFaculty')
-.post(async (req, res)=>{
-    const newFaculty = new faculty_model({name: req.body.name
-    })
-    await newFaculty.save()
-    res.send(newFaculty)
-})
-router.route('/createDepartment')
-.post(async (req, res)=>{
-    // const newDepartment = new department_model({name: req.body.name
-    // })
-    const newDepartment = await department_model(req.body).save()
-    const faculty = await faculties.findOne({name:req.body.faculty})
-    faculty.departments.push(newDepartment)
-
-    await faculty.save()
-    res.send(newDepartment)
-})
-router.route('/addCourse')
-.post(async (req, res)=>{
-    const newCourse = new course_model({name: req.body.name
-    })
-    await newCourse.save()
-    const department = await department_model.findOne({name:req.body.department})
-    department.courses.push(newCourse)
-
-    await department.save()
-    res.send(newCourse)
-})
 
 router.route('/logout')
 .post(async(req,res)=>{

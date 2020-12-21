@@ -22,15 +22,13 @@ const internalRequestSchema= new mongoose.Schema({
         required:true
     },
     reciever:{
-        type:String
+        type:String,
+        required:true
     },
     status:{
         type:String,
         required:true,
         default:"Pending"
-    },
-    department:{
-        type:String
     },
     date:{
         type:Date
