@@ -1156,48 +1156,6 @@ router.route('/removeInstructor')
         res.send("You are not authorized to access this page")
     }
 })
-router.route('/removeInstructor')
-.post(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    user1=await staff_model.findOne(req.body.id)
-    if(user1==null){
-        res.send("There is no corresponding instructor")
-    }
-    if(department.head==user.id){
-        const course = null
-        for(var i=0;i<i<department.courses.length;i++){
-            if(department.courses[i].code==req.body.course){
-                course=department.courses[i]
-            }
-        }
-        if(course==null){
-            res.send("No corresponding course")
-        }else{
-            if(user1.role=="TA"){
-                for(var i=0;i<i<course.TA.length;i++){
-                    if(course.TA[i].id==user1.id){
-                        course.TA.splice(i,1)
-                        await course_model.findOneAndUpdate({name:req.body.course},course)
-                        res.send(course)
-                    }
-                }
-            }
-            else{
-                for(var i=0;i<i<course.lecturer.length;i++){
-                    if(course.lecturer[i].id==user1.id){
-                        course.lecturer.splice(i,1)
-                        await course_model.findOneAndUpdate({name:req.body.course},course)
-                        res.send(course)
-                    }
-                }
-            }
-            res.send("This instructor does not teach this course")
-        }
-    }else{
-        res.send("You are not authorized to access this page")
-    }
-})
 
 router.route('/viewStaff')
 .get(async(req,res)=>{
