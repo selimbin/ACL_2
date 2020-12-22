@@ -25,8 +25,8 @@ const Location_model = mongoose.model('Location', locationSchema)
 const {staffSchema} = require('../models/staff.js') 
 const Staff_model = mongoose.model('Staff', staffSchema)
 // Staffcount Schema and model --------------------------------------
-const {staffcountSchema} = require('../models/staff.js') 
-const Staffcount_model = mongoose.model('Staffcount', staffcountSchema)
+const {Staffcount} = require('../models/staff.js') 
+const Staffcount_model = mongoose.model('Staffcount', Staffcount)
 // scheduleAttendance Schema and model --------------------------------------
 const {scheduleAttendance} = require('../models/scheduling.js') 
 const scheduleAttendance_model = mongoose.model('ScheduleAttendance', scheduleAttendance)
@@ -58,6 +58,9 @@ router.route('/AddLocation')
                 return res.status(400).json({msg:"Please enter a valid building"});
             }
             if(!Type){
+                return res.status(400).json({msg:"Please enter a valid type"});
+            }
+            else if(Type != "office" && Type != "lab" && Type != "hall" && Type != "classroom"){
                 return res.status(400).json({msg:"Please enter a valid type"});
             }
             if(!Capacity){
@@ -425,12 +428,12 @@ router.route('/AddCourse')
             if(existingcourse){
                 return res.status(400).json({msg:"This Course exists already"});
             }
-            const newCourse = new course_model({code:Code,departmentname:Departmentname,coverage:Coverage})
-            await newCourse.save()
             const existingdepartment= await department_model.findOne({name:Departmentname})
             if(!existingdepartment){
                 return res.status(400).json({msg:"This Department doesn't exist"});
             }
+            const newCourse = new course_model({code:Code,departmentname:Departmentname,coverage:Coverage})
+            await newCourse.save()
             await existingdepartment.courses.push(newCourse)
             await existingdepartment.save()
             res.send(newCourse)
@@ -552,7 +555,7 @@ router.route('/AddStaff')
             if(!department){
                 return res.status(400).json({msg:"Please enter a valid department"});
             }
-            if(dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thuresday"){
+            if(dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thuresday" && dayoff != "Saturday"){
                 return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
             }
             const existinglocation = await Location_model.findOne({code:officelocation})
@@ -569,7 +572,9 @@ router.route('/AddStaff')
             if(existingstaff){
                 return res.status(400).json({msg:"This email is already taken"});
             }
-            const password ="123456";
+            let password ="123456";
+            const salt= await bcrypt.genSalt(10)
+            password = await bcrypt.hash(password, salt)
             var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
             if(!email.match(mailformat)){
                 return res.status(400).json({msg:"This email is invalid"});
@@ -610,8 +615,8 @@ router.route('/Updatetaff')
     const {id,name,email,officelocation,role,dayoff,department}=req.body;
     try {
         if (req.user.role  == "HR") {
-            let Updatename = name,Updateemail = email,Updaterole = role,Updatelocation = officelocation,Updatedayoff = dayoff,Updatedepartment = department;
             const existingstaff = await Staff_model.findOne({id:id})
+            let Updatename = name,Updateemail = existingstaff.email,Updaterole = role,Updatelocation = officelocation,Updatedayoff = dayoff,Updatedepartment = department;
             if(!existingstaff){
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
@@ -666,8 +671,6 @@ router.route('/Updatetaff')
                 if(!email.match(mailformat)){
                     return res.status(400).json({msg:"This email is invalid"});
                 }
-            }
-            else{
                 Updateemail = email;
             }
             if(!name){

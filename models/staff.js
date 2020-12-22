@@ -40,7 +40,7 @@ const locationSchema = new mongoose.Schema({
         required:true
     }
 })
-module.exports.Location = locationSchema
+module.exports.locationSchema = locationSchema
 module.exports = mongoose.model('Location', locationSchema)
 
 const staffSchema = new mongoose.Schema({
