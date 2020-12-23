@@ -42,7 +42,6 @@ const departmentSchema = new mongoose.Schema({
     },
     head:{
         type:String,
-        minlength:3
     },
     courses:[courseSchema]
 })
