@@ -28,11 +28,6 @@ module.exports.attendanceSchema = attendanceSchema
 module.exports = mongoose.model('Attendance', attendanceSchema)
 
 const slotSchema = new mongoose.Schema({
-    id:{
-        type:String,
-        minlength:3,
-        required:true
-    },
     course:{
         type:String
     },
@@ -41,6 +36,9 @@ const slotSchema = new mongoose.Schema({
     },
     staff:{
         type:[String]
+    },
+    compensation:{
+        type:Boolean
     }
 })
 module.exports.slotSchema = slotSchema
@@ -109,9 +107,6 @@ const scheduleSchema = new mongoose.Schema({
         type:[slotSchema]
     },
     Thursday:{
-        type:[slotSchema]
-    },
-    Friday:{
         type:[slotSchema]
     }
 })

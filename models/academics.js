@@ -43,7 +43,9 @@ const departmentSchema = new mongoose.Schema({
     head:{
         type:String,
     },
-    courses:[courseSchema]
+    courses:{
+        type:[courseSchema]
+    }
 })
 module.exports.departmentSchema = departmentSchema
 module.exports= mongoose.model('Department', departmentSchema)
@@ -55,7 +57,9 @@ const facultySchema = new mongoose.Schema({
         required:true,
         unique:true
     },
-    departments:[departmentSchema]
+    departments:{
+        type:[departmentSchema]
+    }
 })
 
 module.exports.facultySchema = facultySchema
