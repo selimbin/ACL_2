@@ -32,13 +32,20 @@ const slotSchema = new mongoose.Schema({
         type:String
     },
     location:{
-        type:String
+        type:[String]
     },
     staff:{
         type:[String]
     },
+    type:{
+        type:[String]
+    },
     compensation:{
-        type:Boolean
+        type:[Boolean]
+    },
+    isEmpty:{
+        type:Boolean,
+        default:true
     }
 })
 module.exports.slotSchema = slotSchema
@@ -78,8 +85,21 @@ const scheduleAttendance = new mongoose.Schema({
         minlength:3,
         required:true
     },
+    month:{
+        type:String,
+        minlength:3,
+        required:true
+    },
     days:{
-        type:[daySchema]
+        type:[attendanceSchema]
+    },
+    missedDays:{
+        type:Number,
+        default:0
+    },
+    missedHours:{
+        type:Number,
+        default:0
     }
 })
 module.exports.scheduleAttendance = scheduleAttendance
@@ -91,22 +111,22 @@ const scheduleSchema = new mongoose.Schema({
         minlength:3,
         required:true
     },
-    Saturday:{
+    saturday:{
         type:[slotSchema]
     },
-    Sunday:{
+    sunday:{
         type:[slotSchema]
     },
-    Monday:{
+    monday:{
         type:[slotSchema]
     },
-    Tuesday:{
+    tuesday:{
         type:[slotSchema]
     },
-    Wednesday:{
+    wednesday:{
         type:[slotSchema]
     },
-    Thursday:{
+    thursday:{
         type:[slotSchema]
     }
 })
