@@ -514,14 +514,6 @@ router.route('/AddCourse')
             if(!existingdepartment){
                 return res.status(400).json({msg:"This Department doesn't exist"});
             }
-<<<<<<< HEAD
-            // res.send(existingdepartment)
-            existingdepartment.courses.push(newCourse)
-
-
-            await department_model.findOneAndUpdate({name:Departmentname},existingdepartment)
-            res.send(existingdepartment)
-=======
             let AddCoverage = Coverage;
             if(!Coverage){
                 AddCoverage = 0;
@@ -536,7 +528,6 @@ router.route('/AddCourse')
             await existingfaculty.departments.push(existingdepartment);
             await existingfaculty.save();
             res.send(newCourse)
->>>>>>> origin/master
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
