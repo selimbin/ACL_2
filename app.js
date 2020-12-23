@@ -1,5 +1,6 @@
 const express = require('express')
 const staff_routes = require('./routes/staff_routes')
+const seed_routes = require('./routes/seed_routes')
 const jwt=require('jsonwebtoken')
 const mongoose = require('mongoose')
 const seed_routes= require('./routes/seed_routes')
@@ -12,7 +13,7 @@ app.use(express.json())
 require('dotenv').config()
 
 const AuthenticationRoutes= require('./routes/auth')
-app.use('/seed',seed_routes)
+app.use('/seed', seed_routes)
 app.use('', AuthenticationRoutes)
 
 app.use(async(req, res, next)=>{
