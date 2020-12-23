@@ -28,19 +28,23 @@ module.exports.attendanceSchema = attendanceSchema
 module.exports = mongoose.model('Attendance', attendanceSchema)
 
 const slotSchema = new mongoose.Schema({
-    id:{
-        type:String,
-        minlength:3,
-        required:true
-    },
     course:{
-        type:String
-    },
-    location:{
         type:String
     },
     staff:{
         type:[String]
+    },
+    location:{
+        type:[String]
+    },
+    type:{
+        type:[String]
+    },
+    compensation:{
+        type:[Boolean]
+    },
+    used:{
+        type:[Boolean]
     }
 })
 module.exports.slotSchema = slotSchema
