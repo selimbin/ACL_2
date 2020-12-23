@@ -17,10 +17,10 @@ const courseSchema = new mongoose.Schema({
         type:Number
     },
     lecturer:{
-        type:[staffSchema]
+        type:[String]
     },
     TA:{
-        type:[staffSchema]
+        type:[String]
     },
     courseCoordinator:{
         type:String
@@ -42,7 +42,6 @@ const departmentSchema = new mongoose.Schema({
     },
     head:{
         type:String,
-        minlength:3
     },
     courses:[courseSchema]
 })

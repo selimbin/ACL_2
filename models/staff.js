@@ -98,8 +98,6 @@ const staffSchema = new mongoose.Schema({
     },
     officeLocation:{
         type:String,
-        required:true,
-        minlength:4
     },
     token:{
         type:String,
