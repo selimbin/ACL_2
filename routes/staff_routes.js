@@ -34,7 +34,6 @@ const scheduleAttendance_model = mongoose.model('ScheduleAttendance', scheduleAt
 const {attendanceSchema} = require('../models/scheduling.js') 
 const attendance_model = mongoose.model('Attendance', attendanceSchema)
 
-
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
@@ -46,6 +45,8 @@ const scheduling = require('../models/scheduling.js');
 const { Router } = require('express');
 require('dotenv').config()
 
+//------------------------------------------------------------------
+// Add a location --------------------------------------------------
 router.route('/AddLocation')
 .post(async (req, res)=>{
     const {Code,Building,Type,Capacity}=req.body;
@@ -82,6 +83,7 @@ router.route('/AddLocation')
 })
 //------------------------------------------------------------------
 // Update a location -----------------------------------------------
+
 router.route('/UpdateLocation')
 .post(async (req, res)=>{
     const {Code,newCode,Building,Type,Capacity}=req.body;
@@ -152,6 +154,7 @@ router.route('/UpdateLocation')
 })
 //------------------------------------------------------------------
 // Delete a location -----------------------------------------------
+
 router.route('/DeleteLocation')
 .post(async (req, res)=>{
     const {Code}=req.body;
@@ -182,6 +185,7 @@ router.route('/DeleteLocation')
 })
 //-------------------------------------------------------------------
 // Add a faculty ----------------------------------------------------
+
 router.route('/AddFaculty')
 .post(async (req, res)=>{
     const {Name}=req.body;
@@ -206,6 +210,7 @@ router.route('/AddFaculty')
 })
 //-------------------------------------------------------------------
 // Update a faculty -------------------------------------------------
+
 router.route('/UpdateFaculty')
 .post(async (req, res)=>{
     const {Name,newName}=req.body;
@@ -245,6 +250,7 @@ router.route('/UpdateFaculty')
 })
 //-------------------------------------------------------------------
 // Delete a faculty -------------------------------------------------
+
 router.route('/DeleteFaculty')
 .post(async (req, res)=>{
     const {Name}=req.body;
@@ -298,6 +304,7 @@ router.route('/DeleteFaculty')
 })
 //-------------------------------------------------------------------
 // Add a department under a faculty ---------------------------------
+
 router.route('/AddDepartment')
 .post(async (req, res)=>{
     const {FacultyName,DepartmentName,Head}=req.body;
@@ -338,6 +345,7 @@ router.route('/AddDepartment')
 })
 //-------------------------------------------------------------------
 // Update a department under a faculty ------------------------------
+
 router.route('/UpdateDepartment')
 .post(async (req, res)=>{
     const {FacultyName,DepartmentName,newDepartmentName,newFacultyname,newHead}=req.body;
@@ -418,6 +426,7 @@ router.route('/UpdateDepartment')
 })
 //-------------------------------------------------------------------
 // Delete a department under a faculty ------------------------------
+
 router.route('/DeleteDepartment')
 .post(async (req, res)=>{
     const {FacultyName,Name}=req.body;
@@ -488,6 +497,7 @@ router.route('/DeleteDepartment')
 })
 //------------------------------------------------------------------
 // Add a Course under a department ---------------------------------
+
 router.route('/AddCourse')
 .post(async (req, res)=>{
     const {Departmentname,Code,Coverage}=req.body;
@@ -527,6 +537,7 @@ router.route('/AddCourse')
 })
 //-------------------------------------------------------------------
 // Update a Course under a department -------------------------------
+
 router.route('/UpdateCourse')
 .post(async (req, res)=>{
     const {Departmentname,Code,newDepartmentname,newCode,Coverage}=req.body;
@@ -602,6 +613,7 @@ router.route('/UpdateCourse')
 })
 //-------------------------------------------------------------------
 // Delete a Course under a department -------------------------------
+
 router.route('/DeleteCourse')
 .post(async (req, res)=>{
     const {Departmentname,Code}=req.body;
@@ -655,6 +667,7 @@ router.route('/DeleteCourse')
 })
 //------------------------------------------------------------------
 // Add a staff member ----------------------------------------------
+
 router.route('/AddStaff')
 .post(async (req,res)=>{
     const {name,email,salary,officelocation,role,dayoff,department}=req.body;
@@ -723,6 +736,7 @@ router.route('/AddStaff')
 })
 //--------------------------------------------------------------------
 // Update a staff member ---------------------------------------------
+
 router.route('/Updatetaff')
 .post(async (req,res)=>{
     const {id,name,email,officelocation,role,dayoff,department}=req.body;
@@ -807,6 +821,7 @@ router.route('/Updatetaff')
 })
 //--------------------------------------------------------------------
 // Delete a staff member ---------------------------------------------
+
 router.route('/Deletetaff')
 .post(async (req,res)=>{
     const {id}=req.body;
@@ -863,6 +878,7 @@ router.route('/Deletetaff')
 })
 //--------------------------------------------------------------------
 // Update Salary -----------------------------------------------------
+
 router.route('/UpdateSalary')
 .post(async (req,res)=>{
     const {id,promotion}=req.body;
@@ -902,6 +918,7 @@ router.route('/UpdateSalary')
 })
 //--------------------------------------------------------------------
 // Add Sign in/out record --------------------------------------------
+
 router.route('/AddSigninAndOut')
 .post(async (req,res)=>{
     const {id,Date,Timein,Timeout}=req.body;
@@ -938,9 +955,12 @@ router.route('/AddSigninAndOut')
             if(newTimein > now || newTimeout > now){
                 return res.status(400).json({msg:"You cant access a date that is in the future!"});
             }
-            await attendanceRecord.signIn.push(newTimein);
-            await attendanceRecord.signOut.push(newTimeout);
-            await attendanceReccord.save();
+            attendanceRecord.signIn.push(newTimein);
+            attendanceRecord.signOut.push(newTimeout);
+            attendanceRecord.day = newTimein.toUTCString().substring(0,3)
+            
+            await attendance_model.findOneAndUpdate({date:Date},attendanceRecord);
+            res.send(attendanceRecord)
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1052,17 +1072,12 @@ router.route('/updateProfile')
 router.route('/signIn')
 .post(async(req,res)=>{
     const today =  new Date()
-    res.send(today.toUTCString())
     const user= await staff_model.findById(req.user._id)
-    // res.send(today.toUTCString())
-    const attendance= await attendance_model.findOne({"id":user.id,"date":today.toUTCString().substring(5,16)})
-    // res.send()
+    const attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
     if(attendance==null){
-        // res.send(attendance)
-        // res.send("here")
         attendance1 = new attendance_model({
             id:user.id,
-            date:today.toUTCString().substring(5,16),
+            date:today.toLocaleString().substring(0,10),
             day:today.toUTCString().substring(0,3)
         })
         attendance1.signIn.push(today)
@@ -1077,7 +1092,7 @@ router.route('/signIn')
         else{
             attendance.signIn.push(today)
         }
-        await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toUTCString().substring(5,16)},attendance)
+        await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
 
         res.send(attendance)
     }
@@ -1090,18 +1105,17 @@ router.route('/signOut')
     const today =  new Date()
     const user= await staff_model.findById(req.user._id)
     const attendance= await attendance_model.findOne({"id":user.id,
-        "date":today.toUTCString().substring(5,16)})
+        "date":today.toLocaleString().substring(0,10)})
     if(!attendance){
         res.send("You did not sign in today")
     }else{
-        // res.send(attendance.signIn.length.toString())
         if(attendance.signIn.length!=(attendance.signOut.length+1)){
             res.send("You did not sign in")
         }
         else{
             attendance.signOut.push(today)
         }
-        await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toUTCString().substring(5,16)},attendance)
+        await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
         
         res.send(attendance)
     }
@@ -1134,41 +1148,61 @@ router.route('/viewschedule')
     res.send(Schedule)
 })
 
-/*router.route('/viewReplaceReq')
-.get(async(req,res)=>{
-    const Schedule= await scheduleSchema.findById(req.user._id)
-    res.send(Schedule)
-})*/
 router.route('/sendReplacmentReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const reciver=await staff_model.findOne(req.body.reciever)
-    if(reciver!=null&&user.department==reciver.department){
-        const newreqest = await new request_model({type:req.body.type,requester:user,reciever:reciver,reason:req.body.reason})
+    const reciver=await staff_model.findOne({role:req.body.rec})
+    if(reciver!=null&&user.department==reciver.department&&reciver.role=='TA'){
+        const newreqest = await new request_model({type:req.body.type,requester:user.name,reciever:reciver.name,reason:req.body.reason})
+        await newreqest.save()
         res.send(newreqest)
     }else{
         res.send("pls insert a valid recipient")
     }
 })
+
+router.route('/viewReplaceReq')
+.get(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const myrequests= await request_model.find({type:req.body.type,requester:user.name})
+    res.send(myrequests)
+})
+
 router.route('/changeDayOffReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const hod = await staff_model.findOne(user.department.head)
-    const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod,newDay:req.body.newDay})
-    res.send(newreqest)
+    const hod = await staff_model.findOne({role:'HOD',department:user.department})
+    if(hod!=null){
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.name,reciever:hod.name,newDay:req.body.newDay})
+        await newreqest.save()
+        res.send(newreqest)
+    }else{
+        res.send('no head of department was found')
+    }
 })//all other send reqests of diffrent types such as leaves are copy paste from this with if conditionals if needed and a new dbs
+
+
 router.route('/leaveReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const hod = await staff_model.findOne(user.department.head)
-    if(req.body.type=="CompensationLeave"&&req.body.reason!=null){
+    const hod = await staff_model.findOne({role:'HOD',department:user.department})
+    if(hod!=null){
+    if(req.body.type=="CompensationLeave"&&req.body.reason!=null&&hod!=null){
         const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
+        await newreqest.save()
         res.send(newreqest)
+    }else{if(req.body.type=="CompensationLeave"&&req.body.reason==null){
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
+        await newreqest.save()
+        res.send('CompensationLeave need a reason pls state yours')
     }else{
         const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
+        await newreqest.save()
         res.send(newreqest)
-    }
-    
+    }}
+}else{
+    res.send('no head of department was found')
+}  
 })
 // router.route('/Notification')
 // .get(async(req,res)=>{
@@ -1180,7 +1214,7 @@ router.route('/leaveReq')
 router.route('/viewAcceptedRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const reqests = await request_model.find({requester:user.id,status:"accepted"})
+    const reqests = await request_model.find({requester:user.name,status:"accepted"})
     if(reqests==null){
         res.send("No accepted Requests")
     }
@@ -1191,7 +1225,7 @@ router.route('/viewAcceptedRequests')
 router.route('/viewPendingRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const reqests = await request_model.find({requester:user.id,status:"pending"})
+    const reqests = await request_model.find({requester:user.name,status:"pending"})
     if(reqests==null){
         res.send("No Pending Requests")
     }
@@ -1202,7 +1236,7 @@ router.route('/viewPendingRequests')
 router.route('/viewRejectedRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const reqests = await request_model.find({requester:user.id,status:"rejected"})
+    const reqests = await request_model.find({requester:user.name,status:"rejected"})
     if(reqests==null){
         res.send("No Rejected Requests")
     }
@@ -1213,7 +1247,7 @@ router.route('/viewRejectedRequests')
 router.route('/cancelRequests')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const requests = await request_model.findOne({id:req.body.id})
+    const requests = await request_model.findOne({id:req.body._id})
     if(requests==null){
         res.send("Incorrect request id")
     }
@@ -1389,6 +1423,7 @@ router.route('/acceptRequest')
             res.send("No corresponding request")
         }
         else{
+
             request.status="accepted"
             await request_model.findOneAndUpdate({id:req.body.id},request)
 
