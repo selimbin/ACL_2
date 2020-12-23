@@ -1028,41 +1028,61 @@ router.route('/viewschedule')
     res.send(Schedule)
 })
 
-/*router.route('/viewReplaceReq')
-.get(async(req,res)=>{
-    const Schedule= await scheduleSchema.findById(req.user._id)
-    res.send(Schedule)
-})*/
 router.route('/sendReplacmentReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const reciver=await staff_model.findOne(req.body.reciever)
-    if(reciver!=null&&user.department==reciver.department){
-        const newreqest = await new request_model({type:req.body.type,requester:user,reciever:reciver,reason:req.body.reason})
+    const reciver=await staff_model.findOne({role:req.body.rec})
+    if(reciver!=null&&user.department==reciver.department&&reciver.role=='TA'){
+        const newreqest = await new request_model({type:req.body.type,requester:user.name,reciever:reciver.name,reason:req.body.reason})
+        await newreqest.save()
         res.send(newreqest)
     }else{
         res.send("pls insert a valid recipient")
     }
 })
+
+router.route('/viewReplaceReq')
+.get(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    const myrequests= await request_model.find({type:req.body.type,requester:user.name})
+    res.send(myrequests)
+})
+
 router.route('/changeDayOffReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const hod = await staff_model.findOne(user.department.head)
-    const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod,newDay:req.body.newDay})
-    res.send(newreqest)
+    const hod = await staff_model.findOne({role:'HOD',department:user.department})
+    if(hod!=null){
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.name,reciever:hod.name,newDay:req.body.newDay})
+        await newreqest.save()
+        res.send(newreqest)
+    }else{
+        res.send('no head of department was found')
+    }
 })//all other send reqests of diffrent types such as leaves are copy paste from this with if conditionals if needed and a new dbs
+
+
 router.route('/leaveReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const hod = await staff_model.findOne(user.department.head)
-    if(req.body.type=="CompensationLeave"&&req.body.reason!=null){
+    const hod = await staff_model.findOne({role:'HOD',department:user.department})
+    if(hod!=null){
+    if(req.body.type=="CompensationLeave"&&req.body.reason!=null&&hod!=null){
         const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
+        await newreqest.save()
         res.send(newreqest)
+    }else{if(req.body.type=="CompensationLeave"&&req.body.reason==null){
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
+        await newreqest.save()
+        res.send('CompensationLeave need a reason pls state yours')
     }else{
         const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user,reciever:hod})
+        await newreqest.save()
         res.send(newreqest)
-    }
-    
+    }}
+}else{
+    res.send('no head of department was found')
+}  
 })
 // router.route('/Notification')
 // .get(async(req,res)=>{
@@ -1074,7 +1094,7 @@ router.route('/leaveReq')
 router.route('/viewAcceptedRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const reqests = await request_model.find({requester:user.id,status:"accepted"})
+    const reqests = await request_model.find({requester:user.name,status:"accepted"})
     if(reqests==null){
         res.send("No accepted Requests")
     }
@@ -1085,7 +1105,7 @@ router.route('/viewAcceptedRequests')
 router.route('/viewPendingRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const reqests = await request_model.find({requester:user.id,status:"pending"})
+    const reqests = await request_model.find({requester:user.name,status:"pending"})
     if(reqests==null){
         res.send("No Pending Requests")
     }
@@ -1096,7 +1116,7 @@ router.route('/viewPendingRequests')
 router.route('/viewRejectedRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const reqests = await request_model.find({requester:user.id,status:"rejected"})
+    const reqests = await request_model.find({requester:user.name,status:"rejected"})
     if(reqests==null){
         res.send("No Rejected Requests")
     }
@@ -1107,7 +1127,7 @@ router.route('/viewRejectedRequests')
 router.route('/cancelRequests')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
-    const requests = await request_model.findOne({id:req.body.id})
+    const requests = await request_model.findOne({id:req.body._id})
     if(requests==null){
         res.send("Incorrect request id")
     }
