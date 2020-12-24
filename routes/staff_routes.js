@@ -907,50 +907,168 @@ router.route('/UpdateSalary')
     }
 })
 //--------------------------------------------------------------------
-// Add Sign in/out record --------------------------------------------
-
-router.route('/AddSigninAndOut')
-.post(async (req,res)=>{
-    const {id,Date,Timein,Timeout}=req.body;
+// Add Sign in record --------------------------------------------
+router.route('/AddsignIn')
+.post(async(req,res)=>{
+    const{id,date,Time} = req.body;
     try {
         if (req.user.role  == "HR") {
-            if(!id){
-                return res.status(400).json({msg:"Please enter a valid id"});
+            var year = date.substring(6,10);
+            var month = date.substring(0,2);
+            var date = date.substring(3,5);
+            var hour = Time.substring(0,2);
+            var minute = Time.substring(3,5);
+            var today = new Date();
+            today.setFullYear(year)
+            today.setMonth(month-1)
+            today.setDate(date)
+            today.setHours(hour)
+            today.setMinutes(minute)
+            if(today.toTimeString.substring(0,2)>"19"){
+                res.send("You cannot add a sign in after 7PM")
             }
-            if(!Date){
-                return res.status(400).json({msg:"Please enter a valid Date"});
+            if(today.toTimeString.substring(0,2)<"07"){
+                res.send("You cannot add a sign in before 7AM")
             }
-            if(!Timein){
-                return res.status(400).json({msg:"Please enter a valid Timein"});
+            const user= await staff_model.findOne({id:id})
+            var attendance= await attendance_model.findOne({"id":id,"date":today.toLocaleString().substring(0,10)})
+            var schedule_attendance = null
+            if(today.toDateString().substring(8,10)<"11"){
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
             }
-            if(!Timeout){
-                return res.status(400).json({msg:"Please enter a valid Timeout"});
+            else{
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
             }
-            const existingstaff = await staff_model.findOne({id:id});
-            if(!existingstaff){
-                return res.status(400).json({msg:"Please enter a valid id"});
+            if(schedule_attendance==null){
+                if(today.toDateString().substring(8,10)<"11"){
+                    schedule_attendance = new scheduleAttendance_model({
+                        id:user.id,
+                        month:(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))
+                    })
+                    await schedule_attendance.save()
+                }
+                else{
+                    schedule_attendance = new scheduleAttendance_model({
+                        id:user.id,
+                        month:today.toLocaleString().substring(0,10)
+                    })
+                    await schedule_attendance.save()
+                }
             }
-            if(existingstaff._id == req.header._id){
-                return res.status(400).json({msg:"Can't add sign in/out for yourself!"});
+        
+            if(attendance==null){
+                attendance = new attendance_model({
+                    id:user.id,
+                    date:today.toLocaleString().substring(0,10),
+                    day:today.toUTCString().substring(0,3)
+                })
+                if(user.dayOff != today.toUTCString().substring(0,3)){
+                    var x = schedule_attendance.missedHours+8
+                    schedule_attendance.missedHours=x
+                }
+                for(var i in schedule_attendance.days){
+                    if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                        schedule_attendance.days.splice(i,1)
+                    }
+                }
+                
+                attendance.signIn.push(today)
+                schedule_attendance.days.push(attendance)
+                await attendance.save()
+            }else{
+                if(attendance.signIn.length!=attendance.signOut.length){
+                    attendance.signIn.pop()
+                    attendance.signIn.push(today)
+                }
+                else{
+                    attendance.signIn.push(today)
+                }
+                await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+        
+                for(var i in schedule_attendance.days){
+                    if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                        schedule_attendance.days.splice(i,1)
+                    }
+                }
+                schedule_attendance.days.push(attendance)
             }
-            const attendanceRecord = await attendance_model.findOne({date:Date});
-            if(!attendanceRecord){
-                return res.status(400).json({msg:"No record exists for such a date"});
+        
+            if(today.toDateString().substring(8,10)<"11"){
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
             }
-            let newTimein = Date + "T" + Timein + "Z";
-            let newTimeout = Date + "T" + Timeout + "Z";
-            newTimein = new Date('newTimein');
-            newTimeout = new Date('newTimeout');
-            const now = new Date();
-            if(newTimein > now || newTimeout > now){
-                return res.status(400).json({msg:"You cant access a date that is in the future!"});
+            else{
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
             }
-            attendanceRecord.signIn.push(newTimein);
-            attendanceRecord.signOut.push(newTimeout);
-            attendanceRecord.day = newTimein.toUTCString().substring(0,3)
-            
-            await attendance_model.findOneAndUpdate({date:Date},attendanceRecord);
-            res.send(attendanceRecord)
+            res.send(attendance)
+        } else {
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }     
+    catch (error) {
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
+// Add Sign out record -----------------------------------------------
+router.route('/signOut')
+.post(async(req,res)=>{
+    const{id,date,Time} = req.body;
+    try {
+        if (req.user.role  == "HR") {
+            var year = date.substring(6,10);
+            var month = date.substring(0,2);
+            var date = date.substring(3,5);
+            var hour = Time.substring(0,2);
+            var minute = Time.substring(3,5);
+            var today = new Date();
+            today.setFullYear(year)
+            today.setMonth(month-1)
+            today.setDate(date)
+            today.setHours(hour)
+            today.setMinutes(minute)
+            if(today.toTimeString.substring(0,2)>"19"){
+                res.send("You cannot add a sign in after 7PM")
+            }
+            if(today.toTimeString.substring(0,2)<"07"){
+                res.send("You cannot add a sign out before 7AM")
+            }
+            const user= await staff_model.findOne({id:id})
+            const attendance= await attendance_model.findOne({"id":user.id,
+                "date":today.toLocaleString().substring(0,10)})
+            var schedule_attendance = null
+            if(today.toDateString().substring(8,10)<"11"){
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+            }
+            else{
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+            }
+            if(!attendance||!schedule_attendance){
+                res.send("You did not sign in today")
+            }else{
+                if(attendance.signIn.length!=(attendance.signOut.length+1)){
+                    res.send("You did not sign in")
+                }
+                else{
+                    attendance.signOut.push(today)
+                }
+                var diff =(attendance.signOut[attendance.signOut.length-1]-attendance.signIn[attendance.signIn.length-1])/(1000*60*60)
+                diff=schedule_attendance.missedHours-diff
+                schedule_attendance.missedHours=diff
+                await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+                for(var i in schedule_attendance.days){
+                    if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                        schedule_attendance.days.splice(i,1)
+                    }
+                }
+                schedule_attendance.days.push(attendance)
+                if(today.toDateString().substring(8,10)<"11"){
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+                }
+                else{
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+                }
+                res.send(attendance)
+            }
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
