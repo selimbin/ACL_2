@@ -680,7 +680,6 @@ router.route('/AddStaff')
             }
             if(!gender && gender != "male" && gender != "female"){
                 return res.status(400).json({msg:"Please enter a valid gender"});
-
             }
             if(!department){
                 return res.status(400).json({msg:"Please enter a valid department"});
