@@ -85,7 +85,7 @@ router.route('/AddLocation')
 // Update a location -----------------------------------------------
 
 router.route('/UpdateLocation')
-.post(async (req, res)=>{
+.put(async (req, res)=>{
     const {Code,newCode,Building,Type,Capacity}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -156,7 +156,7 @@ router.route('/UpdateLocation')
 // Delete a location -----------------------------------------------
 
 router.route('/DeleteLocation')
-.post(async (req, res)=>{
+.delete(async (req, res)=>{
     const {Code}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -212,7 +212,7 @@ router.route('/AddFaculty')
 // Update a faculty -------------------------------------------------
 
 router.route('/UpdateFaculty')
-.post(async (req, res)=>{
+.put(async (req, res)=>{
     const {Name,newName}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -252,7 +252,7 @@ router.route('/UpdateFaculty')
 // Delete a faculty -------------------------------------------------
 
 router.route('/DeleteFaculty')
-.post(async (req, res)=>{
+.delete(async (req, res)=>{
     const {Name}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -347,7 +347,7 @@ router.route('/AddDepartment')
 // Update a department under a faculty ------------------------------
 
 router.route('/UpdateDepartment')
-.post(async (req, res)=>{
+.put(async (req, res)=>{
     const {FacultyName,DepartmentName,newDepartmentName,newFacultyname,newHead}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -428,7 +428,7 @@ router.route('/UpdateDepartment')
 // Delete a department under a faculty ------------------------------
 
 router.route('/DeleteDepartment')
-.post(async (req, res)=>{
+.delete(async (req, res)=>{
     const {FacultyName,Name}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -539,7 +539,7 @@ router.route('/AddCourse')
 // Update a Course under a department -------------------------------
 
 router.route('/UpdateCourse')
-.post(async (req, res)=>{
+.put(async (req, res)=>{
     const {Departmentname,Code,newDepartmentname,newCode,Coverage}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -615,7 +615,7 @@ router.route('/UpdateCourse')
 // Delete a Course under a department -------------------------------
 
 router.route('/DeleteCourse')
-.post(async (req, res)=>{
+.delete(async (req, res)=>{
     const {Departmentname,Code}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -738,7 +738,7 @@ router.route('/AddStaff')
 // Update a staff member ---------------------------------------------
 
 router.route('/Updatetaff')
-.post(async (req,res)=>{
+.put(async (req,res)=>{
     const {id,name,email,officelocation,role,dayoff,department}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -823,7 +823,7 @@ router.route('/Updatetaff')
 // Delete a staff member ---------------------------------------------
 
 router.route('/DeleteStaff')
-.post(async (req,res)=>{
+.delete(async (req,res)=>{
     const {id}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -870,7 +870,7 @@ router.route('/DeleteStaff')
 // Update Salary -----------------------------------------------------
 
 router.route('/UpdateSalary')
-.post(async (req,res)=>{
+.put(async (req,res)=>{
     const {id,promotion}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -962,7 +962,7 @@ router.route('/AddSigninAndOut')
 //--------------------------------------------------------------------
 // view staff attendance ---------------------------------------------
 router.route('/ViewAttendance')
-.post(async (req,res)=>{
+.get(async (req,res)=>{
     const {id}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -983,7 +983,7 @@ router.route('/ViewAttendance')
 //--------------------------------------------------------------------
 // View staff with missed days or hours ------------------------------
 router.route('/Viewmissed')
-.post(async (req,res)=>{
+.get(async (req,res)=>{
     try {
         if (req.user.role  == "HR") {
             const existingstaff = await staff_model.find({missedHours:{$gte:1},misseddays:{$gte:1}});
