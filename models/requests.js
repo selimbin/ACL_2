@@ -33,6 +33,15 @@ const internalRequestSchema= new mongoose.Schema({
     date:{
         type:Date
     },
+    slot:{
+        type:Number
+    },
+    location:{
+        type:String
+    },
+    course:{
+        type:String
+    },
     newDay:{
         type:String
     }
