@@ -74,18 +74,6 @@ const staffSchema = new mongoose.Schema({
     dayOff:{
         type:String
     },
-    hoursSpent:{
-        type:Number
-    },
-    accumelatedHours:{
-        type:Number
-    },
-    missedHours:{
-        type:Number
-    },
-    misseddays:{
-        type:Number
-    },
     department:{
         type:String,
     },
