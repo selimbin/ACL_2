@@ -681,7 +681,7 @@ router.route('/AddStaff')
             if(!department){
                 return res.status(400).json({msg:"Please enter a valid department"});
             }
-            if(dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thuresday" && dayoff != "Saturday"){
+            if(dayoff != "Sun" && dayoff != "Mon" && dayoff != "Tues" && dayoff != "Wed" && dayoff != "Thur" && dayoff != "Sat"){
                 return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
             }
             const existinglocation = await Location_model.findOne({code:officelocation})
@@ -748,10 +748,10 @@ router.route('/Updatetaff')
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
             if(dayoff){
-                if(dayoff != "Saturday" && (existingstaff.role == "HR" || role == "HR")){
+                if(dayoff != "Sat" && (existingstaff.role == "HR" || role == "HR")){
                     return res.status(400).json({msg:"HR dayoff can only be saturday!"});
                 }
-                else if(dayoff != "Saturday" && dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thuresday"){
+                else if(dayoff != "Sat" && dayoff != "Sun" && dayoff != "Mon" && dayoff != "Tues" && dayoff != "Wed" && dayoff != "Thur"){
                     return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
                 }
             }
@@ -986,8 +986,13 @@ router.route('/Viewmissed')
 .get(async (req,res)=>{
     try {
         if (req.user.role  == "HR") {
-            const existingstaff = await staff_model.find({missedHours:{$gte:1},misseddays:{$gte:1}});
-            res.send(existingstaff)
+            const existingattendance = await scheduleAttendance_model.find({missedHours:{$gte:1},misseddays:{$gte:1}});
+            let allstaff;
+            for(var i = 0; i< existingattendance.length; i = i+1){
+                const onestaff = await staff_model.findOne({id:existingattendance[i].id})
+                allstaff.push(onestaff)
+            }
+            res.send(allstaff)
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
