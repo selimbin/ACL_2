@@ -33,42 +33,42 @@ var j = schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, function(){
             let slot;
             if(dayname == 'Sunday'){
                 slot = await currentschedule.sunday.splice((currentrequest.slot-1),1)
-                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentstaff.id,type:"compensation",
+                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                 compensation:true,isEmpty:false})
                 await newslot.save()
                 await currentschedule.sunday.splice((currentrequest.slot-1),0,newslot)
             }
             if(dayname == 'Monday'){
                 slot = await currentschedule.monday.splice((currentrequest.slot-1),1)
-                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentstaff.id,type:"compensation",
+                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                 compensation:true,isEmpty:false})
                 await newslot.save()
                 await currentschedule.monday.splice((currentrequest.slot-1),0,newslot)
             }
             if(dayname == 'Tuesday'){
                 slot = await currentschedule.tuesday.splice((currentrequest.slot-1),1)
-                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentstaff.id,type:"compensation",
+                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                 compensation:true,isEmpty:false})
                 await newslot.save()
                 await currentschedule.tuesday.splice((currentrequest.slot-1),0,newslot)
             }
             if(dayname == 'Wednesday'){
                 slot = await currentschedule.wednesday.splice((currentrequest.slot-1),1) 
-                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentstaff.id,type:"compensation",
+                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                 compensation:true,isEmpty:false})
                 await newslot.save()
                 await currentschedule.wednesday.splice((currentrequest.slot-1),0,newslot)
             }
             if(dayname == 'Thursday'){
                 slot = await currentschedule.thuresday.splice((currentrequest.slot-1),1)
-                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentstaff.id,type:"compensation",
+                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                 compensation:true,isEmpty:false})
                 await newslot.save()
                 await currentschedule.thuresday.splice((currentrequest.slot-1),0,newslot) 
             }
             if(dayname == 'Saturday'){
                 slot = await currentschedule.saturday.splice((currentrequest.slot-1),1)
-                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentstaff.id,type:"compensation",
+                const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                 compensation:true,isEmpty:false})
                 await newslot.save()
                 await currentschedule.saturday.splice((currentrequest.slot-1),0,newslot)

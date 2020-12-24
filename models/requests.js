@@ -33,7 +33,6 @@ const internalRequestSchema= new mongoose.Schema({
     date:{
         type:Date
     },
-<<<<<<< HEAD
     slot:{
         type:Number
     },
@@ -43,11 +42,9 @@ const internalRequestSchema= new mongoose.Schema({
     course:{
         type:String
     },
-=======
     amount:{
         type:Number
     },
->>>>>>> e1655176d152d4abd3d3df79350657e9059beca8
     newDay:{
         type:String
     }
