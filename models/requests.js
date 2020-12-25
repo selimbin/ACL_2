@@ -25,6 +25,9 @@ const internalRequestSchema= new mongoose.Schema({
         type:String,
         required:true
     },
+    replacement:{
+        type:String
+    },
     status:{
         type:String,
         required:true,
@@ -47,7 +50,7 @@ const internalRequestSchema= new mongoose.Schema({
     },
     newDay:{
         type:String
-    }
+    },
 })
 module.exports.internalRequestSchema = internalRequestSchema
 module.exports = mongoose.model('IRS', internalRequestSchema)
