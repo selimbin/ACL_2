@@ -20,7 +20,6 @@ const courseSchema = new mongoose.Schema({
     },
     totalSlots:{
         type:Number,
-        required:true
     },
     lecturer:{
         type:[String]

@@ -100,7 +100,7 @@ router.route('/AddLocation')
                 await newLocationschedule.thursday.push(newLocationslot)
             }
             await newLocationschedule.save()
-            res.send(newLocation);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -174,7 +174,7 @@ router.route('/UpdateLocation')
             const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation1._id,
                 {code:UpdateCode,building:Updatebuilding,type:Updatetype,capacity:Updatecapacity},{new:true});
             await Updatedlocation.save();
-            res.send(Updatedlocation);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -444,7 +444,7 @@ router.route('/DeleteLocation')
             await schedule_model.findByIdAndDelete(locationschedule._id);
             await slot_model.deleteMany({location:Code})
             const deletedlocation = await Location_model.findByIdAndDelete(existinglocation._id);
-            res.send(deletedlocation);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -469,7 +469,7 @@ router.route('/AddFaculty')
             }
             const newFaculty = new Faculty_model({name:Name});
             await newFaculty.save();
-            res.send(newFaculty);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -509,7 +509,7 @@ router.route('/UpdateFaculty')
             }
             const Updatedfaculty = await Faculty_model.findByIdAndUpdate(existingfaculty1._id,{name:UpdateName},{new:true});
             await Updatedfaculty.save();
-            res.send(Updatedfaculty);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -563,7 +563,7 @@ router.route('/DeleteFaculty')
                 existingdepartment = await department_model.findOne({facultyname:Name})
             }
             const deletedfaculty = await Faculty_model.findByIdAndDelete(existingfaculty._id);
-            res.send(deletedfaculty);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -604,7 +604,7 @@ router.route('/AddDepartment')
             }
             await existingfaculty.departments.push(newDepartment)
             await existingfaculty.save()
-            res.send(newDepartment)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -685,7 +685,7 @@ router.route('/UpdateDepartment')
                 await newfaculty.departments.push(UpdatedDepartment)
                 await newfaculty.save()
             }
-            res.send(UpdatedDepartment)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -756,7 +756,7 @@ router.route('/DeleteDepartment')
                 await updatestaffindepartment.save();
                 staffindepartment = await staff_model.findOne({department:Name});   
             }
-            res.send(deleteddepartment);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -818,7 +818,7 @@ router.route('/AddCourse')
                 await newcourseschedule.thursday.push(newcourseslot)
             }
             await newcourseschedule.save()
-            res.send(newCourse)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -858,6 +858,9 @@ router.route('/UpdateCourse')
             }
             else{
                 Updateslots = totalslots - (existingcourse1.totalSlots * existingcourse1.coverage);
+                if(Updateslots <= 0){
+                    return res.status(400).json({msg:"please enter a vlaid number of slots for this course"});
+                }
             }
             if(!newDepartmentname){
                 UpdateDepartment = Departmentname;
@@ -900,7 +903,7 @@ router.route('/UpdateCourse')
             const existingfaculty2 = await Faculty_model.findOne({name:existingdepartment2.facultyname});
             await existingfaculty2.departments.push(existingdepartment2);
             await existingfaculty2.save();
-            res.send(UpdatedCourse)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1163,7 +1166,7 @@ router.route('/DeleteCourse')
             await existingdepartment.save();
             await existingfaculty.departments.push(existingdepartment);
             await existingfaculty.save();
-            res.send(deletedCourse);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1185,15 +1188,22 @@ router.route('/AddStaff')
                 }
             }
             if(!salary || salary <= 0){
-                return res.status(400).json({msg:"Please enter a valid salary"});
+                return res.status(400).json({msg:"Please enter a valid Salaray"});
             }
-            if(!gender && gender != "male" && gender != "female"){
+            if(!gender && gender != "M" && gender != "F"){
                 return res.status(400).json({msg:"Please enter a valid gender"});
             }
+            let Adddepartment;
             if(!department){
-                return res.status(400).json({msg:"Please enter a valid department"});
+                Adddepartment = "";
             }
-            if(dayOff != "Sun" && dayOff != "Mon" && dayOff != "Tues" && dayOff != "Wed" && dayOff != "Thur" && dayOff != "Sat"){
+            else{
+                if(role == "HR"){
+                    return res.status(400).json({msg:"HR can't be assigned a department"});
+                }
+                Adddepartment = department;
+            }
+            if(dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thursday" && dayoff != "Saturday"){
                 return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
             }
             const existinglocation = await Location_model.findOne({code:officelocation})
@@ -1231,8 +1241,8 @@ router.route('/AddStaff')
                 const UpdatedStaffcount = await Staffcount_model.findByIdAndUpdate(newStaffcount._id,{Academic:Updatedcount},{new:true});
                 await UpdatedStaffcount.save();
             }
-            const newStaff = new staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayOff,officeLocation:officelocation,
-            department:department,gender:gender});
+            const newStaff = new staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayoff,officeLocation:officelocation,
+            department:Adddepartment,gender:gender});
             await newStaff.save();
             const newCapacity = existinglocation.capacity - 1;
             const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation._id,{capacity:newCapacity},{new:true});
@@ -1260,7 +1270,7 @@ router.route('/AddStaff')
                 await newstaffschedule.thursday.push(newstaffslot)
             }
             await newstaffschedule.save()
-            res.send(newStaff);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1283,10 +1293,10 @@ router.route('/Updatetaff')
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
             if(dayoff){
-                if(dayoff != "Sat" && (existingstaff.role == "HR" || role == "HR")){
+                if((dayoff != "Saturday" && role == "HR") || (dayoff != "Saturday" && existingstaff.role == "HR" && !role)){
                     return res.status(400).json({msg:"HR dayoff can only be saturday!"});
                 }
-                else if(dayoff != "Sat" && dayoff != "Sun" && dayoff != "Mon" && dayoff != "Tues" && dayoff != "Wed" && dayoff != "Thur"){
+                else if(dayoff != "Saturday" && dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thursday"){
                     return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
                 }
             }
@@ -1294,6 +1304,9 @@ router.route('/Updatetaff')
                 Updatedayoff = existingstaff.dayOff;
             }
             if(department){
+                if(role == "HR" || (existingstaff.role == "HR" && !role)){
+                    return res.status(400).json({msg:"HR can't be assigned a department"});
+                }
                 const existingdepartment = await department_model.findOne({name:department});
                 if(!existingdepartment){
                     return res.status(400).json({msg:"This department doesn't exist"});
@@ -1344,7 +1357,7 @@ router.route('/Updatetaff')
             const UpdatedStaff = await staff_model.findByIdAndUpdate(existingstaff._id,{name:Updatename,email:Updateemail,role:Updaterole,
             officelocation:Updatelocation,dayOff:Updatedayoff,department:Updatedepartment},{new:true});
             await UpdatedStaff.save();
-            res.send(UpdatedStaff);
+            res.send();
         
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -1372,26 +1385,32 @@ router.route('/DeleteStaff')
                 const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation._id,{capacity:Updatedcapacity});
                 Updatedlocation.save();
             }
-            let existingdepartment = await department_model.findOne({name:existingstaff.department});
-            const existingfaculty = await Faculty_model.findOne({name:existingdepartment.facultyname});
-            await existingfaculty.departments.pull(existingdepartment);    
-            await existingfaculty.save();
             let currentcourse = existingstaff.course.shift();
-            while(currentcourse){
-                const existingcourse = await course_model.findOne({code:currentcourse});
-                await existingdepartment.courses.pull(existingcourse); 
-                await existingdepartment.save();
-                await existingcourse.Lecturer.pull(existingstaff.id);
-                await existingcourse.TA.pull(existingstaff.id);
-                await existingcourse.save();
-                await existingdepartment.courses.push(existingcourse);
-                await existingdepartment.save();
-                currentcourse = existingstaff.course.shift();
-                
+            if(currentcourse){
+                let existingcourse = await course_model.findOne({code:currentcourse});
+                let existingdepartment = await department_model.findOne({name:existingcourse.departmentname});
+                const existingfaculty = await Faculty_model.findOne({name:existingdepartment.facultyname});
+                await existingfaculty.departments.pull(existingdepartment);    
+                await existingfaculty.save();
+                while(currentcourse){
+                    existingcourse = await course_model.findOne({code:currentcourse});
+                    await existingdepartment.courses.pull(existingcourse); 
+                    await existingdepartment.save();
+                    if(existingstaff.role == "TA"){
+                        await existingcourse.TA.pull(existingstaff.id);
+                    }
+                    else{
+                        await existingcourse.lecturer.pull(existingstaff.id);
+                    }
+                    await existingcourse.save();
+                    await existingdepartment.courses.push(existingcourse);
+                    await existingdepartment.save();
+                    currentcourse = existingstaff.course.shift();
+                }
+                await existingfaculty.departments.push(existingdepartment);
+                await existingfaculty.save();
             }
-            await existingfaculty.departments.push(existingdepartment);
-            await existingfaculty.save();
-            const staffschedule = await schedule_model.findOne({id:Code})
+            const staffschedule = await schedule_model.findOne({id:id})
             for(var i = 0; i<6; i=i+1){
                 if(i == 0){
                     for(var j = 0; j<5; j=j+1){
@@ -1631,7 +1650,7 @@ router.route('/DeleteStaff')
             await schedule_model.findByIdAndDelete(staffschedule._id);
             await slot_model.deleteMany({location:id})
             const deletedstaff = await staff_model.findByIdAndDelete(existingstaff._id);
-            res.send(deletedstaff);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1652,26 +1671,32 @@ router.route('/UpdateSalary')
             if(!existingstaff){
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
-            let newsalary = existingstaff.salary,missedhours = existingstaff.missedHours - 3,misseddays = existingstaff.misseddays;
+            let currentstaffattendance = await scheduleAttendance_model.findOne({id:id})
+            let misseddays = currentstaffattendance.missedDays
+            let missedhours = currentstaffattendance.missedHours - 3
+            let newsalary = existingstaff.salary
             while(misseddays != 0){
-                newsalary = newsalary/60;
+                newsalary = newsalary - newsalary/60;
                 misseddays = misseddays -1;
             }
-            while(missedhours > 1){
-                newsalary = newsalary/180;
+            while(missedhours != 0 ){
+                newsalary = newsalary - newsalary/180;
                 missedhours = missedhours - 1;
             }
             missedhours = (missedhours*100) * 60;
             while(missedhours != 0){
-                newsalary = (newsalary/180) * 60;
+                newsalary = newsalary - ((newsalary/180) * 60);
                 missedhours = missedhours - 1;
             }
             if(promotion){
+                if(promotion < 0){
+                    return res.status(400).json({msg:"Please enter a valid id"});
+                }
                 newsalary = newsalary + promotion
             }
             const Updatedstaff = await staff_model.findByIdAndUpdate(existingstaff._id,{salary:newsalary},{new:true});
             await Updatedstaff.save();
-            res.send(Updatedstaff);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1774,7 +1799,7 @@ router.route('/AddsignIn')
             else{
                 await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
             }
-            res.send(attendance)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1842,7 +1867,7 @@ router.route('/signOut')
                 else{
                     await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
                 }
-                res.send(attendance)
+                res.send();
             }
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -1865,7 +1890,7 @@ router.route('/viewStaffAttendance')
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
             const staffAttendance = await scheduleAttendance_model.findOne({id:id});
-            res.send(staffAttendance.days);
+            res.send(staffAttendance);
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1880,8 +1905,13 @@ router.route('/Viewmissed')
 .get(async (req,res)=>{
     try {
         if (req.user.role  == "HR") {
-            const existingattendance = await scheduleAttendance_model.find({missedHours:{$gte:1},misseddays:{$gte:1}});
-            let allstaff;
+            let existingattendance = await scheduleAttendance_model.find({missedHours:{$gte:1}});
+            let allstaff = [];
+            for(var i = 0; i< existingattendance.length; i = i+1){
+                const onestaff = await staff_model.findOne({id:existingattendance[i].id})
+                allstaff.push(onestaff)
+            }
+            existingattendance = await scheduleAttendance_model.find({missedDays:{$gte:1}});
             for(var i = 0; i< existingattendance.length; i = i+1){
                 const onestaff = await staff_model.findOne({id:existingattendance[i].id})
                 allstaff.push(onestaff)
