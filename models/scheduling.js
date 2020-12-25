@@ -40,9 +40,6 @@ const slotSchema = new mongoose.Schema({
     type:{
         type:[String]
     },
-    type:{
-        type:[String]
-    },
     compensation:{
         type:[Boolean]
     },
