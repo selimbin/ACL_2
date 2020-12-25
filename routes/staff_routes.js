@@ -697,7 +697,7 @@ router.route('/DeleteCourse')
 // Add a staff member ----------------------------------------------
 router.route('/AddStaff')
 .post(async (req,res)=>{
-    const {name,email,salary,officelocation,role,dayoff,department,gender}=req.body;
+    const {name,email,salary,officelocation,role,dayOff,department,gender}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(role == "HR"){
@@ -711,7 +711,7 @@ router.route('/AddStaff')
             if(!department){
                 return res.status(400).json({msg:"Please enter a valid department"});
             }
-            if(dayoff != "Sun" && dayoff != "Mon" && dayoff != "Tues" && dayoff != "Wed" && dayoff != "Thur" && dayoff != "Sat"){
+            if(dayOff != "Sun" && dayOff != "Mon" && dayOff != "Tues" && dayOff != "Wed" && dayOff != "Thur" && dayOff != "Sat"){
                 return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
             }
             const existinglocation = await Location_model.findOne({code:officelocation})
@@ -749,7 +749,7 @@ router.route('/AddStaff')
                 const UpdatedStaffcount = await Staffcount_model.findByIdAndUpdate(newStaffcount._id,{Academic:Updatedcount},{new:true});
                 await UpdatedStaffcount.save();
             }
-            const newStaff = new staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayoff,officeLocation:officelocation,
+            const newStaff = new staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayOff,officeLocation:officelocation,
             department:department,gender:gender});
             await newStaff.save();
             const newCapacity = existinglocation.capacity - 1;
