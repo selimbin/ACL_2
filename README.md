@@ -349,7 +349,7 @@ Response if not HOD: "You are not authorized to access this page"<br>
 
 Functionality: Delete an instructor from a course
 Route: /staff/removeInstructor
-Request type: POST
+Request type: DELETE
 Request body: { “id”:“ac-3”, “course”: “CSEN720”}
 Response if not HOD: "You are not authorized to access this page"
 

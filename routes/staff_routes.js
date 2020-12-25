@@ -2606,7 +2606,7 @@ router.route('/assignInstructor')
 // HOD remove instructor ---------------------------------------------
 
 router.route('/removeInstructor')
-.post(async(req,res)=>{
+.delete(async(req,res)=>{
     try{
         const user= await staff_model.findById(req.user._id)
         const department = await department_model.findOne({name:user.department})
@@ -3049,106 +3049,156 @@ router.route('/viewslotassignment')
     })   
 
 
-router.route('/Assigntoslots').put(async (req,res)=>{
-    const prof= await staff_model.findById(req.user._id);
-    const {courses,staff_id,slot_no,day}=req.body;
-    if(!courses || !staff_id || !slot_no || !day ){
-        return res.status(400).json({msg:"Please enter staff_id,slot_no,day and array of courses"});
-    }
-    if(req.body.slot_no>5)
-    return res.status(400).json({msg:"Enter a valid slot_no"});
-    if(prof.role=="lecturer"){
-
-
-    const courses = req.body.courses;
-
-    const stafffff =  await staff_model.findOne({id: req.body.staff_id});
-    if(!stafffff)
-    return res.status(400).json({msg:"Enter a valid staff_id"});
-
-
-    courses.forEach(async elem => {
-
-        
-        const courseee =  await course_model.findOne({code: elem});
-        if(!courseee)
-        return res.status(400).json({msg:"Enter valid course codes"});  
-
-
-        await courseee.TA.push(req.body.staff_id)
-        await courseee.save()
-        await stafffff.course.push(elem)
-        await stafffff.save()
-
-        const course1 =  await course_model.findOne({code: elem});
-       
-        const ta = course1.TA.length
-        const le = course1.lecturer.length
-        const ts = course1.totalSlots
-        courseee.coverage = ((ta+le)/ts)%100;
-        await course1.save() 
-
-    const sta =  await schedule_model.findOne({id: req.body.staff_id});
-    const cor =  await schedule_model.findOne({id: elem});
-   var slot=cor.saturday[slot_no-1];;
-    switch(day) {
-        case "saturday":
-            if(!sta.saturday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.saturday[slot_no-1];
-          break;
-        case "sunday":
-        
-            if(!sta.sunday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.sunday[slot_no-1];
-          break;
-        case "monday":
-            
-            if(!sta.monday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.monday[slot_no-1];
-          break;
-        case "tuesday":
-           
-            if(!sta.tuesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.tuesday[slot_no-1];
-          break;
-        case "wednesday":
-           
-            if(!sta.wednesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.wednesday[slot_no-1];
-            break;
-        case "thrusday":
-            
-            if(!sta.thursday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.thursday[slot_no-1];
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      }
-    for (var i = 0; i < slot.staff.length; i++) {
-        if(slot.staff[i]==null)
-        slot.staff.set(i, staff_id);
-        
-    }
-    slot.isEmpty=false;
-
-    await slot.save();
-   
-}); 
-
-    
-   
-    res.send("done");
-  
-    }else{
-        return res.status(401).json({msg:"unauthorized"});
-    }
-    })   
+    router.route('/Assigntoslots')
+    .put(async (req,res)=>{
+        const {course, slot_no, day, staff_id, location} = re.body
+        try {
+            if (req.user.role  == "lecturer") {
+                if(!course || !slot_no || !day || !staff_id || location){
+                    return res.status(400).json({msg:"Please enter valid course,slot,day,id and location"});
+                }
+                const prof = await staff_model.findById(req.user._id)
+                const coursecoord = await course_model.findOne({code:course})
+                if(prof != coursecoord.courseCoordinator){
+                    return res.status(400).json({msg:"Please enter valid course"});
+                }
+                const staff = await staff_model.findOne({id:staff_id})
+                let found = false;
+                for(var i =0;i<staff.course.length;i = i + 1){
+                    if(staff.course[i] == course){
+                        found = true;
+                    }
+                }
+                if(found == false){
+                    return res.status(400).json({msg:"The academic member isnt assigned to this course"});
+                }
+                const staffschedule = await schedule_model.findOne({id:staff_id})
+                const locationslot = await schedule_model.findOne({id:location})
+                const courseschedule = await schedule_model.findOne({id:course})
+                if(day == "saturday"){
+                    if(locationslot.saturday[slot_no-1].isEmpty == false){
+                        return res.status(400).json({msg:"This location is occupied please enter an emty one"});
+                    }
+                    let currentslot = await staffschedule.saturday.splice((slot_no-1),1)
+                    let slot = await slot_model.findById(currentslot)
+                    slot.course.push(course)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.saturday.splice((slot_no-1),0,slot);
+                    currentslot = await courseschedule.saturday.splice((slot_no-1),1)
+                    slot = await slot_model.findById(currentslot)
+                    slot.staff.push(staff_id)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.saturday.splice((slot_no-1),0,slot);                
+                }
+                if(day == "monday"){
+                    if(locationslot.monday[slot_no-1].isEmpty == false){
+                        return res.status(400).json({msg:"This location is occupied please enter an emty one"});
+                    }
+                    let currentslot = await staffschedule.monday.splice((slot_no-1),1)
+                    let slot = await slot_model.findById(currentslot)
+                    slot.course.push(course)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.monday.splice((slot_no-1),0,slot);
+                    currentslot = await courseschedule.monday.splice((slot_no-1),1)
+                    slot = await slot_model.findById(currentslot)
+                    slot.staff.push(staff_id)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.monday.splice((slot_no-1),0,slot);                
+                }
+                if(day == "tuesday"){
+                    if(locationslot.tuesday[slot_no-1].isEmpty == false){
+                        return res.status(400).json({msg:"This location is occupied please enter an emty one"});
+                    }
+                    let currentslot = await staffschedule.tuesday.splice((slot_no-1),1)
+                    let slot = await slot_model.findById(currentslot)
+                    slot.course.push(course)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.tuesday.splice((slot_no-1),0,slot);
+                    currentslot = await courseschedule.tuesday.splice((slot_no-1),1)
+                    slot = await slot_model.findById(currentslot)
+                    slot.staff.push(staff_id)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.tuesday.splice((slot_no-1),0,slot);                
+                }
+                if(day == "wednesday"){
+                    if(locationslot.wednesday[slot_no-1].isEmpty == false){
+                        return res.status(400).json({msg:"This location is occupied please enter an emty one"});
+                    }
+                    let currentslot = await staffschedule.wednesday.splice((slot_no-1),1)
+                    let slot = await slot_model.findById(currentslot)
+                    slot.course.push(course)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.wednesday.splice((slot_no-1),0,slot);
+                    currentslot = await courseschedule.wednesday.splice((slot_no-1),1)
+                    slot = await slot_model.findById(currentslot)
+                    slot.staff.push(staff_id)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.wednesday.splice((slot_no-1),0,slot);                
+                }
+                if(day == "thursday"){
+                    if(locationslot.thursday[slot_no-1].isEmpty == false){
+                        return res.status(400).json({msg:"This location is occupied please enter an emty one"});
+                    }
+                    let currentslot = await staffschedule.thursday.splice((slot_no-1),1)
+                    let slot = await slot_model.findById(currentslot)
+                    slot.course.push(course)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.thursday.splice((slot_no-1),0,slot);
+                    currentslot = await courseschedule.thursday.splice((slot_no-1),1)
+                    slot = await slot_model.findById(currentslot)
+                    slot.staff.push(staff_id)
+                    slot.location.push(location)
+                    slot.type.push("normal")
+                    slot.compensation.push(false)
+                    await slot_model.findByIdAndUpdate(currentslot._id,{isEmpty:false},{new:true})
+                    await slot.save()
+                    await staffschedule.thursday.splice((slot_no-1),0,slot);                
+                }
+                res.send();
+            } else {
+                return res.status(401).json({msg:"unauthorized"});
+            }
+        }     
+        catch (error) {
+            res.status(500).json({error:error.message});
+        }
+    })
 
 
 
@@ -3374,8 +3424,8 @@ router.route('/DeleteAssignslots').put(async (req,res)=>{
     courses.forEach(async elem => {
 
         
-     const c = course_model.findOne({code : elem})
-     const staffmem = staff_model.findOne({id : req.body.staff_id})
+     const c = await course_model.findOne({code : elem})
+     const staffmem = await staff_model.findOne({id:req.body.staff_id})
 
     if(!c)
     return res.status(400).json({msg:"please enter a valid course codes"});
@@ -3538,7 +3588,7 @@ router.route('/acceptslotlinkingreq').put(async (req,res)=>{
             break;
         case "thursday":
             
-            if(!sta.thrusday[slot_no-1].isEmpty)
+            if(!sta.thursday[slot_no-1].isEmpty)
             return res.status(400).json({msg:"this staff member is busy in this slot"});
              slot =cor.thursday[slot_no-1];
                 break;        
