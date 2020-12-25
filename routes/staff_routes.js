@@ -2974,4 +2974,1114 @@ router.route('/viewAssignments')
         res.status(500).json({error:error.message});
     }
 })
+
+
+
+
+router.route('/viewcoverage').get(async (req,res)=>{
+    const prof= await staff_model.findById(req.user._id);
+    const {courses}=req.body;
+    if(!courses ){
+        return res.status(400).json({msg:"Please enter an array of courses"});
+    }
+   
+    if(prof.role=="lecturer"){
+        const coursess = req.body.courses;
+        const output = [];
+        coursess.forEach(async elem => {
+            if(elem.coverage==null)
+            output.push(0);
+            else
+            output.push(elem.coverage);
+    
+});
+
+res.send(output);
+    }
+    else{
+        return res.status(401).json({msg:"unauthorized"});
+
+    }
+    })
+
+
+
+router.route('/viewslotassignment').get(async (req,res)=>{
+    const prof= await staff_model.findById(req.user._id);
+    const {courses}=req.body;
+    if(!courses ){
+        return res.status(400).json({msg:"Please enter an array of courses"});
+    }
+   
+    if(prof.role=="lecturer"){
+        const coursess = req.body.courses;
+        coursess.forEach(async elem => {
+        var output =[];
+        const out =  await schedule_model.findOne({id: elem});
+        if(!out)
+        return res.status(400).json({msg:"Please course doent have any slots"});
+        for (var i = 0; i < 5 ; i++) {
+            if(out.saturday[i].isEmpty==false)
+            output.push(out.saturday[i]);
+            if(out.sunday[i].isEmpty==false)
+            output.push(out.saturday[i]);
+            if(out.monday[i].isEmpty==false)
+            output.push(out.saturday[i]);
+            if(out.tuesday[i].isEmpty==false)
+            output.push(out.saturday[i]);
+            if(out.wednesday[i].isEmpty==false)
+            output.push(out.saturday[i]);
+            if(out.thrusday[i].isEmpty==false)
+            output.push(out.saturday[i]);
+            
+        }
+    });
+  
+
+    res.send(output);
+    }
+    else{
+        return res.status(401).json({msg:"unauthorized"});
+
+    }
+    }) 
+
+
+
+ router.route('/viewdepstaff').get(async (req,res)=>{
+    const prof= await staff_model.findById(req.user._id);
+    if(prof.role=="lecturer"){
+    const dep = prof.department;
+    const output = await staff_model.find({department:dep});
+    res.send(output);
+    }else{
+        return res.status(401).json({msg:"unauthorized"});
+    }
+    })   
+
+
+router.route('/Assigntoslots').put(async (req,res)=>{
+    const prof= await staff_model.findById(req.user._id);
+    const {courses,staff_id,slot_no,day}=req.body;
+    if(!courses || !staff_id || !slot_no || !day ){
+        return res.status(400).json({msg:"Please enter staff_id,slot_no,day and array of courses"});
+    }
+    if(req.body.slot_no>5)
+    return res.status(400).json({msg:"Enter a valid slot_no"});
+    if(prof.role=="lecturer"){
+
+
+    const courses = req.body.courses;
+
+    const stafffff =  await staff_model.findOne({id: req.body.staff_id});
+    if(!stafffff)
+    return res.status(400).json({msg:"Enter a valid staff_id"});
+
+
+    courses.forEach(async elem => {
+
+        
+        const courseee =  await course_model.findOne({code: elem});
+        if(!courseee)
+        return res.status(400).json({msg:"Enter valid course codes"});  
+
+
+        await courseee.TA.push(req.body.staff_id)
+        await courseee.save()
+        await stafffff.course.push(elem)
+        await stafffff.save()
+
+        const course1 =  await course_model.findOne({code: elem});
+       
+        const ta = course1.TA.length
+        const le = course1.lecturer.length
+        const ts = course1.totalSlots
+        courseee.coverage = ((ta+le)/ts)%100;
+        await course1.save() 
+
+    const sta =  await schedule_model.findOne({id: req.body.staff_id});
+    const cor =  await schedule_model.findOne({id: elem});
+   var slot=cor.saturday[slot_no-1];;
+    switch(day) {
+        case "saturday":
+            if(!sta.saturday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.saturday[slot_no-1];
+          break;
+        case "sunday":
+        
+            if(!sta.sunday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.sunday[slot_no-1];
+          break;
+        case "monday":
+            
+            if(!sta.monday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.monday[slot_no-1];
+          break;
+        case "tuesday":
+           
+            if(!sta.tuesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.tuesday[slot_no-1];
+          break;
+        case "wednesday":
+           
+            if(!sta.wednesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.wednesday[slot_no-1];
+            break;
+        case "thrusday":
+            
+            if(!sta.thrusday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.thrusday[slot_no-1];
+                break;        
+        default:
+            return res.status(400).json({msg:"Enter a valid day/no upper case"});
+      }
+    for (var i = 0; i < slot.staff.length; i++) {
+        if(slot.staff[i]==null)
+        slot.staff.set(i, staff_id);
+        
+    }
+    slot.isEmpty=false;
+
+    await slot.save();
+   
+}); 
+
+    
+   
+    res.send("done");
+  
+    }else{
+        return res.status(401).json({msg:"unauthorized"});
+    }
+    })   
+
+
+
+
+router.route('/UpdateAssignslots').put(async (req,res)=>{
+    const {courses,staff_id,slot_no,day,newstaff_id}=req.body;
+    if(!courses || !staff_id || !slot_no || !day || newstaff_id){
+        return res.status(400).json({msg:"Please enter staff_id,newstaff_id,slot_no,day and array of courses"});
+    }
+    if(req.body.slot_no>5)
+    return res.status(400).json({msg:"Enter a valid slot_no"});
+    if(prof.role=="lecturer"){
+    const courses = req.body.courses;
+    const stafffff =  await staff_model.findOne({id: req.body.staff_id});
+    if(!stafffff)
+    return res.status(400).json({msg:"Enter a valid staff_id"});
+
+    const stafffff1 =  await staff_model.findOne({id: req.body.newstaff_id});
+    if(!stafffff1)
+    return res.status(400).json({msg:"Enter a valid newstaff_id"});
+
+    courses.forEach(async elem => {
+
+        const courseee =  await course_model.findOne({code: elem});
+        if(!courseee)
+        return res.status(400).json({msg:"Enter valid course codes"});  
+
+
+        for (var i = 0; i < courseee.TA.length; i++) {
+            if(courseee.TA[i]== req.body.staff_id){
+           await courseee.TA.splice(i,1)
+           break;
+            }
+        }
+        for (var i = 0; i < stafffff.course.length; i++) {
+            if(stafffff.course[i]== req.body.elem){
+           await stafffff.course.splice(i,1)
+           break;
+            }
+        }
+        await courseee.TA.push(req.body.newstaff_id)
+        await courseee.save()
+        await stafffff1.course.push(elem)
+        await stafffff1.save()
+        
+    const sta =  await schedule_model.findOne({id: req.body.newstaff_id});
+    const cor =  await schedule_model.findOne({id: elem});
+   
+    var slot =cor.saturday[slot_no-1];
+    switch(day) {
+        case "saturday":
+            if(!sta.saturday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.saturday[slot_no-1];
+          break;
+        case "sunday":
+        
+            if(!sta.sunday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.sunday[slot_no-1];
+          break;
+        case "monday":
+            
+            if(!sta.monday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.monday[slot_no-1];
+          break;
+        case "tuesday":
+           
+            if(!sta.tuesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.tuesday[slot_no-1];
+          break;
+        case "wednesday":
+           
+            if(!sta.wednesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.wednesday[slot_no-1];
+            break;
+        case "thrusday":
+            
+            if(!sta.thrusday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.thrusday[slot_no-1];
+                break;        
+        default:
+            return res.status(400).json({msg:"Enter a valid day/no upper case"});
+      }
+    for (var i = 0; i < slot.staff.length; i++) {
+        if(slot.staff[i]==req.body.staff_id){
+        slot.staff.set(i, newstaff_id);
+        break;
+        }
+    }
+   
+    await slot.save();
+}); 
+    
+       
+        res.send("done");
+      
+        }else{
+            return res.status(401).json({msg:"unauthorized"});
+        }
+        })   
+
+
+
+    
+
+router.route('/DeleteAssignslots').put(async (req,res)=>{
+    const prof= await staff_model.findById(req.user._id);
+    const {courses,staff_id,slot_no,day}=req.body;
+    if(!courses || !staff_id || !slot_no || !day ){
+        return res.status(400).json({msg:"Please enter staff_id,slot_no,day and array of courses"});
+    }
+    if(req.body.slot_no>5)
+    return res.status(400).json({msg:"Enter a valid slot_no"});
+    if(prof.role=="lecturer"){
+    const courses = req.body.courses;
+
+    const stafffff =  await staff_model.findOne({id: req.body.staff_id});
+    if(!stafffff)
+    return res.status(400).json({msg:"Enter a valid staff_id"});
+
+    courses.forEach(async elem => {
+
+        
+
+        const courseee =  await course_model.findOne({code: elem});
+        if(!courseee)
+        return res.status(400).json({msg:"Enter valid course codes"}); 
+
+
+        for (var i = 0; i < courseee.TA.length; i++) {
+            if(courseee.TA[i]== req.body.staff_id){
+           await courseee.TA.splice(i,1)
+           
+            }
+        }
+        
+        for (var i = 0; i < stafffff.course.length; i++) {
+            if(stafffff.course[i]== req.body.elem){
+           await stafffff.course.splice(i,1)
+           
+            }
+        }
+
+        await courseee.save()
+        await stafffff.save()
+
+
+        const course1 =  await course_model.findOne({code: elem});
+        const ta = course1.TA.length
+        const le = course1.lecturer.length
+        const ts = course1.totalSlots
+        courseee.coverage = ((ta+le)/ts)%100;
+        await course1.save() 
+
+
+    const sta =  await schedule_model.findOne({id: req.body.staff_id});
+    const cor =  await schedule_model.findOne({id: elem});
+   
+    
+    var slot =cor.saturday[slot_no-1];
+    switch(day) {
+        case "saturday":
+             slot =cor.saturday[slot_no-1];
+          break;
+        case "sunday":
+             slot =cor.sunday[slot_no-1];
+          break;
+        case "monday":
+             slot =cor.monday[slot_no-1];
+          break;
+        case "tuesday":
+             slot =cor.tuesday[slot_no-1];
+          break;
+        case "wednesday":
+             slot =cor.wednesday[slot_no-1];
+            break;
+        case "thrusday":
+             slot =cor.thrusday[slot_no-1];
+                break;        
+        default:
+            return res.status(400).json({msg:"Enter a valid day/no upper case"});
+      }
+    for (var i = 0; i < slot.staff.length; i++) {
+        if(slot.staff[i]==req.body.staff_id){
+        slot.staff.set(i, null);
+        break;
+        }
+    }
+    slot.isEmpty=false;
+   
+    await slot.save();
+}); 
+
+    
+    res.send("done");
+  
+    }else{
+        return res.status(401).json({msg:"unauthorized"});
+    }
+    })   
+
+
+
+
+
+
+
+
+
+ router.route('/removecoursemem').delete  (async (req,res)=>{
+    const prof= await staff_model.findById(req.user._id);
+    const {courses,staff_id}=req.body;
+    if(!courses || !staff_id ){
+        return res.status(400).json({msg:"Please enter staff_id and array of courses"});
+    }
+    if(prof.role=="lecturer"){
+    const courses = req.body.courses;
+    courses.forEach(async elem => {
+
+        
+     const c = course_model.findOne({code : elem})
+     const staffmem = staff_model.findOne({id : req.body.staff_id})
+
+    if(!c)
+    return res.status(400).json({msg:"please enter a valid course codes"});
+    if(!staffmem)
+    return res.status(400).json({msg:"please enter a valid staff id"});
+
+    console.log(staffmem.role,staffmem.id,c.code)
+     if(staffmem.role == "TA")
+     {
+        for (var i = 0; i < c.TA.length; i++) {
+            if(c.TA[i]== req.body.staff_id){
+           await c.TA.splice(i,1)
+           break;
+            }
+        }
+        for (var i = 0; i < staffmem.course.length; i++) {
+            if(staffmem.course[i]== req.body.elem){
+           await staffmem.course.splice(i,1)
+           break;
+            }
+        }
+    }
+     else{if(staffmem.role == "lecturer"){
+        return res.status(401).json({msg:"unauthorized"});
+     }else{
+        return res.status(400).json({msg:"please enter a valid staff member"});
+
+     }
+     
+    }
+
+    await staffmem.save();
+    await c.save();
+
+    });
+    
+     res.send("done");
+  
+    }else{
+        return res.status(401).json({msg:"unauthorized"});
+    }
+
+
+
+    })   
+
+
+
+
+router.route('/Assigncoordinator').put(async (req,res)=>{
+    const prof= await staff_model.findById(req.user._id);
+    const {course_code,staff_id}=req.body;
+    if(!course_code || !staff_id )
+        return res.status(400).json({msg:"Please enter staff_id and a course_code"});
+    
+    if(prof.role=="lecturer"){
+     const staff = await staff_model.findOne({id: req.body.staff_id});
+    //const rem = await staff.findAndRemove({course : {$ne : req.body.course}});// not sure if he can have more than one course 
+    const course = await course_model.findOne({code:  req.body.course_code});
+
+    if(!course)
+    return res.status(400).json({msg:"please enter a valid course code"});
+    if(!staff)
+    return res.status(400).json({msg:"please enter a valid staff id"});
+
+    course.courseCoordinator=staff.name;
+    await course.save();
+    res.send("done");
+ 
+  
+    }else{
+        return res.status(401).json({msg:"unauthorized"});
+    }
+    })   
+
+
+
+
+ router.route('/viewslotlinkingreq').get(async (req,res)=>{
+    const cord= await staff_model.findById(req.user._id);
+    const {course_code}=req.body;
+    if(!course_code){
+        return res.status(400).json({msg:"Please enter a course_code"});
+    }
+    const course = await course_model.findOne({code : req.body.course_code })
+    if(!course)
+    return res.status(400).json({msg:"Please enter a valid course"}); 
+
+  
+    if(cord.id==course.courseCoordinator){
+       
+        console.log(cord.id,t);
+    const output = await request_model.findOne({type:t, receiver: cord.id  });
+    if(!output)
+    return res.status(400).json({msg:"No slot linking requests"});
+    res.send(output);
+    }
+    else{
+        return res.status(401).json({msg:"unauthorized"});
+
+    }
+    })
+
+
+    
+
+router.route('/acceptslotlinkingreq').put(async (req,res)=>{
+    const cord= await staff_model.findById(req.user._id);
+    const {slotlinking_id,course_code}=req.body;
+    if(!course_code){
+        return res.status(400).json({msg:"Please enter a course_code"});
+    }
+    if(!slotlinking_id){
+        return res.status(400).json({msg:"Please enter a slotlinking_id"});
+    }
+    const course = await course_model.findOne({code : req.body.course_code })
+    if(cord.id==course.courseCoordinator){
+    const slotreq = await request_model.findOne({id : req.body.slotlinking_id });
+    if(!slotreq)
+    return res.status(400).json({msg:"please enter a valid slotlinking_id"});
+
+    const day = slotreq.newDay;
+    const slot_no = slotreq.slot;
+    const staff= slotreq.requester;
+
+
+    const sta =  await schedule_model.findOne({id: staff});
+    const cor =  await schedule_model.findOne({id: course});
+   
+    var slot =cor.saturday[slot_no-1];
+    switch(day) {
+        case "saturday":
+            if(!sta.saturday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.saturday[slot_no-1];
+          break;
+        case "sunday":
+        
+            if(!sta.sunday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.sunday[slot_no-1];
+          break;
+        case "monday":
+            
+            if(!sta.monday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.monday[slot_no-1];
+          break;
+        case "tuesday":
+           
+            if(!sta.tuesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.tuesday[slot_no-1];
+          break;
+        case "wednesday":
+           
+            if(!sta.wednesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.wednesday[slot_no-1];
+            break;
+        case "thrusday":
+            
+            if(!sta.thrusday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this staff member is busy in this slot"});
+             slot =cor.thrusday[slot_no-1];
+                break;        
+        default:
+            return res.status(400).json({msg:"Enter a valid day/no upper case"});
+      }
+    for (var i = 0; i < slot.staff.length; i++) {
+        if(slot.staff[i]==null)
+        slot.staff.set(i, staff_id);
+        
+    }
+
+    
+    slotreq.status="Accepted";
+    await slot.save();
+    await slotreq.save();
+   
+    res.send("done");
+    }
+    else{
+        return res.status(401).json({msg:"unauthorized"});
+
+    }
+    })    
+
+
+
+
+router.route('/Rejectslotlinkingreq').put(async (req,res)=>{
+    const cord= await staff_model.findById(req.user._id);
+    const {slotlinking_id,course_code}=req.body;
+    if(!course_code){
+        return res.status(400).json({msg:"Please enter a course_code"});
+    }
+    const course = await course_model.findOne({code : req.body.course_code })
+    if(cord.id==course.courseCoordinator){   
+    const slotreq = await request_model.findOne({id : req.body.slotlinking_id });
+    if(!slotreq)
+    return res.status(400).json({msg:"please enter a valid slotlinking_id"});
+
+    slotreq.status="Rejected";
+    await slotreq.save();
+    res.send("done");
+   
+    }
+    else{
+        return res.status(401).json({msg:"unauthorized"});
+
+    }
+    })    
+
+
+      
+
+
+
+
+router.route('/Addslot').post(async (req,res)=>{
+    const cord= await staff_model.findById(req.user._id);
+    const {course_code,slot_no,day,locations,types}=req.body;
+    if(!course_code || !slot_no || !day || !locations ||!types){
+        return res.status(400).json({msg:"Please enter array of locations,array of types,slot_no,day and course_code"});
+    }
+
+    if(req.body.slot_no>5)
+    return res.status(400).json({msg:"Enter a valid slot_no"});
+
+   
+
+    if(locations.length != types.length)
+    return res.status(400).json({msg:"the number of location != number of types"});
+
+   
+
+    const course =  await course_model.findOne({code: req.body.course_code});
+    if(!course)
+    return res.status(400).json({msg:"Please enter a valid course"}); 
+
+    if(cord.id == course.courseCoordinator){
+    const locat = req.body.locations;
+    const cor =  await schedule_model.findOne({id:  req.body.course_code});
+    var slot =cor.saturday[slot_no-1];
+    locat.forEach(async elem => {
+        const lo = await Location_model.findOne({code:req.body.elem});
+        if(!lo)
+        return res.status(400).json({msg:"Please enter a valid location"}); 
+ 
+        
+        const loc = await schedule_model.findOne({id: elem});
+       
+        var slot =cor.saturday[slot_no-1];
+        var slotloc =loc.saturday[slot_no-1];
+    switch(day) {
+        case "saturday":
+            if(!loc.saturday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+            
+             slot =cor.saturday[slot_no-1];
+             slotloc =loc.saturday[slot_no-1];
+
+          break;
+        case "sunday":
+            if(!loc.sunday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+           
+             slot =cor.sunday[slot_no-1];
+             slotloc =loc.sunday[slot_no-1];
+          break;
+        case "monday":
+            if(!loc.monday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+          
+             slot =cor.monday[slot_no-1];
+             slotloc =loc.monday[slot_no-1];
+          break;
+        case "tuesday":
+            if(!loc.tuesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+            
+             slot =cor.tuesday[slot_no-1];
+             slotloc =loc.tuesday[slot_no-1];
+          break;
+        case "wednesday":
+            if(!loc.wednesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+           
+             slot =cor.wednesday[slot_no-1];
+             slotloc =loc.wednesday[slot_no-1];
+            break;
+        case "thrusday":
+            if(!loc.thrusday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+           
+             slot =cor.thrusday[slot_no-1];
+             slotloc =loc.thrusday[slot_no-1];
+                break;        
+        default:
+            return res.status(400).json({msg:"Enter a valid day/no upper case"});
+      }
+
+
+    for (var i = 0; i < slot.location.length; i++) {
+        if(slot.location[i]==null){
+        slot.location.set(i, elem);
+        break; }
+    }
+    for (var i = 0; i < slotloc.location.length; i++) {
+        if(slotloc.location[i]==null){
+        slotloc.location.set(i, elem);
+        break; }
+    }
+
+    slot.isEmpty=false;
+    slotloc.isEmpty=false;
+    switch(day) {
+        case "saturday":
+           cor.saturday.splice(slot_no-1,1,slot)
+          
+           loc.saturday.splice(slot_no-1,1,slotloc)
+          break;
+        case "sunday":
+            cor.sunday.splice(slot_no-1,1,slot)
+         
+           loc.sunday.splice(slot_no-1,1,slotloc)
+          break;
+        case "monday":
+            cor.monday.splice(slot_no-1,1,slot)
+           
+            loc.monday.splice(slot_no-1,1,slotloc)
+          break;
+        case "tuesday":
+            cor.tuesday.splice(slot_no-1,1,slot)
+        
+           loc.tuesday.splice(slot_no-1,1,slotloc)
+          break;
+        case "wednesday":
+            cor.wednesday.splice(slot_no-1,1,slot)
+   
+            loc.wednesday.splice(slot_no-1,1,slotloc)
+            break;
+        case "thrusday":
+            cor.thrusday.splice(slot_no-1,1,slot)
+      
+            loc.thrusday.splice(slot_no-1,1,slotloc)
+             
+                break;        
+           }
+           slot.save();
+           slotloc.save();
+});
+
+const typ = req.body.types;
+    typ.forEach(async elem => {
+       
+        var slot =cor.saturday[slot_no-1];
+       
+    switch(day) {
+        case "saturday":
+
+             slot =cor.saturday[slot_no-1];
+            
+
+          break;
+        case "sunday":
+  
+             slot =cor.sunday[slot_no-1];
+             
+          break;
+        case "monday":
+     
+             slot =cor.monday[slot_no-1];
+       
+          break;
+        case "tuesday":
+            
+             slot =cor.tuesday[slot_no-1];
+            
+          break;
+        case "wednesday":
+        
+             slot =cor.wednesday[slot_no-1];
+           
+            break;
+        case "thrusday":
+           
+             slot =cor.thrusday[slot_no-1];
+            
+                break;        
+        default:
+            return res.status(400).json({msg:"Enter a valid day/no upper case"});
+      }
+        if(elem != "tut" && req.body.elem != "lab" )
+        return res.status(400).json({msg:"the type is either lab or tut"});    
+
+        for (var i = 0; i < slot.type.length; i++) {
+            if(slot.type[i]==null){
+            slot.type.set(i, elem);
+            break; }
+        }
+
+        
+        switch(day) {
+            case "saturday":
+               cor.saturday.splice(slot_no-1,1,slot)
+              
+              break;
+            case "sunday":
+                cor.sunday.splice(slot_no-1,1,slot)
+              
+              break;
+            case "monday":
+                cor.monday.splice(slot_no-1,1,slot)
+                
+              break;
+            case "tuesday":
+                cor.tuesday.splice(slot_no-1,1,slot)
+               
+              break;
+            case "wednesday":
+                cor.wednesday.splice(slot_no-1,1,slot)
+                
+                break;
+            case "thrusday":
+                cor.thrusday.splice(slot_no-1,1,slot)
+              
+                    break;        
+               }
+    });    
+    slot.save();
+
+    
+    
+   
+    res.send("done");
+    
+    }
+    else{
+        return res.status(401).json({msg:"unauthorized"}); 
+
+    }
+    })    
+          
+
+
+
+
+
+router.route('/updateslot').put(async (req,res)=>{
+    const cord= await staff_model.findById(req.user._id);
+    const {course_code,slot_no,day,location,newlocation,newtype}=req.body;
+    if(!course_code || !slot_no || !day || !location ||  !(newlocation||newtype)){
+        return res.status(400).json({msg:"Please enter location,slot_no,day,course_code and the new location or/and type"});
+    }
+
+    if(req.body.slot_no>5)
+    return res.status(400).json({msg:"Enter a valid slot_no"});
+
+    if(newtype){
+    if(req.body.newtype != "tut" && req.body.newtype != "lab" )
+    return res.status(400).json({msg:"the type is either lab or tut"});}
+
+    if(newlocation){
+    const nlo = await Location_model.findOne({code:req.body.newlocation});
+    if(!nlo)
+    return res.status(400).json({msg:"Please enter a valid location"}); 
+    }
+    const lo = await Location_model.findOne({code:req.body.location});
+    if(!lo)
+    return res.status(400).json({msg:"Please enter a valid location"}); 
+
+    const course =  await course_model.findOne({code: req.body.course_code});
+    if(!course)
+    return res.status(400).json({msg:"Please enter a valid course"}); 
+    
+    if(cord.id == course.courseCoordinator){
+ 
+        const cor =  await schedule_model.findOne({id:  req.body.course_code});
+        if(newlocation){
+        const loc = await schedule_model.findOne({id: req.body.newlocation});
+        var slotloc =loc.saturday[slot_no-1];
+        }
+        var slot =cor.saturday[slot_no-1];
+       
+    switch(day) {
+        case "saturday":
+            if(newlocation){
+            if(!loc.saturday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+            slotloc =loc.saturday[slot_no-1];
+            }
+             slot =cor.saturday[slot_no-1];
+            
+          break;
+        case "sunday":
+            if(newlocation){
+            if(!loc.sunday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+            slotloc =loc.sunday[slot_no-1];}
+             slot =cor.sunday[slot_no-1];
+             
+          break;
+        case "monday":
+            if(newlocation){
+            if(!loc.monday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+            slotloc =loc.monday[slot_no-1];}
+             slot =cor.monday[slot_no-1];
+            
+          break;
+        case "tuesday":
+            if(newlocation){
+            if(!loc.tuesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+            slotloc =loc.tuesday[slot_no-1];}
+             slot =cor.tuesday[slot_no-1];
+             
+          break;
+        case "wednesday":
+            if(newlocation){
+            if(!loc.wednesday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+            slotloc =loc.wednesday[slot_no-1];}
+             slot =cor.wednesday[slot_no-1];
+            
+            break;
+        case "thrusday":
+            if(newlocation){
+            if(!loc.thrusday[slot_no-1].isEmpty)
+            return res.status(400).json({msg:"this location is used in this slot"});
+            slotloc =loc.thrusday[slot_no-1];
+            }
+             slot =cor.thrusday[slot_no-1];
+             
+                break;        
+        default:
+            return res.status(400).json({msg:"Enter a valid day/no upper case"});
+      }
+    for (var i = 0; i < slot.location.length; i++) {
+        if(slot.location[i]==req.body.location){
+        if(newlocation)
+        slot.location.set(i, req.body.newlocation);
+        if(newtype)
+        slot.type.set(i, req.body.newtype);
+        break; }
+    }
+    if(newlocation){ for (var i = 0; i < slotloc.location.length; i++) {
+        if(slotloc.location[i]==req.body.location){
+        
+        slotloc.location.set(i, req.body.newlocation);
+        if(newtype)
+        slotloc.type.set(i, req.body.newtype);
+        break; }
+    }}
+
+
+
+    switch(day) {
+        case "saturday":
+           cor.saturday.splice(slot_no-1,1,slot)
+           if(newlocation)
+           loc.saturday.splice(slot_no-1,1,slotloc)
+          break;
+        case "sunday":
+            cor.sunday.splice(slot_no-1,1,slot)
+           if(newlocation)
+           loc.sunday.splice(slot_no-1,1,slotloc)
+          break;
+        case "monday":
+            cor.monday.splice(slot_no-1,1,slot)
+            if(newlocation)
+            loc.monday.splice(slot_no-1,1,slotloc)
+          break;
+        case "tuesday":
+            cor.tuesday.splice(slot_no-1,1,slot)
+           if(newlocation)
+           loc.tuesday.splice(slot_no-1,1,slotloc)
+          break;
+        case "wednesday":
+            cor.wednesday.splice(slot_no-1,1,slot)
+            if(newlocation)
+            loc.wednesday.splice(slot_no-1,1,slotloc)
+            break;
+        case "thrusday":
+            cor.thrusday.splice(slot_no-1,1,slot)
+            if(newlocation)
+            loc.thrusday.splice(slot_no-1,1,slotloc)
+             
+                break;        
+           }
+           
+           var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
+           if(newlocation)
+           var loc3 = await schedule_model.findOneAndUpdate({id: req.body.newlocation},loc);
+   
+           
+   
+    res.send("done");
+    
+    }
+    else{
+        return res.status(401).json({msg:"unauthorized"}); 
+
+    }
+    })   
+
+
+
+
+
+
+
+
+
+router.route('/deleteslot').delete(async (req,res)=>{
+    const cord= await staff_model.findById(req.user._id);
+    const {course_code,slot_no,day,location}=req.body;
+    if(!course_code || !slot_no || !day || !location ){
+        return res.status(400).json({msg:"Please enter location,slot_no,day and course_code"});
+    }
+
+    if(req.body.slot_no>5)
+    return res.status(400).json({msg:"Enter a valid slot_no"});
+
+    const course =  await course_model.findOne({code: req.body.course_code});
+    if(!course)
+    return res.status(400).json({msg:"Please enter a valid course"}); 
+    
+    if(cord.id == course.courseCoordinator){
+ 
+        const cor =  await schedule_model.findOne({id:  req.body.course_code});
+        const loc =  await schedule_model.findOne({id:  req.body.location});
+
+        if(!loc)
+    return res.status(400).json({msg:"Please enter a valid location"}); 
+       
+        var slot =cor.saturday[slot_no-1];
+        var slotloc =loc.saturday[slot_no-1];
+    switch(day) {
+        case "saturday":
+             slot =cor.saturday[slot_no-1];
+             slotloc =loc.saturday[slot_no-1];
+          break;
+        case "sunday":
+             slot =cor.sunday[slot_no-1];
+             slotloc =loc.sunday[slot_no-1];
+          break;
+        case "monday":
+             slot =cor.monday[slot_no-1];
+             slotloc =loc.monday[slot_no-1];
+          break;
+        case "tuesday":
+             slot =cor.tuesday[slot_no-1];
+             slotloc =loc.tuesday[slot_no-1];
+          break;
+        case "wednesday":
+             slot =cor.wednesday[slot_no-1];
+             slotloc =loc.wednesday[slot_no-1];
+            break;
+        case "thrusday":
+             slot =cor.thrusday[slot_no-1];
+             slotloc =loc.thrusday[slot_no-1];
+                break;        
+        default:
+            return res.status(400).json({msg:"Enter a valid day/no upper case"});
+      }
+    for (var i = 0; i < slot.staff.length; i++) {
+        slot.staff.set(i, null);
+        slot.location.set(i, null); 
+        slot.type.set(i, null); 
+        slot.compensation.set(i, null);
+    }
+    for (var i = 0; i < slotloc.staff.length; i++) {
+        slotloc.staff.set(i, null);
+        slotloc.location.set(i, null); 
+        slotloc.type.set(i, null); 
+        slotloc.compensation.set(i, null);
+    }
+
+    slot.isEmpty=true;
+    slotloc.isEmpty=true;
+    
+    
+    await slot.save();
+    await slotloc.save();
+    res.send("done");
+    
+    }
+    else{
+        return res.status(401).json({msg:"unauthorized"}); 
+
+    }
+    })    
+          
+
 module.exports=router;
