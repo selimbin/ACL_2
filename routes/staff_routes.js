@@ -2299,7 +2299,7 @@ router.route('/slotlinkingrequest')
         const course=await course_model.findOne({course:req.body.course})
         for(var i =0;i<user.courses.length();i++){
             if(user.courses[i]==course.id){
-                const newreqest = await new request_model({type:'slotlinkingrequest',requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason,slot:req.body.slot,location:req.body.location})
+                const newreqest = await new request_model({type:'slotlinkingrequest',requester:user.id,receiver:course.courseCoordinator.id,date:req.body.date,reason:req.body.reason,slot:req.body.slot,location:req.body.location})
                 await newreqest.save()
                 res.send(newreqest)
         }
