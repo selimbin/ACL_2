@@ -1445,7 +1445,7 @@ router.route('/leaveReq')
         res.send(newreqest)
     }else{if(req.body.type=="CompensationLeave"&&req.body.reason==null){
         res.send('CompensationLeave need a reason pls state yours')
-    }else{if(req.body.type=='MaternityLeave'&&user.gender=='female'){
+    }else{if(req.body.type=='MaternityLeave'&&user.gender=='f'){
         const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head})
         await newreqest.save()
         res.send(newreqest)
