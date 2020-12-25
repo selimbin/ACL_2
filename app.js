@@ -11,14 +11,43 @@ const {scheduleSchema} = require('./models/scheduling.js')
 const schedule_model=mongoose.model("Schedule",scheduleSchema)
 const {slotSchema} = require('./models/scheduling.js') 
 const slot_model=mongoose.model("Slot",slotSchema)
+const {scheduleAttendance} = require('./models/scheduling.js') 
+const scheduleAttendance_model = mongoose.model('ScheduleAttendance', scheduleAttendance)
 const { nextTick } = require('process')
 var schedule = require('node-schedule');
 const app =express()
 app.use(express.json())
 // app.use('',staff_routes)
 require('dotenv').config()
-
 const AuthenticationRoutes= require('./routes/auth')
+
+schedule.scheduleJob({date: 11}, async function(){
+    let allstaff = await staff_model.find();
+    for(var i = 0; i < allstaff.length; i = i + 1){
+        let currentstaff = allstaff[i];
+        let currentstaffattendance = await scheduleAttendance_model.findOne({id:currentstaff.id})
+        let misseddays = currentstaffattendance.missedDays
+        let missedhours = currentstaffattendance.missedHours - 3
+        let staffsalary = currentstaff.salary
+        while(misseddays != 0){
+            staffsalary = staffsalary - staffsalary/60;
+            misseddays = misseddays -1;
+        }
+        while(missedhours != 0){
+            staffsalary = staffsalary - staffsalary/180;
+            missedhours = missedhours - 1;
+        }
+        missedhours = (missedhours*100) * 60;
+        while(missedhours != 0){
+            staffsalary = staffsalary - ((staffsalary/180) * 60);
+            missedhours = missedhours - 1;
+        }
+        let newleavebalance = currentstaff.leaveBalance + 2.5
+        let currentstaff1 = await staff_model.findOne({id:currentstaff.id})
+        await staff_model.findByIdAndUpdate(currentstaff1._id,{leaveBalance:newleavebalance,lastSalary:staffsalary},{new:true})
+        await currentstaff1.save();
+    }
+});
 schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
     var today = new Date()
     var week1 = new Date()
@@ -585,7 +614,7 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
         }
 
     }
-})
+});
 app.use('/seed', seed_routes)
 app.use('', AuthenticationRoutes)
 
