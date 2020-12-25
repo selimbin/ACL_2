@@ -2233,11 +2233,11 @@ router.route('/slotlinkingrequest')
         const course=await course_model.findOne({course:req.body.course})
         for(var i =0;i<user.courses.length();i++){
             if(user.courses[i]==course.id){
-                const newreqest = await new request_model({type:req.body.type,requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
+                const newreqest = await new request_model({type:'slotlinkingrequest',requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
                 await newreqest.save()
                 res.send(newreqest)
         }
-    }
+    }res.send('no course fits')
     }else
     res.send('HR cants have requests of any kind')
 })
@@ -2247,7 +2247,7 @@ router.route('/changeDayOffReq')
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
     if(department!=null){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,newDay:req.body.newDay})
+        const newreqest = await new request_model({type:'changeDayOffReq',reason:req.body.reason,requester:user.id,receiver:department.head,newDay:req.body.newDay})
         await newreqest.save()
         res.send(newreqest)
     }else{
