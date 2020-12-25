@@ -2913,7 +2913,7 @@ router.route('/rejectRequest')
 //--------------------------------------------------------------------
 // HOD view course Coverage ------------------------------------------
 
-router.route('/viewCoverage')
+router.route('/viewCourseCoverage')
 .get(async(req,res)=>{
     try{
         const user= await staff_model.findById(req.user._id)
@@ -2975,13 +2975,14 @@ router.route('/viewAssignments')
     }
 })
 
+// MAHMOUD FROM HERE
 
 
 
 router.route('/viewcoverage').get(async (req,res)=>{
     const prof= await staff_model.findById(req.user._id);
     const {courses}=req.body;
-    if(!courses ){
+    if(!courses){
         return res.status(400).json({msg:"Please enter an array of courses"});
     }
    
@@ -2994,7 +2995,7 @@ router.route('/viewcoverage').get(async (req,res)=>{
             else
             output.push(elem.coverage);
     
-});
+    });
 
 res.send(output);
     }
@@ -3002,49 +3003,37 @@ res.send(output);
         return res.status(401).json({msg:"unauthorized"});
 
     }
-    })
+})
 
 
 
-router.route('/viewslotassignment').get(async (req,res)=>{
-    const prof= await staff_model.findById(req.user._id);
-    const {courses}=req.body;
-    if(!courses ){
-        return res.status(400).json({msg:"Please enter an array of courses"});
-    }
-   
-    if(prof.role=="lecturer"){
-        const coursess = req.body.courses;
-        coursess.forEach(async elem => {
-        var output =[];
-        const out =  await schedule_model.findOne({id: elem});
-        if(!out)
-        return res.status(400).json({msg:"Please course doent have any slots"});
-        for (var i = 0; i < 5 ; i++) {
-            if(out.saturday[i].isEmpty==false)
-            output.push(out.saturday[i]);
-            if(out.sunday[i].isEmpty==false)
-            output.push(out.saturday[i]);
-            if(out.monday[i].isEmpty==false)
-            output.push(out.saturday[i]);
-            if(out.tuesday[i].isEmpty==false)
-            output.push(out.saturday[i]);
-            if(out.wednesday[i].isEmpty==false)
-            output.push(out.saturday[i]);
-            if(out.thrusday[i].isEmpty==false)
-            output.push(out.saturday[i]);
-            
+router.route('/viewslotassignment')
+.get(async (req,res)=>{
+    const{courses} = req.body
+    try {
+        if (req.user.role  == "lecturer") {
+            const prof= await staff_model.findById(req.user._id);
+            let allslots = []
+            let profcourses = prof.course
+            for(var i = 0; i < courses.length; i = i + 1){
+                profcourses.pull(courses[i])
+                if(!profcourses){
+                    return res.status(400).json({msg:"Please enter a valid array of courses"});
+                }
+                let currentcourse = courses[i]
+                let currentcourseslots = await slot_model.find({course:currentcourse})
+                for(var j = 0; j < currentcourseslots.length; j = j + 1){
+                    allslots.push(currentcourseslots[j])
+                }
+            }
+            res.send(allslots);
+        } else {
+            return res.status(401).json({msg:"unauthorized"});
         }
-    });
-  
-
-    res.send(output);
+    } catch (error) {
+        res.status(500).json({error:error.message});
     }
-    else{
-        return res.status(401).json({msg:"unauthorized"});
-
-    }
-    }) 
+})
 
 
 
@@ -3134,9 +3123,9 @@ router.route('/Assigntoslots').put(async (req,res)=>{
             break;
         case "thrusday":
             
-            if(!sta.thrusday[slot_no-1].isEmpty)
+            if(!sta.thursday[slot_no-1].isEmpty)
             return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.thrusday[slot_no-1];
+             slot =cor.thursday[slot_no-1];
                 break;        
         default:
             return res.status(400).json({msg:"Enter a valid day/no upper case"});
@@ -3547,7 +3536,7 @@ router.route('/acceptslotlinkingreq').put(async (req,res)=>{
             return res.status(400).json({msg:"this staff member is busy in this slot"});
              slot =cor.wednesday[slot_no-1];
             break;
-        case "thrusday":
+        case "thursday":
             
             if(!sta.thrusday[slot_no-1].isEmpty)
             return res.status(400).json({msg:"this staff member is busy in this slot"});

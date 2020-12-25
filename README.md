@@ -425,7 +425,7 @@ Response if incorrect _id:"No corresponding request"
 Response if not HOD: "You are not authorized to access this page"
 
 Functionality: View coverage of each course in his/her department
-Route: /staff/viewCoverage
+Route: /staff/viewCourseCoverage
 Request type: GET
 Response if not HOD: "You are not authorized to access this page"
 Response: Course Coverag, Code and _id , ex: 
