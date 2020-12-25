@@ -34,10 +34,10 @@ const slotSchema = new mongoose.Schema({
     course:{
         type:String
     },
-    location:{
+    staff:{
         type:[String]
     },
-    staff:{
+    location:{
         type:[String]
     },
     type:{
