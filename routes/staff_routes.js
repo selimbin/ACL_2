@@ -918,13 +918,13 @@ router.route('/AddsignIn')
         if (req.user.role  == "HR") {
             var year = date.substring(6,10);
             var month = date.substring(0,2);
-            var date = date.substring(3,5);
+            var date1 = date.substring(3,5);
             var hour = Time.substring(0,2);
             var minute = Time.substring(3,5);
             var today = new Date();
             today.setFullYear(year)
             today.setMonth(month-1)
-            today.setDate(date)
+            today.setDate(date1)
             today.setHours(hour)
             today.setMinutes(minute)
             if(today.toTimeString.substring(0,2)>"19"){
@@ -1020,13 +1020,13 @@ router.route('/signOut')
         if (req.user.role  == "HR") {
             var year = date.substring(6,10);
             var month = date.substring(0,2);
-            var date = date.substring(3,5);
+            var date1 = date.substring(3,5);
             var hour = Time.substring(0,2);
             var minute = Time.substring(3,5);
             var today = new Date();
             today.setFullYear(year)
             today.setMonth(month-1)
-            today.setDate(date)
+            today.setDate(date1)
             today.setHours(hour)
             today.setMinutes(minute)
             if(today.toTimeString.substring(0,2)>"19"){
