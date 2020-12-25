@@ -2256,6 +2256,7 @@ res.send('HR cants view schedules of any kind')
 
 router.route('/sendReplacmentReq')
 .post(async(req,res)=>{
+
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
         if(req.body.date==null||req.body.date.length!=10){
@@ -2267,7 +2268,7 @@ router.route('/sendReplacmentReq')
                 const receiver=await staff_model.findById(req.body.id)
                 for(var x =0;i<course.TA.length();x++){
                     if(course.TA[i]==receiver.id){
-                        const newreqest = await new request_model({type:'ReplacmentReq',requester:user.id,receiver:receiver.id,reason:req.body.reason})
+                        const newreqest = await new request_model({type:'ReplacmentReq',date:req.body.date,requester:user.id,receiver:receiver.id,reason:req.body.reason})
                         await newreqest.save()
                         res.send(newreqest)
                     }
@@ -2291,11 +2292,14 @@ router.route('/viewReplacementReq')
 router.route('/slotlinkingrequest')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
+    if(req.body.date==null||req.body.date.length!=10){
+        res.send("Enter date request will take effect of format MM/DD/YYYY")
+    }
     if(user.role!='HR'){
         const course=await course_model.findOne({course:req.body.course})
         for(var i =0;i<user.courses.length();i++){
             if(user.courses[i]==course.id){
-                const newreqest = await new request_model({type:'slotlinkingrequest',requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
+                const newreqest = await new request_model({type:'slotlinkingrequest',date:req.body.date,requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
                 await newreqest.save()
                 res.send(newreqest)
         }
@@ -2322,6 +2326,9 @@ res.send('HR cants have requests of any kind')
 
 router.route('/AnnualLeaveReq')
 .post(async(req,res)=>{
+    if(req.body.date==null||req.body.date.length!=10){
+        res.send("Enter date request will take effect of format MM/DD/YYYY")
+    }
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
@@ -2349,12 +2356,15 @@ router.route('/AnnualLeaveReq')
 
     router.route('/CompensationLeaveReq')
     .post(async(req,res)=>{
+        if(req.body.date==null||req.body.date.length!=10){
+            res.send("Enter date request will take effect of format MM/DD/YYYY")
+        }
         const user = await staff_model.findById(req.user._id)
         if(user.role!='HR'){
         const department = await department_model.findOne({name:user.department})
         if(department.head!=null){
      if(req.body.type=='CompensationLeave'&&req.body.reason!=null&&department.head!=null){
-            const newreqest = await new request_model({type:'CompensationLeave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
+            const newreqest = await new request_model({type:'CompensationLeave',reason:req.body.reason,date:req.body.date,requester:user.id,receiver:department.head,amount:req.body.amount})
             await newreqest.save()
             res.send(newreqest)
         }else{
@@ -2376,12 +2386,15 @@ router.route('/AnnualLeaveReq')
 
 router.route('/MaternityLeaveReq')
 .post(async(req,res)=>{
+    if(req.body.date==null||req.body.date.length!=10){
+        res.send("Enter date request will take effect of format MM/DD/YYYY")
+    }
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
         const department = await department_model.findOne({name:user.department})
         if(department.head!=null){
             if(req.body.type=='MaternityLeave'&&user.gender=="F"){
-                const newreqest = await new request_model({type:'MaternityLeave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
+                const newreqest = await new request_model({type:'MaternityLeave',reason:req.body.reason,date:req.body.date,requester:user.id,receiver:department.head,amount:req.body.amount})
                 await newreqest.save()
                 res.send(newreqest)
              }else{
@@ -2403,6 +2416,9 @@ router.route('/MaternityLeaveReq')
 
 router.route('/accidentalLeaveReq')
 .post(async(req,res)=>{
+    if(req.body.date==null||req.body.date.length!=10){
+        res.send("Enter date request will take effect of format MM/DD/YYYY")
+    }
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
@@ -2411,7 +2427,7 @@ router.route('/accidentalLeaveReq')
             res.send('no more than six days can be had as accedentall leave')
     }else{
         if(req.body.type=='accidentalLeave'&&req.body.amount<=6){
-            const newreqest = await new request_model({type:'accidentalLeave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
+            const newreqest = await new request_model({type:'accidentalLeave',reason:req.body.reason,requester:user.id,date:req.body.date,receiver:department.head,amount:req.body.amount})
             await newreqest.save()
             res.send(newreqest)
     
@@ -2427,12 +2443,15 @@ router.route('/accidentalLeaveReq')
 })
 router.route('/sickleaveReq')
 .post(async(req,res)=>{
+    if(req.body.date==null||req.body.date.length!=10){
+        res.send("Enter date request will take effect of format MM/DD/YYYY")
+    }
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
         const department = await department_model.findOne({name:user.department})
         if(department.head!=null){
             if(req.body.type=='sickleave'){
-                 const newreqest = await new request_model({type:'sickleave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
+                 const newreqest = await new request_model({type:'sickleave',reason:req.body.reason,date:req.body.date,requester:user.id,receiver:department.head,amount:req.body.amount})
                  await newreqest.save()
                  res.send(newreqest)
          
