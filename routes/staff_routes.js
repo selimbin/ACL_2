@@ -8,6 +8,9 @@ const request_model = mongoose.model('IRS', internalRequestSchema)
 const {scheduleSchema} = require('../models/scheduling.js') 
 const schedule_model=mongoose.model("Schedule",scheduleSchema)
 
+const {slotSchema} = require('../models/scheduling.js') 
+const slot_model=mongoose.model("Slot",slotSchema)
+
 // Department Schema and model ----------------------------------------
 const {departmentSchema, find, findOne} = require('../models/academics.js')
 const department_model = mongoose.model('Department', departmentSchema)
@@ -74,6 +77,18 @@ router.route('/AddLocation')
             }
             const newLocation = new Location_model({code:Code,building:Building,type:Type,capacity:Capacity});
             await newLocation.save();
+            const newLocationslot = new slot_model({location:Code})
+            await newLocationslot.save();
+            const newLocationschedule = new schedule_model({id:Code})
+            for(var i = 1; i < 6; i = i + 1){
+                await newLocationschedule.sunday.push(newLocationslot)
+                await newLocationschedule.saturday.push(newLocationslot)
+                await newLocationschedule.monday.push(newLocationslot)
+                await newLocationschedule.tuesday.push(newLocationslot)
+                await newLocationschedule.wednesday.push(newLocationslot)
+                await newLocationschedule.thursday.push(newLocationslot)
+            }
+            await newLocationschedule.save()
             res.send(newLocation);
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -528,6 +543,18 @@ router.route('/AddCourse')
 
             await existingfaculty.departments.push(existingdepartment);
             await existingfaculty.save();
+            const newcourseslot = new slot_model({course:Code})
+            await newcourseslot.save();
+            const newcourseschedule = new schedule_model({id:Code})
+            for(var i = 1; i < 6; i = i + 1){
+                await newcourseschedule.sunday.push(newcourseslot)
+                await newcourseschedule.saturday.push(newcourseslot)
+                await newcourseschedule.monday.push(newcourseslot)
+                await newcourseschedule.tuesday.push(newcourseslot)
+                await newcourseschedule.wednesday.push(newcourseslot)
+                await newcourseschedule.thursday.push(newcourseslot)
+            }
+            await newcourseschedule.save()
             res.send(newCourse)
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -728,6 +755,18 @@ router.route('/AddStaff')
             const newCapacity = existinglocation.capacity - 1;
             const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation._id,{capacity:newCapacity},{new:true});
             await Updatedlocation.save();
+            const newstaffslot = new slot_model({staff:id})
+            await newstaffslot.save();
+            const newstaffschedule = new schedule_model({id:id})
+            for(var i = 1; i < 6; i = i + 1){
+                await newstaffschedule.sunday.push(newstaffslot)
+                await newstaffschedule.saturday.push(newstaffslot)
+                await newstaffschedule.monday.push(newstaffslot)
+                await newstaffschedule.tuesday.push(newstaffslot)
+                await newstaffschedule.wednesday.push(newstaffslot)
+                await newstaffschedule.thursday.push(newstaffslot)
+            }
+            await newstaffschedule.save()
             res.send(newStaff);
         } else {
             return res.status(401).json({msg:"unauthorized"});

@@ -21,10 +21,242 @@ require('dotenv').config()
 const AuthenticationRoutes= require('./routes/auth')
 schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
     var today = new Date()
-    var week = new Date()
-    var day = today.getDate() + 6
-    week.setDate(day)
+    var week1 = new Date()
+    var day = today.getDate() - 7
+    week1.setDate(day)
     let allstaff = await staff_model.find();
+    while(allstaff.length != 0){
+        let currentstaff = allstaff.shift();
+        let allstaffrequests = await requests_model.find({requester:currentstaff.id,reason:"CompensationLeave",status:"accepted"});
+        while(allstaffrequests){
+            let currentrequest = allstaffrequests.shift();
+            if(currentrequest.date < today && currentrequest.date >= week1){
+                let currentschedule = await schedule_model.findOne({id:currentstaff.id})
+                var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                var d = new Date(currentrequest.date);
+                var dayName = days[d.getDay()];
+                let slot;
+                if(dayName == 'Sunday'){
+                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    await currentschedule.sunday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.compensation.push(false)
+                    await slot.isEmpty.pull(false)
+                    await slot.isEmpty.push(true)
+                    await slot.save()
+                    await currentschedule.sunday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    await currentschedule.sunday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.sunday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    await currentschedule.sunday.splice((currentrequest.slot-1),1)
+                    await slot.course.pull(currentrequest.course)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.sunday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                }
+                if(dayName == 'Monday'){
+                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    await currentschedule.monday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.compensation.push(false)
+                    await slot.isEmpty.pull(false)
+                    await slot.isEmpty.push(true)
+                    await slot.save()
+                    await currentschedule.monday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    await currentschedule.monday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.monday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    await currentschedule.monday.splice((currentrequest.slot-1),1)
+                    await slot.course.pull(currentrequest.course)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.monday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                }
+                if(dayName == 'Tuesday'){
+                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.compensation.push(false)
+                    await slot.isEmpty.pull(false)
+                    await slot.isEmpty.push(true)
+                    await slot.save()
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),1)
+                    await slot.course.pull(currentrequest.course)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                }
+                if(dayName == 'Wednesday'){
+                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.compensation.push(false)
+                    await slot.isEmpty.pull(false)
+                    await slot.isEmpty.push(true)
+                    await slot.save()
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),1)
+                    await slot.course.pull(currentrequest.course)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                }
+                if(dayName == 'Thursday'){
+                    slot = await currentschedule.thuresday[(currentrequest.slot-1)]
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.compensation.push(false)
+                    await slot.isEmpty.pull(false)
+                    await slot.isEmpty.push(true)
+                    await slot.save()
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.thuresday[(currentrequest.slot-1)]
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.thuresday[(currentrequest.slot-1)]
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),1)
+                    await slot.course.pull(currentrequest.course)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save() 
+                }
+                if(dayName == 'Saturday'){
+                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    await currentschedule.saturday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.compensation.push(false)
+                    await slot.isEmpty.pull(false)
+                    await slot.isEmpty.push(true)
+                    await slot.save()
+                    await currentschedule.saturday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    await currentschedule.saturday.splice((currentrequest.slot-1),1)
+                    await slot.location.pull(currentrequest.location)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.saturday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    await currentschedule.saturday.splice((currentrequest.slot-1),1)
+                    await slot.course.pull(currentrequest.course)
+                    await slot.staff.pull(currentrequest.reciever)
+                    await slot.type.pull("compensation")
+                    await slot.compensation.pull(true)
+                    await slot.isEmpty.pull(false)
+                    await slot.save()
+                    await currentschedule.saturday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save() 
+                }
+            }
+        }
+
+    }
+    allstaff = await staff_model.find();
     while(allstaff.length != 0){
         let currentstaff = allstaff.shift();
         let allstaffrequests = await requests_model.find({requester:currentstaff.id,reason:"CompensationLeave",status:"accepted"});
@@ -36,47 +268,191 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                 var d = new Date(currentrequest.date);
                 var dayName = days[d.getDay()];
                 let slot;
-                if(dayname == 'Sunday'){
+                if(dayName == 'Sunday'){
                     slot = await currentschedule.sunday.splice((currentrequest.slot-1),1)
                     const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                     compensation:true,isEmpty:false})
                     await newslot.save()
                     await currentschedule.sunday.splice((currentrequest.slot-1),0,newslot)
+                    await slot_model.findByIdAndDelete(slot._id)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    await currentschedule.sunday.splice((currentrequest.slot-1),1)
+                    await slot.location.push(currentrequest.location)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.sunday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    await currentschedule.sunday.splice((currentrequest.slot-1),1)
+                    await slot.course.push(currentrequest.course)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.sunday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
                 }
-                if(dayname == 'Monday'){
+                if(dayName == 'Monday'){
                     slot = await currentschedule.monday.splice((currentrequest.slot-1),1)
                     const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                     compensation:true,isEmpty:false})
                     await newslot.save()
                     await currentschedule.monday.splice((currentrequest.slot-1),0,newslot)
+                    await slot_model.findByIdAndDelete(slot._id)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    await currentschedule.monday.splice((currentrequest.slot-1),1)
+                    await slot.location.push(currentrequest.location)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.monday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    await currentschedule.monday.splice((currentrequest.slot-1),1)
+                    await slot.course.push(currentrequest.course)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.monday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
                 }
-                if(dayname == 'Tuesday'){
+                if(dayName == 'Tuesday'){
                     slot = await currentschedule.tuesday.splice((currentrequest.slot-1),1)
                     const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                     compensation:true,isEmpty:false})
                     await newslot.save()
                     await currentschedule.tuesday.splice((currentrequest.slot-1),0,newslot)
+                    await slot_model.findByIdAndDelete(slot._id)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),1)
+                    await slot.location.push(currentrequest.location)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),1)
+                    await slot.course.push(currentrequest.course)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.tuesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
                 }
-                if(dayname == 'Wednesday'){
+                if(dayName == 'Wednesday'){
                     slot = await currentschedule.wednesday.splice((currentrequest.slot-1),1) 
                     const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                     compensation:true,isEmpty:false})
                     await newslot.save()
                     await currentschedule.wednesday.splice((currentrequest.slot-1),0,newslot)
+                    await slot_model.findByIdAndDelete(slot._id)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),1)
+                    await slot.location.push(currentrequest.location)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),1)
+                    await slot.course.push(currentrequest.course)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.wednesday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
                 }
-                if(dayname == 'Thursday'){
+                if(dayName == 'Thursday'){
                     slot = await currentschedule.thuresday.splice((currentrequest.slot-1),1)
                     const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                     compensation:true,isEmpty:false})
                     await newslot.save()
-                    await currentschedule.thuresday.splice((currentrequest.slot-1),0,newslot) 
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),0,newslot)
+                    await slot_model.findByIdAndDelete(slot._id)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.thuresday[(currentrequest.slot-1)]
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),1)
+                    await slot.location.push(currentrequest.location)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.thuresday[(currentrequest.slot-1)]
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),1)
+                    await slot.course.push(currentrequest.course)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.thuresday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save() 
                 }
-                if(dayname == 'Saturday'){
+                if(dayName == 'Saturday'){
                     slot = await currentschedule.saturday.splice((currentrequest.slot-1),1)
                     const newslot = await slot_model({course:currentrequest.course,location:currentrequest.location,staff:currentrequest.reciever,type:"compensation",
                     compensation:true,isEmpty:false})
                     await newslot.save()
                     await currentschedule.saturday.splice((currentrequest.slot-1),0,newslot)
+                    await slot_model.findByIdAndDelete(slot._id)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.course})
+                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    await currentschedule.saturday.splice((currentrequest.slot-1),1)
+                    await slot.location.push(currentrequest.location)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.saturday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save()
+                    currentschedule = await schedule_model.findOne({id:currentrequest.location})
+                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    await currentschedule.saturday.splice((currentrequest.slot-1),1)
+                    await slot.course.push(currentrequest.course)
+                    await slot.staff.push(currentrequest.reciever)
+                    await slot.type.push("compensation")
+                    await slot.compensation.push(true)
+                    await slot.isEmpty.push(false)
+                    await slot.save()
+                    await currentschedule.saturday.splice((currentrequest.slot-1),0,slot)
+                    await currentschedule.save() 
                 }
             }
         }

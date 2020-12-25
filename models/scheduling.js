@@ -32,7 +32,7 @@ module.exports = mongoose.model('Attendance', attendanceSchema)
 
 const slotSchema = new mongoose.Schema({
     course:{
-        type:String
+        type:[String]
     },
     staff:{
         type:[String]
