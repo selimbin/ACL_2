@@ -29,7 +29,7 @@ router.route('/login')
 .post(async (req,res)=>{
     const result = await staff_model.findOne({email:req.body.email})
     if(!result){
-        return res.send('You need to sign up first')
+        return res.send('You need to sign up first or incorrect email')
     }
     const correctPassword= await bcrypt.compare(req.body.password, result.password)
     if(correctPassword){

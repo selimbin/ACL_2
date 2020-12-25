@@ -12,7 +12,7 @@ const {slotSchema} = require('../models/scheduling.js')
 const slot_model=mongoose.model("Slot",slotSchema)
 
 // Department Schema and model ----------------------------------------
-const {departmentSchema, find, findOne} = require('../models/academics.js')
+const {departmentSchema, find, findOne, findOneAndUpdate} = require('../models/academics.js')
 const department_model = mongoose.model('Department', departmentSchema)
 // Course Schema and model ----------------------------------------
 const {courseSchema} = require('../models/academics.js') 
@@ -1785,7 +1785,7 @@ router.route('/AddsignIn')
 })
 //--------------------------------------------------------------------
 // Add Sign out record -----------------------------------------------
-router.route('/signOut')
+router.route('/AddsignOut')
 .post(async(req,res)=>{
     const{id,date,Time} = req.body;
     try {
@@ -1896,63 +1896,67 @@ router.route('/Viewmissed')
     }
 })
 //--------------------------------------------------------------------
-// router.route('/login')
-// .post(async (req,res)=>{
-//     try {
-//         const result = await staff_model.findOne({email:req.body.email})
-//         if(!result){
-//             return res.send('You need to sign up first')
-//         }
-//         const correctPassword= await bcrypt.compare(req.body.password, result.password)
-//         if(correctPassword){
-//             const token=jwt.sign({_id:result._id, role:result.role}, 
-//                 process.env.TOKEN_SECRET)
-//             res.header('token',token).send(token)
-//         }
-//         else{
-//             res.send('Incorrect Password')
-//         }
-//     }     
-//     catch (error) {
-//         res.status(500).json({error:error.message});
-//     }
-// })
-//--------------------------------------------------------------------
 // logout ------------------------------------------------------------
+
 router.route('/logout')
 .post(async(req,res)=>{
-    
-    const user=await staff_model.findById(req.user._id);
-    user.token = null
-    await staff_model.findOneAndUpdate({_id:req.user._id},user)
-    res.send("loged out")
-    
+    try{
+        const user=await staff_model.findById(req.user._id);
+        user.token = null
+        await staff_model.findOneAndUpdate({_id:req.user._id},user)
+        res.send("logged out")
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
+    }
 })
 //--------------------------------------------------------------------
 // view profile ------------------------------------------------------
 
 router.route('/viewProfile')
 .get(async(req,res)=>{
-    const result= await staff_model.findById(req.user._id)
-    res.send(result)
+    try{
+        const result= await staff_model.findById(req.user._id)
+        res.send(result)
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
+    }
 })
 //--------------------------------------------------------------------
 // update profile ----------------------------------------------------
 
 router.route('/updateProfile')
-.post(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    if(req.body.officeLocation){
-        user.officeLocation=req.body.officeLocation
+.put(async(req,res)=>{
+    try{
+        const user= await staff_model.findById(req.user._id)
+        if(req.body.officeLocation){
+            user.officeLocation=req.body.officeLocation
+        }
+        if(req.body.email){
+            user.email=req.body.email
+        }
+        if(req.body.dayOff){
+            user.dayOff=req.body.dayOff
+        }
+        if(req.body.oldPassword!=null&&req.body.newPassword!=null){
+            const correctPassword= await bcrypt.compare(req.body.oldPassword, user.password)
+            if(correctPassword){
+                    const salt= await bcrypt.genSalt(10)
+                    req.body.newPassword = await bcrypt.hash(req.body.newPassword, salt) 
+                    user.password=req.body.newPassword
+            }else{
+                res.send("wrong insertion")
+            }
+        }
+
+        await staff_model.findByIdAndUpdate(req.user._id,user)
+
+        res.send()
     }
-    if(req.body.email){
-        user.email=req.body.email
+    catch(error){
+        res.status(500).json({error:error.message});
     }
-    if(req.body.dayOff){
-        user.dayOff=req.body.dayOff
-    }
-    await user.save()
-    res.send(user)
 
 })
 //--------------------------------------------------------------------
@@ -1960,183 +1964,198 @@ router.route('/updateProfile')
 
 router.route('/signIn')
 .post(async(req,res)=>{
-    var today =  new Date()
-    if(today.toTimeString().substring(0,2)>"19"){
-        res.send("You cannot sign in after 7PM")
-    }
-    if(today.toTimeString().substring(0,2)<"07"){
-        today.setHours(7)
-        today.setMinutes(0)
-    }
-    const user= await staff_model.findById(req.user._id)
-    var attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
-    var schedule_attendance = null
-    if(today.toDateString().substring(8,10)<"11"){
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
-    }
-    else{
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
-    }
-    if(schedule_attendance==null){
+    try{
+        var today =  new Date()
+        if(today.toTimeString().substring(0,2)>"19"){
+            res.send("You cannot sign in after 7PM")
+        }
+        if(today.toTimeString().substring(0,2)<"07"){
+            today.setHours(7)
+            today.setMinutes(0)
+        }
+        const user= await staff_model.findById(req.user._id)
+        var attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
+        var schedule_attendance = null
         if(today.toDateString().substring(8,10)<"11"){
-            schedule_attendance = new scheduleAttendance_model({
-                id:user.id,
-                month:(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()
-            })
-            await schedule_attendance.save()
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
         }
         else{
-            schedule_attendance = new scheduleAttendance_model({
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+        }
+        if(schedule_attendance==null){
+            if(today.toDateString().substring(8,10)<"11"){
+                schedule_attendance = new scheduleAttendance_model({
+                    id:user.id,
+                    month:(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()
+                })
+                await schedule_attendance.save()
+            }
+            else{
+                schedule_attendance = new scheduleAttendance_model({
+                    id:user.id,
+                    month:today.toLocaleString().substring(0,2)
+                })
+                await schedule_attendance.save()
+            }
+        }
+
+        if(attendance==null){
+            attendance = new attendance_model({
                 id:user.id,
+                date:today.toLocaleString().substring(0,10),
+                day:today.toUTCString().substring(0,3),
                 month:today.toLocaleString().substring(0,2)
             })
-            await schedule_attendance.save()
-        }
-    }
-
-    if(attendance==null){
-        attendance = new attendance_model({
-            id:user.id,
-            date:today.toLocaleString().substring(0,10),
-            day:today.toUTCString().substring(0,3),
-            month:today.toLocaleString().substring(0,2)
-        })
-        if(user.dayOff != today.toUTCString().substring(0,3)){
-            var x = schedule_attendance.missedHours+8
-            schedule_attendance.missedHours=x
-        }
-        for(var i in schedule_attendance.days){
-            if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
-                schedule_attendance.days.splice(i,1)
+            if(user.dayOff != today.toUTCString().substring(0,3)){
+                var x = schedule_attendance.missedHours+8
+                schedule_attendance.missedHours=x
             }
-        }
-        
-        attendance.signIn.push(today)
-        schedule_attendance.days.push(attendance)
-        await attendance.save()
-    }else{
-        if(attendance.signIn.length!=attendance.signOut.length){
-            attendance.signIn.pop()
+            for(var i in schedule_attendance.days){
+                if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                    schedule_attendance.days.splice(i,1)
+                }
+            }
+            
             attendance.signIn.push(today)
-        }
-        else{
-            attendance.signIn.push(today)
-        }
-        await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
-
-        for(var i in schedule_attendance.days){
-            if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
-                schedule_attendance.days.splice(i,1)
+            schedule_attendance.days.push(attendance)
+            await attendance.save()
+        }else{
+            if(attendance.signIn.length!=attendance.signOut.length){
+                attendance.signIn.pop()
+                attendance.signIn.push(today)
             }
-        }
-        schedule_attendance.days.push(attendance)
-    }
-
-    if(today.toDateString().substring(8,10)<"11"){
-        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
-    }
-    else{
-        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
-    }
-    res.send(attendance)
-
-})
-//--------------------------------------------------------------------
-// sign Out ----------------------------------------------------------
-
-router.route('/signOut')
-.post(async(req,res)=>{
-    
-    var today =  new Date()
-    if(today.toTimeString().substring(0,2)>"19"){
-        today.setHours(19)
-        today.setMinutes(0)
-    }
-    if(today.toTimeString().substring(0,2)<"07"){
-        today.setHours(7)
-        today.setMinutes(0)
-    }
-    const user= await staff_model.findById(req.user._id)
-    const attendance= await attendance_model.findOne({"id":user.id,
-        "date":today.toLocaleString().substring(0,10)})
-    // res.send(attendance.signIn.length.toString())
-    var schedule_attendance = null
-    if(today.toDateString().substring(8,10)<"11"){
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
-    }
-    else{
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
-    }
-    if(!attendance||!schedule_attendance){
-        res.send("You did not sign in today")
-    }else{
-        if(attendance.signIn.length!=(attendance.signOut.length+1)){
-            res.send("You did not sign in")
-        }
-        else{
-            attendance.signOut.push(today)
-        }
-        var diff =(attendance.signOut[attendance.signOut.length-1]-attendance.signIn[attendance.signIn.length-1])/(1000*60*60)
-        diff=schedule_attendance.missedHours-diff
-        schedule_attendance.missedHours=diff
-        await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
-        for(var i in schedule_attendance.days){
-            if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
-                schedule_attendance.days.splice(i,1)
+            else{
+                attendance.signIn.push(today)
             }
+            await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+
+            for(var i in schedule_attendance.days){
+                if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                    schedule_attendance.days.splice(i,1)
+                }
+            }
+            schedule_attendance.days.push(attendance)
         }
-        schedule_attendance.days.push(attendance)
+
         if(today.toDateString().substring(8,10)<"11"){
             await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
         }
         else{
             await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
         }
-        res.send(attendance)
+        res.send()
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
+// sign Out ----------------------------------------------------------
+
+router.route('/signOut')
+.post(async(req,res)=>{
+    try{
+        var today =  new Date()
+        if(today.toTimeString().substring(0,2)>"19"){
+            today.setHours(19)
+            today.setMinutes(0)
+        }
+        if(today.toTimeString().substring(0,2)<"07"){
+            today.setHours(7)
+            today.setMinutes(0)
+        }
+        const user= await staff_model.findById(req.user._id)
+        const attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
+        var schedule_attendance = null
+        if(today.toDateString().substring(8,10)<"11"){
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+        }
+        else{
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+        }
+        if(!attendance||!schedule_attendance){
+            res.send("You did not sign in today")
+        }else{
+            if(attendance.signIn.length!=(attendance.signOut.length+1)){
+                res.send("You did not sign in")
+            }
+            else{
+                attendance.signOut.push(today)
+            }
+            var diff =(attendance.signOut[attendance.signOut.length-1]-attendance.signIn[attendance.signIn.length-1])/(1000*60*60)
+            diff=schedule_attendance.missedHours-diff
+            schedule_attendance.missedHours=diff
+            await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+            for(var i in schedule_attendance.days){
+                if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                    schedule_attendance.days.splice(i,1)
+                }
+            }
+            schedule_attendance.days.push(attendance)
+            if(today.toDateString().substring(8,10)<"11"){
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
+            }
+            else{
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
+            }
+            res.send()
+        }
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
 // reset Password ----------------------------------------------------
 
 router.route('/resetPassword')
-.post(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const correctPassword= await bcrypt.compare(req.body.oldPassword, user.password)
-    if(correctPassword){
-        const salt= await bcrypt.genSalt(10)
-        req.body.newPassword = await bcrypt.hash(req.body.newPassword, salt) 
-        user.password=req.body.newPassword
-        await user.save()
-        res.send("Password Changed");
-    }else{
-        res.send("wrong insertion")
+.put(async(req,res)=>{
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const correctPassword= await bcrypt.compare(req.body.oldPassword, user.password)
+        if(correctPassword){
+            const salt= await bcrypt.genSalt(10)
+            req.body.newPassword = await bcrypt.hash(req.body.newPassword, salt) 
+            user.password=req.body.newPassword
+            await staff_model.findByIdAndUpdate(req.user._id,user)
+            res.send("Password Changed");
+        }else{
+            res.send("wrong insertion")
+        }
     }
-
+    catch(error){
+        res.status(500).json({error:error.message});
+    }
 })
 // //--------------------------------------------------------------------
 // // view attendance ---------------------------------------------------
 
 router.route('/viewAttendance')
 .get(async (req,res)=>{
-    var today =  new Date()
-    const user= await staff_model.findById(req.user._id)
-    if(req.body.month==null){
-        const attendance = await attendance_model.find({id:user.id})
-        if(attendance==null){
-            res.send("You have not attende anything yet")
+    try{
+        var today =  new Date()
+        const user= await staff_model.findById(req.user._id)
+        if(req.body.month==null){
+            const attendance = await attendance_model.find({id:user.id})
+            if(attendance==null){
+                res.send("You have not attende anything yet")
+            }
+            else{
+                res.send(attendance)
+            }
         }
         else{
-            res.send(attendance)
+            const attendance = await attendance_model.find({id:user.id,month:req.body.month}) 
+            if(attendance==null){
+                res.send("You have no attende in this month")
+            }
+            else{
+                res.send(attendance)
+            }
         }
     }
-    else{
-        const attendance = await attendance_model.find({id:user.id,month:req.body.month}) 
-        if(attendance==null){
-            res.send("You have no attende in this month")
-        }
-        else{
-            res.send(attendance)
-        }
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 // //--------------------------------------------------------------------
@@ -2144,20 +2163,25 @@ router.route('/viewAttendance')
 
 router.route('/viewMissingDays')
 .get(async(req,res)=>{
-    var today =  new Date()
-    const user= await staff_model.findById(req.user._id)
-    var schedule_attendance = null
-    if(today.toDateString().substring(8,10)<"11"){
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+    try{
+        var today =  new Date()
+        const user= await staff_model.findById(req.user._id)
+        var schedule_attendance = null
+        if(today.toDateString().substring(8,10)<"11"){
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+        }
+        else{
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+        }
+        if(schedule_attendance==null){
+            res.send("You're missing days have not yet been calculated this month")
+        }
+        else{
+            res.send(schedule_attendance.missedDays.toString())
+        }
     }
-    else{
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
-    }
-    if(schedule_attendance==null){
-        res.send("You're missing days have not yet been calculated this month")
-    }
-    else{
-        res.send(schedule_attendance.missedDays.toString())
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 // //--------------------------------------------------------------------
@@ -2165,20 +2189,25 @@ router.route('/viewMissingDays')
 
 router.route('/viewMissingHours')
 .get(async(req,res)=>{
-    var today =  new Date()
-    const user= await staff_model.findById(req.user._id)
-    var schedule_attendance = null
-    if(today.toDateString().substring(8,10)<"11"){
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+    try{
+        var today =  new Date()
+        const user= await staff_model.findById(req.user._id)
+        var schedule_attendance = null
+        if(today.toDateString().substring(8,10)<"11"){
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+        }
+        else{
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+        }
+        if(schedule_attendance==null){
+            res.send("You're missing hours have not yet been calculated this month")
+        }
+        else{
+            res.send(schedule_attendance.missedHours.toString())
+        }
     }
-    else{
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
-    }
-    if(schedule_attendance==null){
-        res.send("You're missing hours have not yet been calculated this month")
-    }
-    else{
-        res.send(schedule_attendance.missedHours.toString())
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 
@@ -2199,6 +2228,9 @@ router.route('/sendReplacmentReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
+        if(req.body.date==null||req.body.date.length!=10){
+            res.send("Enter date request will take effect of format MM/DD/YYYY")
+        }
         const course=await course_model.findOne({course:req.body.course})
         for(var i =0;i<user.courses.length();i++){
             if(user.courses[i]==course.id){
@@ -2310,12 +2342,13 @@ router.route('/leaveReq')
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
      const reqests = await request_model.findOne({requester:user.id})
-     if(reqests.Status!="pending"){
+     if(reqests.Status!="Pending"){
          res.send("requests that have been approved or denied",reqests)
      }
     }else
     res.send('HR cant be notified of anything')
  })
+
 router.route('/viewAcceptedRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
@@ -2328,22 +2361,25 @@ router.route('/viewAcceptedRequests')
         res.send(reqests)
     }
 }else
-res.send('HR cants have requests of any kind')
+res.send('HR cant have requests of any kind')
 })
+
 router.route('/viewPendingRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
-    const reqests = await request_model.find({requester:user.id,status:"pending"})
-    if(reqests==null){
-        res.send("No Pending Requests")
+        const reqests = await request_model.find({requester:user.id,status:"Pending"})
+        if(reqests==null){
+            res.send("No Pending Requests")
+        }
+        else{
+            res.send(reqests)
+        }
+    }else{
+        res.send('HR cant have requests of any kind')
     }
-    else{
-        res.send(reqests)
-    }
-}else
-res.send('HR cants have requests of any kind')
 })
+
 router.route('/viewRejectedRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
@@ -2358,97 +2394,82 @@ router.route('/viewRejectedRequests')
 }else
 res.send('HR cants have requests of any kind')
 })
+
 router.route('/cancelRequests')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
+    today=new Date()
+    // res.send(today.toLocaleDateString())
     if(user.role!='HR'){
-    const requests = await request_model.findOne({id:req.body._id})
-    if(requests==null){
-        res.send("Incorrect request id")
-    }
-    if(requests.requester==user.id){
-        if(requests.Status=="pending"||requests.Date>=Date.now()){
-            const cancelRequests = request_model.findByIdAndDelete(requests._id)
-            res.send("Request Canceled")
+        const requests = await request_model.findById(req.body._id)
+        if(requests==null){
+            res.send("Incorrect request id")
+        }
+        if(requests.requester==user.id){
+            const date = new Date(requests.date)
+            if(requests.Status=="Pending"||date>=today){
+                const cancelRequests = request_model.findByIdAndDelete(requests._id)
+                res.send("Request Canceled")
+            }
+            else{
+                res.send("You cannot cancel this requests")
+            }
         }
         else{
-            res.send("You cannot cancel this requests")
+            res.send("You cannot cancel another staff members request")
         }
-    }
-    else{
-        res.send("You cannot cancel another staff members request")
-    }
-}else
-res.send('HR cants have requests of any kind')
+    }else
+    res.send('HR cants have requests of any kind')
 })
 //--------------------------------------------------------------------
 // HOD assign instructor ---------------------------------------------
 
 router.route('/assignInstructor')
 .post(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    const user1=await staff_model.findOne({id:req.body.id})
-    if(user1==null){
-        res.send("There is no corresponding instructor")
-    }
-    if(department.head==user.id){
-        var index= null
-        var course = null 
-        const check= await course_model.findOne({code:req.body.course}) 
-        for(var x in department.courses){
-            if(department.courses[x].code==check.code){
-                course=department.courses[x]
-                index=x
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        const user1=await staff_model.findOne({id:req.body.id})
+        if(user1==null){
+            res.send("There is no corresponding instructor")
+        }
+        if(department.head==user.id){
+            var index= null
+            var course = null 
+            const check= await course_model.findOne({code:req.body.course}) 
+            for(var x in department.courses){
+                if(department.courses[x].code==check.code){
+                    course=department.courses[x]
+                    index=x
+                }
             }
-        }
-        if(course==null){
-            res.send("No corresponding course")
-        }else{
-            // if(req.body.role=="TA"){
-            //     course.TA.push(user1.id)
-            //     res.send(course)
-            //     await course_model.findOneAndUpdate({code:req.body.course},course)
-            //     department.courses.splice(index,1)
-            //     department.courses.push(course)
-            //     await department_model.findOneAndUpdate({name:user.department}, department)
-            //     var faculty = await Faculty_model.findOne({name:department.facultyname})
-            //     for(var x in faculty.departments){
-            //         if(faculty.departments[x].name==department.name){
-            //             faculty.departments.splice(x,1)
-            //             faculty.departments.push(department)
-            //             await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
-            //         }
+            if(course==null){
+                res.send("No corresponding course")
+            }else{
+                        course.lecturer.push(user1.id)
+                        var coverage = ((course.TA.length+course.lecturer.length)/course.totalSlots)/100
+                        course.coverage=coverage
+                        await course_model.findOneAndUpdate({code:req.body.course},course)
+                        department.courses.splice(x,1)
+                        department.courses.push(course)
+                        await department_model.findOneAndUpdate({name:user.department}, department)
+                        var faculty = await Faculty_model.findOne({name:department.facultyname})
+                        for(var x in faculty.departments){
+                            if(faculty.departments[x].name==department.name){
+                                faculty.departments.splice(x,1)
+                                faculty.departments.push(department)
+                                await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
+                            }
 
-            //     }
-
-            //     res.send(course)
-            // }
-            // else{
-                // if(req.body.role=="lecturer"){
-                    course.lecturer.push(user1.id)
-                    await course_model.findOneAndUpdate({code:req.body.course},course)
-                    department.courses.splice(x,1)
-                    department.courses.push(course)
-                    await department_model.findOneAndUpdate({name:user.department}, department)
-                    var faculty = await Faculty_model.findOne({name:department.facultyname})
-                    for(var x in faculty.departments){
-                        if(faculty.departments[x].name==department.name){
-                            faculty.departments.splice(x,1)
-                            faculty.departments.push(department)
-                            await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
                         }
-
-                    }
-                    res.send(course)
-                // }
-                // else{
-                    // res.send("Wrong instructor role choose lecturer or TA")
-                // }
-            // }
+                        res.send()
+            }
+        }else{
+            res.send("You are not authorized to access this page")
         }
-    }else{
-        res.send("You are not authorized to access this page")
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2456,77 +2477,103 @@ router.route('/assignInstructor')
 
 router.route('/removeInstructor')
 .post(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    const user1=await staff_model.findOne({id:req.body.id})
-    if(user1==null){
-        res.send("There is no corresponding instructor")
-    }
-    if(department.head==user.id){
-        var course = null
-        var index = null
-        for(var i in department.courses){
-            if(department.courses[i].code==req.body.course){
-                course=department.courses[i]
-                index=i
-            }
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        const user1=await staff_model.findOne({id:req.body.id})
+        if(user1==null){
+            res.send("There is no corresponding instructor")
         }
-        if(course==null){
-            res.send("No corresponding course")
-        }else{
-            // if(user1.role=="TA"){
-            //     for(var i in course.TA){
-            //         if(course.TA[i]==user1.id){
-            //             course.TA.splice(i,1)
-            //             await course_model.findOneAndUpdate({code:req.body.course},course)
-            //             department.courses.splice(index,1)
-            //             department.courses.push(course)
-            //             await department_model.findOneAndUpdate({name:user.department}, department)
-            //             var faculty = await Faculty_model.findOne({name:department.facultyname})
-            //             for(var x in faculty.departments){
-            //                 if(faculty.departments[x].name==department.name){
-            //                     faculty.departments.splice(x,1)
-            //                     faculty.departments.push(department)
-            //                     await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
-            //                 }
-        
-            //             }
-            //             res.send(course)
-
-            //         }
-            //     }
-            //     res.send("This instructor does not teach this course")
-            // }
-            // else{
-                // if(req.body.role=="lecturer"){
-                    for(var i in course.lecturer){
-                        if(course.lecturer[i]==user1.id){
-                            course.lecturer.splice(i,1)
-                            await course_model.findOneAndUpdate({code:req.body.course},course)
-                            department.courses.splice(index,1)
-                            department.courses.push(course)
-                            await department_model.findOneAndUpdate({name:user.department}, department)
-                            var faculty = await Faculty_model.findOne({name:department.facultyname})
-                            for(var x in faculty.departments){
-                                if(faculty.departments[x].name==department.name){
-                                    faculty.departments.splice(x,1)
-                                    faculty.departments.push(department)
-                                    await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
-                                }
-                            }
-                            res.send(course)
-                        }
-                    }
-
-                    res.send("This instructor does not teach this course")
-                // }
-                // else{
-                //     res.send("This staff member cannot teach this course")
-                // }
+        if(department.head==user.id){
+            var course = null
+            var index = null
+            for(var i in department.courses){
+                if(department.courses[i].code==req.body.course){
+                    course=department.courses[i]
+                    index=i
+                }
             }
-        // }
-    }else{
-        res.send("You are not authorized to access this page")
+            if(course==null){
+                res.send("No corresponding course")
+            }else{
+                        for(var i in course.lecturer){
+                            if(course.lecturer[i]==user1.id){
+                                course.lecturer.splice(i,1)
+                                var coverage = ((course.TA.length+course.lecturer.length)/course.totalSlots)/100
+                                course.coverage=coverage
+                                await course_model.findOneAndUpdate({code:req.body.course},course)
+                                department.courses.splice(index,1,course)
+                                await department_model.findOneAndUpdate({name:user.department}, department)
+                                var faculty = await Faculty_model.findOne({name:department.facultyname})
+                                for(var x in faculty.departments){
+                                    if(faculty.departments[x].name==department.name){
+                                        faculty.departments.splice(x,1,department)
+                                        await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
+                                    }
+                                }
+                                res.send()
+                            }
+                        }
+
+                        res.send("This instructor does not teach this course")
+                }
+        }else{
+            res.send("You are not authorized to access this page")
+        }
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
+// HOD update instructor ---------------------------------------------
+
+router.route('/updateInstructor')
+.put(async(req,res)=>{
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        const user1=await staff_model.findOne({id:req.body.oldID})
+        const user2=await staff_model.findOne({id:req.body.newID})
+        if(user1==null||user2==null){
+            res.send("There is no corresponding instructor")
+        }
+        if(department.head==user.id){
+            var index= null
+            var course = null 
+            const check= await course_model.findOne({code:req.body.course}) 
+            for(var x in department.courses){
+                if(department.courses[x].code==check.code){
+                    course=department.courses[x]
+                    index=x
+                }
+            }
+            if(course==null){
+                res.send("No corresponding course")
+            }else{
+                for(var i in course.lecturer){
+                    if(course.lecturer[i]==user1.id){
+                        course.lecturer.splice(i,1,user2.id)
+                        await course_model.findOneAndUpdate({code:req.body.course},course)
+                        department.courses.splice(index,1,course)
+                        await department_model.findOneAndUpdate({name:user.department}, department)
+                        var faculty = await Faculty_model.findOne({name:department.facultyname})
+                        for(var x in faculty.departments){
+                            if(faculty.departments[x].name==department.name){
+                                faculty.departments.splice(x,1,department)
+                                await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
+                            }
+                        }
+                        res.send()
+                    }
+                }
+            }
+        }else{
+            res.send("You are not authorized to access this page")
+        }
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2534,45 +2581,50 @@ router.route('/removeInstructor')
 
 router.route('/viewStaff')
 .get(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    if(department.head==user.id){
-        if(req.body.view=="department"){
-            info = await staff_model.find({department:user.department})
-            res.send(info)
-        }
-        else{
-            if(req.body.view=="course"){
-                var course = null
-                for(var x in department.courses){
-                    if(department.courses[x].code==req.body.course){
-                        course=department.courses[x]
-                    }
-                }
-                if(course==null){
-                    res.send("You cannot access this course")
-                }
-                else{
-                    const staff = []
-                    var TA1= null
-                    for(var i in course.TA){
-                        TA1 = await staff_model.findOne({id:course.TA[i]})
-                        staff.push(TA1)
-                    }
-                    for(var i in course.lecturer){
-                        TA1 = await staff_model.findOne({id:course.lecturer[i]})
-                        staff.push(TA1)
-                    }
-                    res.send(staff)
-                }
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        if(department.head==user.id){
+            if(req.body.view=="department"){
+                info = await staff_model.find({department:user.department})
+                res.send(info)
             }
             else{
-                res.send("Please enter view")
+                if(req.body.view=="course"){
+                    var course = null
+                    for(var x in department.courses){
+                        if(department.courses[x].code==req.body.course){
+                            course=department.courses[x]
+                        }
+                    }
+                    if(course==null){
+                        res.send("You cannot access this course")
+                    }
+                    else{
+                        const staff = []
+                        var TA1= null
+                        for(var i in course.TA){
+                            TA1 = await staff_model.findOne({id:course.TA[i]})
+                            staff.push(TA1)
+                        }
+                        for(var i in course.lecturer){
+                            TA1 = await staff_model.findOne({id:course.lecturer[i]})
+                            staff.push(TA1)
+                        }
+                        res.send(staff)
+                    }
+                }
+                else{
+                    res.send("Please enter view")
+                }
             }
         }
+        else{
+            res.send("You are not authorized to access this page")
+        }
     }
-    else{
-        res.send("You are not authorized to access this page")
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2580,24 +2632,30 @@ router.route('/viewStaff')
 
 router.route('/viewDayOff')
 .get(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    if(department.head==user.id){
-        if(req.body.id!=null){
-            const staff= await staff_model.findOne({id:req.body.id})
-            if(staff.department==user.department){
-                res.send(staff.dayOff)
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        if(department.head==user.id){
+            if(req.body.id){
+                const staff= await staff_model.findOne({id:req.body.id})
+                if(staff.department==user.department){
+                    res.send(staff.dayOff)
+                }
+                else{
+                    res.send("This staff member is not in your department")
+                }
             }
             else{
-                res.send("This staff member is not in your department")
+                const result = await staff_model.find({department:user.department},'name id dayOff')
+                res.send(result)
             }
         }
         else{
-            const result = await staff_model.find({department:user.department},'name id dayOff')
+            res.send("You are not authorized to access this page")
         }
     }
-    else{
-        res.send("You are not authorized to access this page")
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2605,14 +2663,20 @@ router.route('/viewDayOff')
 
 router.route('/viewChangeDayOff')
 .get(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    if(department.head==user.id){
-        const requests = await request_model.find({department:user.department})
-        res.send(requests)
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        if(department.head==user.id){
+            // const requests = await request_model.find({receiver:user.id,type:"changedayoffRequest"}) 
+            const requests = await request_model.find({receiver:user.id}) 
+            res.send(requests)
+        }
+        else{
+            res.send("You are not authorized to access this page")
+        }
     }
-    else{
-        res.send("You are not authorized to access this page")
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2620,55 +2684,65 @@ router.route('/viewChangeDayOff')
 
 router.route('/acceptRequest')
 .post(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    if(department.head==user.id){
-        const request = await request_model.findById(req.body._id)
-        if(request==null){
-            res.send("No corresponding request")
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        if(department.head==user.id){
+            const request = await request_model.findById(req.body._id)
+            if(request==null){
+                res.send("No corresponding request")
+            }
+            else{
+                var today =  new Date()
+                var schedule_attendance=null
+                if(today.toDateString().substring(8,10)<"11"){
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
+                }
+                else{
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
+                }
+                request.status="accepted"
+                await request_model.findByIdAndUpdate(req.body._id,request)
+                const sender = await staff_model.findOne({id:request.requester})
+                var amount = request.amount
+                var schedule = null
+                if(request.type=="accidentalLeave"){
+                    var missed = sender.leaveBalance - amount
+                    sender.leaveBalance = missed
+                    await staff_model.findOneAndUpdate({id:request.requester},sender)
+                }
+                if(request.type=="annualLeave"){
+                    var missed = sender.leaveBalance - amount
+                    sender.leaveBalance = missed
+                    await staff_model.findOneAndUpdate({id:request.requester},sender)
+                }
+                if(request.type=="sick"){
+                    var missed = schedule_attendance.misseddays-amount
+                    schedule_attendance.misseddays = missed
+                }
+                if(request.type=="maternity"){
+                    var missed = schedule_attendance.misseddays-amount
+                    schedule_attendance.misseddays = missed
+                }
+                if(request.type=="compensation"){
+                    var missed = schedule_attendance.misseddays-amount
+                    schedule_attendance.misseddays = missed
+                }
+                if(today.toDateString().substring(8,10)<"11"){
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
+                }
+                else{
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
+                }
+                res.send()
+            }
         }
         else{
-            var today =  new Date()
-            var schedule_attendance=null
-            if(today.toDateString().substring(8,10)<"11"){
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
-            }
-            else{
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
-            }
-            request.status="accepted"
-            await request_model.findByIdAndUpdate(req.body._id,request)
-            const sender = await staff_model.findOne({id:request.requester})
-            var amount = request.amount
-            var schedule = null
-            if(request.type=="accidental"){
-                var missed = sender.leaveBalance - amount
-                sender.leaveBalance = missed
-                await sender.save()
-            }
-            if(request.type=="sick"){
-                var missed = schedule_attendance.misseddays-amount
-                schedule_attendance.misseddays = missed
-            }
-            if(request.type=="maternity"){
-                var missed = schedule_attendance.misseddays-amount
-                schedule_attendance.misseddays = missed
-            }
-            if(request.type=="compensation"){
-                var missed = schedule_attendance.misseddays-amount
-                schedule_attendance.misseddays = missed
-            }
-            if(today.toDateString().substring(8,10)<"11"){
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
-            }
-            else{
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
-            }
-            res.send(request)
+            res.send("You are not authorized to access this page")
         }
-    }
-    else{
-        res.send("You are not authorized to access this page")
+    }   
+    catch(error){   
+        res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2676,21 +2750,34 @@ router.route('/acceptRequest')
 
 router.route('/rejectRequest')
 .post(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    if(department.head==user.id){
-        const request = await request_model.findById(req.body._id)
-        if(request==null){
-            res.send("No corresponding request")
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        if(department.head==user.id){
+            const request = await request_model.findById(req.body._id)
+            if(request==null){
+                res.send("No corresponding request")
+            }
+            else{
+                request.status="rejected"
+                
+                if(req.body.response==null){
+                    await request_model.findByIdAndUpdate(req.body._id,request)
+                    res.send()
+                }
+                else{
+                    request.response=req.body.response
+                    await request_model.findByIdAndUpdate(req.body._id,request)
+                    res.send()
+                }
+            }
         }
         else{
-            request.status="rejected"
-            await request_model.findByIdAndUpdate(req.body._id,request)
-            res.send(request)
+            res.send("You are not authorized to access this page")
         }
     }
-    else{
-        res.send("You are not authorized to access this page")
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2698,19 +2785,24 @@ router.route('/rejectRequest')
 
 router.route('/viewCoverage')
 .get(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    if(department.head==user.id){
-        const coverage = await course_model.find({departmentname:user.department},'code coverage')
-        if(coverage==null){
-            res.send("No courses in your department")
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        if(department.head==user.id){
+            const coverage = await course_model.find({departmentname:user.department},'code coverage')
+            if(coverage==null){
+                res.send("No courses in your department")
+            }
+            else{
+                res.send(coverage)
+            }
         }
         else{
-            res.send(coverage)
+            res.send("You are not authorized to access this page")
         }
     }
-    else{
-        res.send("You are not authorized to access this page")
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 
@@ -2718,32 +2810,38 @@ router.route('/viewCoverage')
 // HOD view course Assignments ---------------------------------------
 router.route('/viewAssignments')
 .get(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    const department = await department_model.findOne({name:user.department})
-    if(department.head==user.id){
-        const course = null
+    try{
+        const user= await staff_model.findById(req.user._id)
+        const department = await department_model.findOne({name:user.department})
+        if(department.head==user.id){
+            var course = null
 
-        for(var i=0;i<i<department.courses.length;i++){
-            if(department.courses[i].code==req.body.course){
-                course=department.courses[i]
+            for(var i in department.courses){
+                if(department.courses[i].code==req.body.course){
+                    course=department.courses[i]
+                }
             }
-        }
 
-        if(course==null){
-            res.send("There is no corresponding course")
-        }
-        else{
-            const schedule = await schedule_model.findOne({id:course.code})
-            if(schedule==null){
-                res.send("Course does not yet have a schedule")
+            if(course==null){
+                res.send("There is no corresponding course")
             }
             else{
-                res.send(schedule)
+                const schedule = await schedule_model.findOne({id:course.code})
+                // const slots = await slot_model.find({course:course.code})
+                if(schedule==null){
+                    res.send("Course does not yet have a schedule")
+                }
+                else{
+                    res.send(schedule)
+                }
             }
         }
+        else{
+            res.send("You are not authorized to access this page")
+        }
     }
-    else{
-        res.send("You are not authorized to access this page")
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 module.exports=router;
