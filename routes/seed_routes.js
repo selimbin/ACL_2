@@ -55,7 +55,7 @@ router.route('/Seed')
         role:"HR",salary:100000,dayOff:"saturday",officeLocation:"A1-105",
         misseddays:0,missedHours:0,department:"IDK"});
         await newStaff.save();
-        const seedStaffcount = new Staffcount_model({id:"1",HR:0,Academic:0});
+        const seedStaffcount = new Staffcount_model({id:"1",HR:1,Academic:1});
         await seedStaffcount.save();
         res.send(newStaff);
     } catch (error) {
