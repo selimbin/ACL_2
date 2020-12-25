@@ -443,6 +443,95 @@ Response: course schedule
 Response if not HOD: "You are not authorized to access this page"
 
 
+  --CourseInstructor routes--
+
+  Function:View the coverage of course(s) he/she is assigned to.
+Route:/staff/viewcoverage
+Request type : Get
+Request body : {“courses” : [“CS704”]}
+Response : Array  of covarages.
+
+Function:View the slots’ assignment of course(s) he/she is assigned Route:/staff/viewslotassignment
+Request type : Get
+Request body : {“courses” : [“CS704”]}
+Response : Array  of slots.
+
+Function:View all the staff in his/her department or per course along with their profiles.
+Route:/staff/viewdepstaff
+Request type : Get
+Response : Array  of staff members.
+
+
+
+Function:Assign an academic member to an unassigned slots in course(s) he/she is assigned to.
+Route:/staff/Assigntoslots
+Request type : Put
+Request body : {“courses”:  [“CS704”]  ,”staff_id”: “43-12222” ,”slot_no”:4 ,”day”: “saturday”}
+
+
+Function: Update assignment of academic member in course(s) he/she is assigned to.
+Route:/staff/UpdateAssignslots
+Request type : Put
+Request body : {“courses”:  [“CS704”]  ,”staff_id”: “43-12222” ,”slot_no”:4 ,”day”: “saturday”,”staff_id”: “43-12223” }
+
+
+Function:delete assignment of academic member in course(s) he/she is assigned to.
+Route:/staff/DeleteAssignslots
+Request type : Put
+Request body : {“courses”:  [“CS704”]  ,”staff_id”: “43-12222” ,”slot_no”:4 ,”day”: “saturday”}
+
+
+
+
+
+Function:Remove an assigned academic member in course(s) he/she is assigned to.
+Route:/staff/removecoursemem
+Request type : Delete
+Request body : {“courses”:  [“CS704”]  ,”staff_id”: “43-12222” }
+
+Function:Assign an academic member in each of his/her course(s) to be a course coordinator.
+Route:/staff/Assigncoordinator
+Request type : Put
+Request body : {“course_code”:  “CS704”  ,”staff_id”: “43-12222” }
+
+--Course Coordinator--
+
+Function: View “slot linking” request(s) from academic members linked to his/her course.
+Route:/staff/viewslotlinkingreq
+Request type : Get
+Request body : {“course_code”:  “CS704”  }
+Response : Array  of requests and their info
+
+
+
+Function:Accept “slot linking” requests from academic members linked to his/her course.
+Route:/staff/acceptslotlinkingreq
+Request type : Put
+Request body : {“course_code”:  “CS704”  ,”slotlinking_id_id”: “111111111” }
+
+Function:reject “slot linking” requests from academic members linked to his/her course.
+Route:/staff/Rejectslotlinkingreq
+Request type : Put
+Request body : {“course_code”:  “CS704”  ,”slotlinking_id_id”: “111111111” }
+
+
+
+Function:Add course slot(s) in his/her course.
+Route:/staff/Addslot
+Request type : Post
+Request body : {“course_code”:  “CS704”  ,”locations”: [“C5-210”] ,”types”: [“tut”],”slot_no”:4 ,”day”: “saturday”}
+Function:update course slot(s) in his/her course.
+Route:/staff/updateslot
+Request type : Put
+Request body : {“course_code”:  “CS704”  ,”location”: “C5-210”,”newtype”: “tut”,”newlocation”: “C5-208”,”slot_no”:4 ,”day”: “saturday”}
+
+
+Function:delete course slot(s) in his/her course.
+Route:/staff/deleteslot
+Request type : Delete
+Request body : {“course_code”:  “CS704”  ,”location”: “C5-210”,”slot_no”:4 ,”day”: “saturday”}
+
+
 	--All academic staff routes:--
   
 Functionality: views staff schedules usinhg their ids

@@ -3228,7 +3228,7 @@ router.route('/UpdateAssignslots').put(async (req,res)=>{
             return res.status(400).json({msg:"this staff member is busy in this slot"});
              slot =cor.wednesday[slot_no-1];
             break;
-        case "thrusday":
+        case "thursday":
             
             if(!sta.thrusday[slot_no-1].isEmpty)
             return res.status(400).json({msg:"this staff member is busy in this slot"});
@@ -3540,7 +3540,7 @@ router.route('/acceptslotlinkingreq').put(async (req,res)=>{
             
             if(!sta.thrusday[slot_no-1].isEmpty)
             return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.thrusday[slot_no-1];
+             slot =cor.thursday[slot_no-1];
                 break;        
         default:
             return res.status(400).json({msg:"Enter a valid day/no upper case"});
