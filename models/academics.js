@@ -14,10 +14,13 @@ const courseSchema = new mongoose.Schema({
         required:true,
     },
     coverage:{
-        type:Number
+        type:Number,
+        required:true,
+        default:0
     },
     totalSlots:{
-        type:Number
+        type:Number,
+        required:true
     },
     lecturer:{
         type:[String]
