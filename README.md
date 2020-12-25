@@ -3,6 +3,9 @@
 **Some of these tables were change on the latest merge to main**
 
 **2 GUC staff member functionalities**<br>
+
+PORT = 3000
+
 *Any staff member functionalities*<br>
 
 Functionality: Log In<br>
@@ -21,10 +24,10 @@ Functionality: User views his/her profile<br>
 Route: /staff/viewProfile<br>
 Request type: GET<br>
 Response: User Profile, ex:<br>
-{
-    "leaveBalance": 2.5,
-    "course": [
-        "CSEN720"
+{<br>
+    "leaveBalance": 2.5,<br>
+    "course": [<br>
+        "CSEN720"<br>
     ],
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxYTk0NTQyOTY3MTA2ZjRlNmQ0ZTciLCJyb2xlIjoibGVjdHVyZXIiLCJpYXQiOjE2MDg5MTIxMjR9.BVuay2SA62Tx7crWnt3unvM2wOZsFSEtWa1R9xVOpz4",
     "_id": "5fe1a94542967106f4e6d4e7",
@@ -78,10 +81,10 @@ Request type: GET<br>
 Request body for all atendances: {}<br>
 Request body for atendances in a specific month: {month:"12"}<br>
 response: attendance sheet of specific month, ex:<br>
-[
-    {
-        "signIn": [
-            "2020-12-09T05:00:00.000Z"
+[<br>
+    {<br>
+        "signIn": [<br>
+            "2020-12-09T05:00:00.000Z"<br>
         ],
         "signOut": [],
         "_id": "5fe5b2b0e61abb2180e42975",
