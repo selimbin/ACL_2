@@ -82,7 +82,7 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
         }
 
     }
-  });
+})
 app.use('/seed', seed_routes)
 app.use('', AuthenticationRoutes)
 

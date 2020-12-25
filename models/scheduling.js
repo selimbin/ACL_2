@@ -17,6 +17,9 @@ const attendanceSchema = new mongoose.Schema({
     day:{
         type:String
     },
+    month:{
+        type:String
+    },
     signIn:{
         type:[Date]
     },
@@ -87,7 +90,6 @@ const scheduleAttendance = new mongoose.Schema({
     },
     month:{
         type:String,
-        minlength:3,
         required:true
     },
     days:{

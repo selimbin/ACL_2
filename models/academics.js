@@ -16,6 +16,9 @@ const courseSchema = new mongoose.Schema({
     coverage:{
         type:Number
     },
+    totalSlots:{
+        type:Number
+    },
     lecturer:{
         type:[String]
     },
