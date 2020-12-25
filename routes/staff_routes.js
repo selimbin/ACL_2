@@ -2251,23 +2251,23 @@ router.route('/viewReplacementReq')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
-    const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
-    res.send(myrequests)
-}else
-res.send('HR cants have requests or view of any kind')
+        const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
+        res.send(myrequests)
+    }else
+        res.send('HR cants have requests or view of any kind')
 })
 router.route('/slotlinkingrequest')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
-    const course=await course_model.findOne({course:req.body.course})
-    for(var i =0;i<user.courses.length();i++){
-        if(user.courses[i]==course.id){
-            const newreqest = await new request_model({type:req.body.type,requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
-            await newreqest.save()
-            res.send(newreqest)
+        const course=await course_model.findOne({course:req.body.course})
+        for(var i =0;i<user.courses.length();i++){
+            if(user.courses[i]==course.id){
+                const newreqest = await new request_model({type:'slotlinkingrequest',requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
+                await newreqest.save()
+                res.send(newreqest)
         }
-    }
+    }res.send('no course fits')
     }else
     res.send('HR cants have requests of any kind')
 })
@@ -2277,7 +2277,7 @@ router.route('/changeDayOffReq')
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
     if(department!=null){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,newDay:req.body.newDay})
+        const newreqest = await new request_model({type:'changeDayOffReq',reason:req.body.reason,requester:user.id,receiver:department.head,newDay:req.body.newDay})
         await newreqest.save()
         res.send(newreqest)
     }else{
@@ -2285,53 +2285,133 @@ router.route('/changeDayOffReq')
     }
 }else
 res.send('HR cants have requests of any kind')
-})//all other send reqests of diffrent types such as leaves are copy paste from this with if conditionals if needed and a new dbs
+})
 
 
-router.route('/leaveReq')
+router.route('/AnnualLeaveReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
     if(department.head!=null){
-        if(req.body.type=="AnnualLeave"&&requests.Date<=Date.now()&&department.head!=null){
-            try{
-            const replacementREQ= await request_model.findOne({type:'ReplacmentReq'})
-            if(replacementREQ.status=='accepted'){
-            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,replacement:replacementREQ.receiver.id})
+        if(req.body.type=='AnnualLeave'&&req.body.date>=Date.now()&&department.head!=null){
+            const replacementREQ= await request_model.findOne({type:'ReplacmentReq',requester:user.id})
+            if(replacementREQ!=null&&replacementREQ.status=='accepted'){
+                const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:replacementREQ.receiver.id,date:req.body.date,amount:req.body.amount})
+                await newreqest.save()
+                res.send(newreqest)
+            }else{
+                const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null',date:req.body.date})
+                await newreqest.save()
+                res.send(newreqest)   
+                    }
+                }else{
+                    res.send('incorrect details entered')
+                }
+            }else
+                 res.send('no head of department was found')
+                
+        }else
+        res.send('HR cants have requests of any kind')
+    })
+
+    router.route('/CompensationLeaveReq')
+    .post(async(req,res)=>{
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+        const department = await department_model.findOne({name:user.department})
+        if(department.head!=null){
+     if(req.body.type=='CompensationLeave'&&req.body.reason!=null&&department.head!=null){
+            const newreqest = await new request_model({type:'CompensationLeave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
             await newreqest.save()
             res.send(newreqest)
         }else{
-            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null'})
-            await newreqest.save()
-            res.send(newreqest)   
+            if(req.body.type=='CompensationLeave'&&req.body.reason==null){
+                res.send('CompensationLeave need a reason pls state yours')
+        }else{
+            res.send('not right kind of leave dumdum')
         }
-            }
-            catch{
-                const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null'})
+    }
+}
+    else
+            res.send('no head of department was found')
+}      
+   else
+   res.send('HR cants have requests of any kind')
+                })
+
+
+
+router.route('/MaternityLeaveReq')
+.post(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    if(user.role!='HR'){
+        const department = await department_model.findOne({name:user.department})
+        if(department.head!=null){
+            if(req.body.type=='MaternityLeave'&&user.gender=="F"){
+                const newreqest = await new request_model({type:'MaternityLeave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
                 await newreqest.save()
-                res.send(newreqest)              
-            }}else{ if(req.body.type=="CompensationLeave"&&req.body.reason!=null&&department.head!=null){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head})
-        await newreqest.save()
-        res.send(newreqest)
-    }else{if(req.body.type=="CompensationLeave"&&req.body.reason==null){
-        res.send('CompensationLeave need a reason pls state yours')
-    }else{if(req.body.type=="MaternityLeave"&&user.gender=="F"){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head})
-        await newreqest.save()
-        res.send(newreqest)
+                res.send(newreqest)
+             }else{
+                res.send('not right kind of leave or wrong gender')
+            }
+            }else
+                res.send('no head of department was found')
+               
+    }else
+       res.send('HR cants have requests of any kind')
+})
+
+
+
+
+
+
+
+
+router.route('/accidentalLeaveReq')
+.post(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    if(user.role!='HR'){
+    const department = await department_model.findOne({name:user.department})
+    if(department.head!=null){
+        if(req.body.type=='accidentalLeave'&&req.body.amount>=6){
+            res.send('no more than six days can be had as accedentall leave')
     }else{
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head})
-        await newreqest.save()
-        res.send(newreqest)
-    }}}
-}}else{
-    res.send('no head of department was found')
-}  
+        if(req.body.type=='accidentalLeave'&&req.body.amount<=6){
+            const newreqest = await new request_model({type:'accidentalLeave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
+            await newreqest.save()
+            res.send(newreqest)
+    
+               }else{
+                res.send('not right kind of leave dumdum')
+            }
+            }
+        }else
+            res.send('no head of department was found')
+           
+   }else
+   res.send('HR cants have requests of any kind') 
+})
+router.route('/sickleaveReq')
+.post(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    if(user.role!='HR'){
+        const department = await department_model.findOne({name:user.department})
+        if(department.head!=null){
+            if(req.body.type=='sickleave'){
+                 const newreqest = await new request_model({type:'sickleave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
+                 await newreqest.save()
+                 res.send(newreqest)
+         
+        }else{
+            res.send('not right kind of leave dumdum')
+        }
+         }else
+            res.send('no head of department was found')
+   
     }else
         res.send('HR cants have requests of any kind')
-    
 })
 
 
@@ -2340,7 +2420,7 @@ router.route('/leaveReq')
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
      const reqests = await request_model.findOne({requester:user.id})
-     if(reqests.Status!="pending"){
+     if(reqests.Status!="Pending"){
          res.send("requests that have been approved or denied",reqests)
      }
     }else
@@ -2364,12 +2444,12 @@ router.route('/viewPendingRequests')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
-    const reqests = await request_model.find({requester:user.id,status:"pending"})
+    const reqests = await request_model.find({requester:user.id,status:"Pending"})
     if(reqests==null){
         res.send("No Pending Requests")
     }
     else{
-        res.send(reqests)
+        res.send({reqests})
     }
 }else
 res.send('HR cants have requests of any kind')
@@ -2396,8 +2476,8 @@ router.route('/cancelRequests')
     if(requests==null){
         res.send("Incorrect request id")
     }
-    if(requests.requester==user.id){
-        if(requests.Status=="pending"||requests.Date>=Date.now()){
+     if(user.id==requests.requester){
+        if(requests.Status=="Pending"||requests.Date>=Date.now()){
             const cancelRequests = request_model.findByIdAndDelete(requests._id)
             res.send("Request Canceled")
         }
