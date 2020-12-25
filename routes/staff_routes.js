@@ -2202,10 +2202,10 @@ router.route('/sendReplacmentReq')
         const course=await course_model.findOne({course:req.body.course})
         for(var i =0;i<user.courses.length();i++){
             if(user.courses[i]==course.id){
-                const reciever=await staff_model.findById(req.body.id)
+                const receiver=await staff_model.findById(req.body.id)
                 for(var x =0;i<course.TA.length();x++){
-                    if(course.TA[i]==reciever.id){
-                        const newreqest = await new request_model({type:'ReplacmentReq',requester:user.id,reciever:reciever.id,reason:req.body.reason})
+                    if(course.TA[i]==receiver.id){
+                        const newreqest = await new request_model({type:'ReplacmentReq',requester:user.id,receiver:receiver.id,reason:req.body.reason})
                         await newreqest.save()
                         res.send(newreqest)
                     }
@@ -2233,7 +2233,7 @@ router.route('/slotlinkingrequest')
     const course=await course_model.findOne({course:req.body.course})
     for(var i =0;i<user.courses.length();i++){
         if(user.courses[i]==course.id){
-            const newreqest = await new request_model({type:req.body.type,requester:user.id,reciever:course.courseCoordinator.id,reason:req.body.reason})
+            const newreqest = await new request_model({type:req.body.type,requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
             await newreqest.save()
             res.send(newreqest)
         }
@@ -2247,7 +2247,7 @@ router.route('/changeDayOffReq')
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
     if(department!=null){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head,newDay:req.body.newDay})
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,newDay:req.body.newDay})
         await newreqest.save()
         res.send(newreqest)
     }else{
@@ -2268,31 +2268,31 @@ router.route('/leaveReq')
             try{
             const replacementREQ= await request_model.findOne({type:'ReplacmentReq'})
             if(replacementREQ.status=='accepted'){
-            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head,replacement:replacementREQ.reciver.id})
+            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,replacement:replacementREQ.receiver.id})
             await newreqest.save()
             res.send(newreqest)
         }else{
-            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head,replacement:'null'})
+            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null'})
             await newreqest.save()
             res.send(newreqest)   
         }
             }
             catch{
-                const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head,replacement:'null'})
+                const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null'})
                 await newreqest.save()
                 res.send(newreqest)              
             }}else{ if(req.body.type=="CompensationLeave"&&req.body.reason!=null&&department.head!=null){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head})
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head})
         await newreqest.save()
         res.send(newreqest)
     }else{if(req.body.type=="CompensationLeave"&&req.body.reason==null){
         res.send('CompensationLeave need a reason pls state yours')
-    }else{if(req.body.type=='MaternityLeave'&&user.gender=='female'){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head})
+    }else{if(req.body.type=="MaternityLeave"&&user.gender=="F"){
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head})
         await newreqest.save()
         res.send(newreqest)
     }else{
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head})
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head})
         await newreqest.save()
         res.send(newreqest)
     }}}
