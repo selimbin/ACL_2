@@ -17,6 +17,9 @@ const attendanceSchema = new mongoose.Schema({
     day:{
         type:String
     },
+    month:{
+        type:String
+    },
     signIn:{
         type:[Date]
     },
@@ -29,7 +32,7 @@ module.exports = mongoose.model('Attendance', attendanceSchema)
 
 const slotSchema = new mongoose.Schema({
     course:{
-        type:String
+        type:[String]
     },
     staff:{
         type:[String]
@@ -87,7 +90,6 @@ const scheduleAttendance = new mongoose.Schema({
     },
     month:{
         type:String,
-        minlength:3,
         required:true
     },
     days:{

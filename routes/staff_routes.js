@@ -8,6 +8,9 @@ const request_model = mongoose.model('IRS', internalRequestSchema)
 const {scheduleSchema} = require('../models/scheduling.js') 
 const schedule_model=mongoose.model("Schedule",scheduleSchema)
 
+const {slotSchema} = require('../models/scheduling.js') 
+const slot_model=mongoose.model("Slot",slotSchema)
+
 // Department Schema and model ----------------------------------------
 const {departmentSchema, find, findOne} = require('../models/academics.js')
 const department_model = mongoose.model('Department', departmentSchema)
@@ -74,6 +77,29 @@ router.route('/AddLocation')
             }
             const newLocation = new Location_model({code:Code,building:Building,type:Type,capacity:Capacity});
             await newLocation.save();
+            const newLocationschedule = new schedule_model({id:Code})
+            let newLocationslot;
+            for(var i = 1; i < 6; i = i + 1){
+                newLocationslot = new slot_model({location:Code})
+                await newLocationslot.save();
+                await newLocationschedule.sunday.push(newLocationslot)
+                newLocationslot = new slot_model({location:Code})
+                await newLocationslot.save();
+                await newLocationschedule.saturday.push(newLocationslot)
+                newLocationslot = new slot_model({location:Code})
+                await newLocationslot.save();
+                await newLocationschedule.monday.push(newLocationslot)
+                newLocationslot = new slot_model({location:Code})
+                await newLocationslot.save();
+                await newLocationschedule.tuesday.push(newLocationslot)
+                newLocationslot = new slot_model({location:Code})
+                await newLocationslot.save();
+                await newLocationschedule.wednesday.push(newLocationslot)
+                newLocationslot = new slot_model({location:Code})
+                await newLocationslot.save();
+                await newLocationschedule.thursday.push(newLocationslot)
+            }
+            await newLocationschedule.save()
             res.send(newLocation);
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -129,6 +155,9 @@ router.route('/UpdateLocation')
                 UpdateCode = Code;
             }
             else{
+                const locationschedule = schedule_model.findOne({id:Code})
+                await schedule_model.findByIdAndUpdate(locationschedule._id,{id:newCode},{new:true})
+                await locationschedule.save();
                 const existinglocation2 = await Location_model.findOne({code:newCode});
                 if(existinglocation2){
                     return res.status(400).json({msg:"The new Location id already exists"});
@@ -175,6 +204,245 @@ router.route('/DeleteLocation')
                 await updatedstaff.save();
                 stafflocation = await staff_model.findOne({officeLocation:existinglocation.code});
             }
+            const locationschedule = await schedule_model.findOne({id:Code})
+            for(var i = 0; i<6; i=i+1){
+                if(i == 0){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = locationschedule.saturday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.saturday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.saturday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.saturday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let staffinslot = await schedule_model.findOne({id:slot.staff[0]})
+                            let slot2 = await staffinslot.saturday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await staffinslot.saturday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await staffinslot.saturday.splice(j,0,slot)
+                            await staffinslot.save()
+                        }
+                    }
+                }
+                if(i == 1){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = locationschedule.sunday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.sunday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.sunday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.sunday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let staffinslot = await schedule_model.findOne({id:slot.staff[0]})
+                            let slot2 = await staffinslot.sunday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await staffinslot.sunday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await staffinslot.sunday.splice(j,0,slot)
+                            await staffinslot.save()
+                        }
+                    }
+                }
+                if(i == 2){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = locationschedule.monday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.monday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.monday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.monday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let staffinslot = await schedule_model.findOne({id:slot.staff[0]})
+                            let slot2 = await staffinslot.monday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await staffinslot.monday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await staffinslot.monday.splice(j,0,slot)
+                            await staffinslot.save()
+                        }
+                    }
+                }
+                if(i == 3){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = locationschedule.tuesday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.tuesday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.tuesday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.tuesday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let staffinslot = await schedule_model.findOne({id:slot.staff[0]})
+                            let slot2 = await staffinslot.tuesday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await staffinslot.tuesday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await staffinslot.tuesday.splice(j,0,slot)
+                            await staffinslot.save()
+                        }
+                    }
+                }
+                if(i == 4){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = locationschedule.wednesday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.wednesday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.wednesday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.wednesday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let staffinslot = await schedule_model.findOne({id:slot.staff[0]})
+                            let slot2 = await staffinslot.wednesday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await staffinslot.wednesday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await staffinslot.wednesday.splice(j,0,slot)
+                            await staffinslot.save()
+                        }
+                    }
+                }
+                if(i == 5){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = locationschedule.thursday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.thursday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.thursday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.thursday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let staffinslot = await schedule_model.findOne({id:slot.staff[0]})
+                            let slot2 = await staffinslot.thursday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await staffinslot.thursday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await staffinslot.thursday.splice(j,0,slot)
+                            await staffinslot.save()
+                        }
+                    }
+                }
+            }
+            await schedule_model.findByIdAndDelete(locationschedule._id);
+            await slot_model.deleteMany({location:Code})
             const deletedlocation = await Location_model.findByIdAndDelete(existinglocation._id);
             res.send(deletedlocation);
         } else {
@@ -501,11 +769,14 @@ router.route('/DeleteDepartment')
 
 router.route('/AddCourse')
 .post(async (req, res)=>{
-    const {Departmentname,Code,Coverage}=req.body;
+    const {Departmentname,Code,totalSlots}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(!Departmentname||!Code){
                 return res.status(400).json({msg:"Please enter a valid course code and department name"});
+            }
+            if(!totalSlots || totalSlots <= 0){
+                return res.status(400).json({msg:"Please enter a valid number of total slots required"});
             }
             const existingcourse = await course_model.findOne({code:Code});
             if(existingcourse){
@@ -515,11 +786,7 @@ router.route('/AddCourse')
             if(!existingdepartment){
                 return res.status(400).json({msg:"This Department doesn't exist"});
             }
-            let AddCoverage = Coverage;
-            if(!Coverage){
-                AddCoverage = 0;
-            }
-            const newCourse = new course_model({code:Code,departmentname:Departmentname,coverage:AddCoverage})
+            const newCourse = new course_model({code:Code,departmentname:Departmentname,totalSlots:totalSlots})
             const existingfaculty = await Faculty_model.findOne({name:existingdepartment.facultyname})
             await existingfaculty.departments.pull(existingdepartment);
             await newCourse.save()
@@ -528,6 +795,29 @@ router.route('/AddCourse')
 
             await existingfaculty.departments.push(existingdepartment);
             await existingfaculty.save();
+            let newcourseslot;
+            const newcourseschedule = new schedule_model({id:Code})
+            for(var i = 1; i < 6; i = i + 1){
+                newcourseslot = new slot_model({course:Code})
+                await newcourseslot.save();
+                await newcourseschedule.sunday.push(newcourseslot)
+                newcourseslot = new slot_model({course:Code})
+                await newcourseslot.save();
+                await newcourseschedule.saturday.push(newcourseslot)
+                newcourseslot = new slot_model({course:Code})
+                await newcourseslot.save();
+                await newcourseschedule.monday.push(newcourseslot)
+                newcourseslot = new slot_model({course:Code})
+                await newcourseslot.save();
+                await newcourseschedule.tuesday.push(newcourseslot)
+                newcourseslot = new slot_model({course:Code})
+                await newcourseslot.save();
+                await newcourseschedule.wednesday.push(newcourseslot)
+                newcourseslot = new slot_model({course:Code})
+                await newcourseslot.save();
+                await newcourseschedule.thursday.push(newcourseslot)
+            }
+            await newcourseschedule.save()
             res.send(newCourse)
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -541,7 +831,7 @@ router.route('/AddCourse')
 
 router.route('/UpdateCourse')
 .put(async (req, res)=>{
-    const {Departmentname,Code,newDepartmentname,newCode,Coverage}=req.body;
+    const {Departmentname,Code,newDepartmentname,newCode,totalslots}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(!Departmentname || !Code){
@@ -562,9 +852,12 @@ router.route('/UpdateCourse')
             if(existingcourse1.departmentname != Departmentname){
                 return res.status(400).json({msg:"please enter a vlaid department for this course"});
             }
-            let UpdateCode = newCode, UpdateCoverage = Coverage, UpdateDepartment = newDepartmentname;
-            if(!Coverage){
-                UpdateCoverage = existingcourse1.coverage;
+            let UpdateCode = newCode, Updateslots = totalslots, UpdateDepartment = newDepartmentname;
+            if(!totalslots){
+                Updateslots= existingcourse1.totalSlots;
+            }
+            else{
+                Updateslots = totalslots - (existingcourse1.totalSlots * existingcourse1.coverage);
             }
             if(!newDepartmentname){
                 UpdateDepartment = Departmentname;
@@ -573,6 +866,9 @@ router.route('/UpdateCourse')
                 UpdateCode = Code;
             }
             else if(newCode != Code){
+                const courseschedule = schedule_model.findOne({id:Code})
+                await schedule_model.findByIdAndUpdate(courseschedule._id,{id:newCode},{new:true})
+                await courseschedule.save();
                 let lecturers = await existingcourse1.lecturer
                 let TAs = await existingcourse1.TA
                 while(lecturers.length != 0){
@@ -597,7 +893,7 @@ router.route('/UpdateCourse')
             await existingdepartment1.save()
             const existingdepartment2 = await department_model.findOne({name:UpdateDepartment});
             const UpdatedCourse = await course_model.findByIdAndUpdate(existingcourse1._id,{code:UpdateCode,departmentname:UpdateDepartment,
-                coverage:UpdateCoverage},{new:true})
+                totalSlots:Updateslots},{new:true})
             await UpdatedCourse.save()
             await existingdepartment2.courses.push(UpdatedCourse)
             await existingdepartment2.save()
@@ -650,6 +946,215 @@ router.route('/DeleteCourse')
                 await ta.course.pull(Code)
                 await ta.save();
             }
+            const courseschedule = await schedule_model.findOne({id:Code})
+            for(var i = 0; i<6; i=i+1){
+                if(i == 0){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = courseschedule.saturday[j]
+                        if(!slot.isEmpty){
+                            for(var n = 0; n < slot.location.length; n = n + 1){
+                                let locationinslot = await schedule_model.findOne({id:slot.location[n]})
+                                let slot1 = await locationinslot.saturday[j]
+                                slot = await slot_model.findById(slot1._id);
+                                await locationinslot.saturday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.staff.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await locationinslot.saturday.splice(j,0,slot)
+                                await locationinslot.save()
+                            }
+                            for(var m = 0; m < slot.location.length; m = m + 1){
+                                let staffinslot = await schedule_model.findOne({id:slot.staff[m]})
+                                let slot2 = await staffinslot.saturday[j]
+                                slot = await slot_model.findById(slot2._id);
+                                await staffinslot.saturday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.course.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await staffinslot.saturday.splice(j,0,slot)                          
+                            }
+                        }
+                    }
+                }
+                if(i == 1){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = courseschedule.sunday[j]
+                        if(!slot.isEmpty){
+                            for(var n = 0; n < slot.location.length; n = n + 1){
+                                let locationinslot = await schedule_model.findOne({id:slot.location[n]})
+                                let slot1 = await locationinslot.sunday[j]
+                                slot = await slot_model.findById(slot1._id);
+                                await locationinslot.sunday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.staff.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await locationinslot.sunday.splice(j,0,slot)
+                                await locationinslot.save()
+                            }
+                            for(var m = 0; m < slot.location.length; m = m + 1){
+                                let staffinslot = await schedule_model.findOne({id:slot.staff[m]})
+                                let slot2 = await staffinslot.sunday[j]
+                                slot = await slot_model.findById(slot2._id);
+                                await staffinslot.sunday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.course.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await staffinslot.sunday.splice(j,0,slot)                          
+                            }
+                        }                        
+                    }
+                }
+                if(i == 2){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = courseschedule.monday[j]
+                        if(!slot.isEmpty){
+                            for(var n = 0; n < slot.location.length; n = n + 1){
+                                let locationinslot = await schedule_model.findOne({id:slot.location[n]})
+                                let slot1 = await locationinslot.monday[j]
+                                slot = await slot_model.findById(slot1._id);
+                                await locationinslot.monday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.staff.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await locationinslot.monday.splice(j,0,slot)
+                                await locationinslot.save()
+                            }
+                            for(var m = 0; m < slot.location.length; m = m + 1){
+                                let staffinslot = await schedule_model.findOne({id:slot.staff[m]})
+                                let slot2 = await staffinslot.monday[j]
+                                slot = await slot_model.findById(slot2._id);
+                                await staffinslot.monday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.course.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await staffinslot.monday.splice(j,0,slot)                          
+                            }
+                        }
+                    }
+                }
+                if(i == 3){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = courseschedule.tuesday[j]
+                        if(!slot.isEmpty){
+                            for(var n = 0; n < slot.location.length; n = n + 1){
+                                let locationinslot = await schedule_model.findOne({id:slot.location[n]})
+                                let slot1 = await locationinslot.tuesday[j]
+                                slot = await slot_model.findById(slot1._id);
+                                await locationinslot.tuesday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.staff.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await locationinslot.tuesday.splice(j,0,slot)
+                                await locationinslot.save()
+                            }
+                            for(var m = 0; m < slot.location.length; m = m + 1){
+                                let staffinslot = await schedule_model.findOne({id:slot.staff[m]})
+                                let slot2 = await staffinslot.tuesday[j]
+                                slot = await slot_model.findById(slot2._id);
+                                await staffinslot.tuesday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.course.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await staffinslot.tuesday.splice(j,0,slot)                          
+                            }
+                        }
+                    }
+                }
+                if(i == 4){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = courseschedule.wednesday[j]
+                        if(!slot.isEmpty){
+                            for(var n = 0; n < slot.location.length; n = n + 1){
+                                let locationinslot = await schedule_model.findOne({id:slot.location[n]})
+                                let slot1 = await locationinslot.wednesday[j]
+                                slot = await slot_model.findById(slot1._id);
+                                await locationinslot.wednesday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.staff.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await locationinslot.wednesday.splice(j,0,slot)
+                                await locationinslot.save()
+                            }
+                            for(var m = 0; m < slot.location.length; m = m + 1){
+                                let staffinslot = await schedule_model.findOne({id:slot.staff[m]})
+                                let slot2 = await staffinslot.wednesday[j]
+                                slot = await slot_model.findById(slot2._id);
+                                await staffinslot.wednesday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.course.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await staffinslot.wednesday.splice(j,0,slot)                          
+                            }
+                        }
+                    }
+                }
+                if(i == 5){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = courseschedule.thursday[j]
+                        if(!slot.isEmpty){
+                            for(var n = 0; n < slot.location.length; n = n + 1){
+                                let locationinslot = await schedule_model.findOne({id:slot.location[n]})
+                                let slot1 = await locationinslot.thursday[j]
+                                slot = await slot_model.findById(slot1._id);
+                                await locationinslot.thursday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.staff.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await locationinslot.thursday.splice(j,0,slot)
+                                await locationinslot.save()
+                            }
+                            for(var m = 0; m < slot.location.length; m = m + 1){
+                                let staffinslot = await schedule_model.findOne({id:slot.staff[m]})
+                                let slot2 = await staffinslot.thursday[j]
+                                slot = await slot_model.findById(slot2._id);
+                                await staffinslot.thursday.splice(j,1)
+                                await slot.location.splice(0,1)
+                                await slot.course.splice(0,1)
+                                await slot.type.splice(0,1)
+                                await slot.compensation.splice(0,1)
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                                slot.save()
+                                await staffinslot.thursday.splice(j,0,slot)                          
+                            }
+                        }
+                    }
+                }
+            }
+            await schedule_model.findByIdAndDelete(courseschedule._id);
+            await slot_model.deleteMany({location:Code})
             const deletedCourse = await course_model.findByIdAndDelete(existingcourse._id);
             const existingfaculty = await Faculty_model.findOne({name:existingdepartment.facultyname});
             await existingfaculty.departments.pull(existingdepartment);
@@ -662,7 +1167,8 @@ router.route('/DeleteCourse')
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
-    } catch (error) {
+    }
+    catch (error) {
         res.status(500).json({error:error.message});
     }
 })
@@ -670,7 +1176,7 @@ router.route('/DeleteCourse')
 // Add a staff member ----------------------------------------------
 router.route('/AddStaff')
 .post(async (req,res)=>{
-    const {name,email,salary,officelocation,role,dayoff,department,gender}=req.body;
+    const {name,email,salary,officelocation,role,dayOff,department,gender}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(role == "HR"){
@@ -678,13 +1184,16 @@ router.route('/AddStaff')
                     return res.status(400).json({msg:"HR dayoff can only be saturday!"});
                 }
             }
+            if(!salary || salary <= 0){
+                return res.status(400).json({msg:"Please enter a valid salary"});
+            }
             if(!gender && gender != "male" && gender != "female"){
                 return res.status(400).json({msg:"Please enter a valid gender"});
             }
             if(!department){
                 return res.status(400).json({msg:"Please enter a valid department"});
             }
-            if(dayoff != "Sun" && dayoff != "Mon" && dayoff != "Tues" && dayoff != "Wed" && dayoff != "Thur" && dayoff != "Sat"){
+            if(dayOff != "Sun" && dayOff != "Mon" && dayOff != "Tues" && dayOff != "Wed" && dayOff != "Thur" && dayOff != "Sat"){
                 return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
             }
             const existinglocation = await Location_model.findOne({code:officelocation})
@@ -722,12 +1231,35 @@ router.route('/AddStaff')
                 const UpdatedStaffcount = await Staffcount_model.findByIdAndUpdate(newStaffcount._id,{Academic:Updatedcount},{new:true});
                 await UpdatedStaffcount.save();
             }
-            const newStaff = new staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayoff,officeLocation:officelocation,
+            const newStaff = new staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayOff,officeLocation:officelocation,
             department:department,gender:gender});
             await newStaff.save();
             const newCapacity = existinglocation.capacity - 1;
             const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation._id,{capacity:newCapacity},{new:true});
             await Updatedlocation.save();
+            let newstaffslot;
+            const newstaffschedule = new schedule_model({id:id})
+            for(var i = 1; i < 6; i = i + 1){
+                newstaffslot = new slot_model({staff:id})
+                await newstaffslot.save();
+                await newstaffschedule.sunday.push(newstaffslot)
+                newstaffslot = new slot_model({staff:id})
+                await newstaffslot.save();
+                await newstaffschedule.saturday.push(newstaffslot)
+                newstaffslot = new slot_model({staff:id})
+                await newstaffslot.save();
+                await newstaffschedule.monday.push(newstaffslot)
+                newstaffslot = new slot_model({staff:id})
+                await newstaffslot.save();
+                await newstaffschedule.tuesday.push(newstaffslot)
+                newstaffslot = new slot_model({staff:id})
+                await newstaffslot.save();
+                await newstaffschedule.wednesday.push(newstaffslot)
+                newstaffslot = new slot_model({staff:id})
+                await newstaffslot.save();
+                await newstaffschedule.thursday.push(newstaffslot)
+            }
+            await newstaffschedule.save()
             res.send(newStaff);
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -859,6 +1391,245 @@ router.route('/DeleteStaff')
             }
             await existingfaculty.departments.push(existingdepartment);
             await existingfaculty.save();
+            const staffschedule = await schedule_model.findOne({id:Code})
+            for(var i = 0; i<6; i=i+1){
+                if(i == 0){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = staffschedule.saturday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.saturday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.saturday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.saturday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let locationinslot = await schedule_model.findOne({id:slot.location[0]})
+                            let slot2 = await locationinslot.saturday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await locationinslot.saturday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await locationinslot.saturday.splice(j,0,slot)
+                            await locationinslot.save()
+                        }
+                    }
+                }
+                if(i == 1){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = staffschedule.sunday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.sunday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.sunday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.sunday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let locationinslot = await schedule_model.findOne({id:slot.location[0]})
+                            let slot2 = await locationinslot.sunday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await locationinslot.sunday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await locationinslot.sunday.splice(j,0,slot)
+                            await locationinslot.save()
+                        }
+                    }
+                }
+                if(i == 2){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = staffschedule.monday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.monday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.monday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.monday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let locationinslot = await schedule_model.findOne({id:slot.location[0]})
+                            let slot2 = await locationinslot.monday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await locationinslot.monday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await locationinslot.monday.splice(j,0,slot)
+                            await locationinslot.save()
+                        }
+                    }
+                }
+                if(i == 3){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = staffschedule.tuesday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.tuesday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.tuesday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.tuesday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let locationinslot = await schedule_model.findOne({id:slot.location[0]})
+                            let slot2 = await locationinslot.tuesday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await locationinslot.tuesday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await locationinslot.tuesday.splice(j,0,slot)
+                            await locationinslot.save()
+                        }
+                    }
+                }
+                if(i == 4){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = staffschedule.wednesday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.wednesday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.wednesday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.wednesday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let locationinslot = await schedule_model.findOne({id:slot.location[0]})
+                            let slot2 = await locationinslot.wednesday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await locationinslot.wednesday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await locationinslot.wednesday.splice(j,0,slot)
+                            await locationinslot.save()
+                        }
+                    }
+                }
+                if(i == 5){
+                    for(var j = 0; j<5; j=j+1){
+                        let slot = staffschedule.thursday[j]
+                        if(!slot.isEmpty){
+                            let courseinslot = await schedule_model.findOne({id:slot.course[0]})
+                            let slot1 = await courseinslot.thursday[j]
+                            slot = await slot_model.findById(slot1._id);
+                            await courseinslot.thursday.splice(j,1)
+                            let index;
+                            for(var k = 0;k<slot.location.length; k = k + 1){
+                                if(slot.location[k] == Code){
+                                    index = k;
+                                }
+                            }
+                            await slot.location.splice(index,1)
+                            await slot.staff.splice(index,1)
+                            await slot.type.splice(index,1)
+                            await slot.compensation.splice(index,1)
+                            if(slot.location.length == 0){
+                                await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            }
+                            slot.save()
+                            await courseinslot.thursday.splice(j,0,slot)
+                            await courseinslot.save()
+                            let locationinslot = await schedule_model.findOne({id:slot.location[0]})
+                            let slot2 = await locationinslot.thursday[j]
+                            slot = await slot_model.findById(slot2._id);
+                            await locationinslot.thursday.splice(j,1)
+                            await slot.location.splice(0,1)
+                            await slot.course.splice(0,1)
+                            await slot.type.splice(0,1)
+                            await slot.compensation.splice(0,1)
+                            await slot_model.findByIdAndUpdate(slot._id,{isEmpty:true},{new:true})
+                            slot.save()
+                            await locationinslot.thursday.splice(j,0,slot)
+                            await locationinslot.save()
+                        }
+                    }
+                }
+            }
+            await schedule_model.findByIdAndDelete(staffschedule._id);
+            await slot_model.deleteMany({location:id})
             const deletedstaff = await staff_model.findByIdAndDelete(existingstaff._id);
             res.send(deletedstaff);
         } else {
@@ -927,33 +1698,33 @@ router.route('/AddsignIn')
             today.setDate(date1)
             today.setHours(hour)
             today.setMinutes(minute)
-            if(today.toTimeString.substring(0,2)>"19"){
+            if(today.toTimeString().substring(0,2)>"19"){
                 res.send("You cannot add a sign in after 7PM")
             }
-            if(today.toTimeString.substring(0,2)<"07"){
+            if(today.toTimeString().substring(0,2)<"07"){
                 res.send("You cannot add a sign in before 7AM")
             }
             const user= await staff_model.findOne({id:id})
             var attendance= await attendance_model.findOne({"id":id,"date":today.toLocaleString().substring(0,10)})
             var schedule_attendance = null
             if(today.toDateString().substring(8,10)<"11"){
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
             }
             else{
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
             }
             if(schedule_attendance==null){
                 if(today.toDateString().substring(8,10)<"11"){
                     schedule_attendance = new scheduleAttendance_model({
                         id:user.id,
-                        month:(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))
+                        month:(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()
                     })
                     await schedule_attendance.save()
                 }
                 else{
                     schedule_attendance = new scheduleAttendance_model({
                         id:user.id,
-                        month:today.toLocaleString().substring(0,10)
+                        month:today.toLocaleString().substring(0,2)
                     })
                     await schedule_attendance.save()
                 }
@@ -963,7 +1734,8 @@ router.route('/AddsignIn')
                 attendance = new attendance_model({
                     id:user.id,
                     date:today.toLocaleString().substring(0,10),
-                    day:today.toUTCString().substring(0,3)
+                    day:today.toUTCString().substring(0,3),
+                    month:today.toLocaleString().substring(0,2)
                 })
                 if(user.dayOff != today.toUTCString().substring(0,3)){
                     var x = schedule_attendance.missedHours+8
@@ -997,10 +1769,10 @@ router.route('/AddsignIn')
             }
         
             if(today.toDateString().substring(8,10)<"11"){
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
             }
             else{
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
             }
             res.send(attendance)
         } else {
@@ -1029,10 +1801,10 @@ router.route('/signOut')
             today.setDate(date1)
             today.setHours(hour)
             today.setMinutes(minute)
-            if(today.toTimeString.substring(0,2)>"19"){
+            if(today.toTimeString().substring(0,2)>"19"){
                 res.send("You cannot add a sign in after 7PM")
             }
-            if(today.toTimeString.substring(0,2)<"07"){
+            if(today.toTimeString().substring(0,2)<"07"){
                 res.send("You cannot add a sign out before 7AM")
             }
             const user= await staff_model.findOne({id:id})
@@ -1040,10 +1812,10 @@ router.route('/signOut')
                 "date":today.toLocaleString().substring(0,10)})
             var schedule_attendance = null
             if(today.toDateString().substring(8,10)<"11"){
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
             }
             else{
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
             }
             if(!attendance||!schedule_attendance){
                 res.send("You did not sign in today")
@@ -1065,10 +1837,10 @@ router.route('/signOut')
                 }
                 schedule_attendance.days.push(attendance)
                 if(today.toDateString().substring(8,10)<"11"){
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
                 }
                 else{
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
                 }
                 res.send(attendance)
             }
@@ -1082,7 +1854,8 @@ router.route('/signOut')
 })
 //--------------------------------------------------------------------
 // view staff attendance ---------------------------------------------
-router.route('/ViewAttendance')
+
+router.route('/viewStaffAttendance')
 .get(async (req,res)=>{
     const {id}=req.body;
     try {
@@ -1188,11 +1961,10 @@ router.route('/updateProfile')
 router.route('/signIn')
 .post(async(req,res)=>{
     var today =  new Date()
-    // res.send(today.toTimeString())
-    if(today.toTimeString.substring(0,2)>"19"){
+    if(today.toTimeString().substring(0,2)>"19"){
         res.send("You cannot sign in after 7PM")
     }
-    if(today.toTimeString.substring(0,2)<"07"){
+    if(today.toTimeString().substring(0,2)<"07"){
         today.setHours(7)
         today.setMinutes(0)
     }
@@ -1200,23 +1972,23 @@ router.route('/signIn')
     var attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
     var schedule_attendance = null
     if(today.toDateString().substring(8,10)<"11"){
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
     }
     else{
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
     }
     if(schedule_attendance==null){
         if(today.toDateString().substring(8,10)<"11"){
             schedule_attendance = new scheduleAttendance_model({
                 id:user.id,
-                month:(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))
+                month:(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()
             })
             await schedule_attendance.save()
         }
         else{
             schedule_attendance = new scheduleAttendance_model({
                 id:user.id,
-                month:today.toLocaleString().substring(0,10)
+                month:today.toLocaleString().substring(0,2)
             })
             await schedule_attendance.save()
         }
@@ -1226,7 +1998,8 @@ router.route('/signIn')
         attendance = new attendance_model({
             id:user.id,
             date:today.toLocaleString().substring(0,10),
-            day:today.toUTCString().substring(0,3)
+            day:today.toUTCString().substring(0,3),
+            month:today.toLocaleString().substring(0,2)
         })
         if(user.dayOff != today.toUTCString().substring(0,3)){
             var x = schedule_attendance.missedHours+8
@@ -1260,10 +2033,10 @@ router.route('/signIn')
     }
 
     if(today.toDateString().substring(8,10)<"11"){
-        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
     }
     else{
-        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
     }
     res.send(attendance)
 
@@ -1275,11 +2048,11 @@ router.route('/signOut')
 .post(async(req,res)=>{
     
     var today =  new Date()
-    if(today.toTimeString.substring(0,2)>"19"){
+    if(today.toTimeString().substring(0,2)>"19"){
         today.setHours(19)
         today.setMinutes(0)
     }
-    if(today.toTimeString.substring(0,2)<"07"){
+    if(today.toTimeString().substring(0,2)<"07"){
         today.setHours(7)
         today.setMinutes(0)
     }
@@ -1289,10 +2062,10 @@ router.route('/signOut')
     // res.send(attendance.signIn.length.toString())
     var schedule_attendance = null
     if(today.toDateString().substring(8,10)<"11"){
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
     }
     else{
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
     }
     if(!attendance||!schedule_attendance){
         res.send("You did not sign in today")
@@ -1314,10 +2087,10 @@ router.route('/signOut')
         }
         schedule_attendance.days.push(attendance)
         if(today.toDateString().substring(8,10)<"11"){
-            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
         }
         else{
-            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
         }
         res.send(attendance)
     }
@@ -1340,9 +2113,78 @@ router.route('/resetPassword')
     }
 
 })
+// //--------------------------------------------------------------------
+// // view attendance ---------------------------------------------------
+
+router.route('/viewAttendance')
+.get(async (req,res)=>{
+    var today =  new Date()
+    const user= await staff_model.findById(req.user._id)
+    if(req.body.month==null){
+        const attendance = await attendance_model.find({id:user.id})
+        if(attendance==null){
+            res.send("You have not attende anything yet")
+        }
+        else{
+            res.send(attendance)
+        }
+    }
+    else{
+        const attendance = await attendance_model.find({id:user.id,month:req.body.month}) 
+        if(attendance==null){
+            res.send("You have no attende in this month")
+        }
+        else{
+            res.send(attendance)
+        }
+    }
+})
+// //--------------------------------------------------------------------
+// // view Missing Days ---------------------------------------------------
+
+router.route('/viewMissingDays')
+.get(async(req,res)=>{
+    var today =  new Date()
+    const user= await staff_model.findById(req.user._id)
+    var schedule_attendance = null
+    if(today.toDateString().substring(8,10)<"11"){
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+    }
+    else{
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+    }
+    if(schedule_attendance==null){
+        res.send("You're missing days have not yet been calculated this month")
+    }
+    else{
+        res.send(schedule_attendance.missedDays.toString())
+    }
+})
+// //--------------------------------------------------------------------
+// // view Missing Hours ---------------------------------------------------
+
+router.route('/viewMissingHours')
+.get(async(req,res)=>{
+    var today =  new Date()
+    const user= await staff_model.findById(req.user._id)
+    var schedule_attendance = null
+    if(today.toDateString().substring(8,10)<"11"){
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+    }
+    else{
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+    }
+    if(schedule_attendance==null){
+        res.send("You're missing hours have not yet been calculated this month")
+    }
+    else{
+        res.send(schedule_attendance.missedHours.toString())
+    }
+})
 
 //--------------------------------------------------------------------
 // view Schedule -----------------------------------------------------
+
 router.route('/viewschedule')
 .get(async(req,res)=>{
     const user= await staff_model.findById(req.user._id)
@@ -1360,10 +2202,10 @@ router.route('/sendReplacmentReq')
         const course=await course_model.findOne({course:req.body.course})
         for(var i =0;i<user.courses.length();i++){
             if(user.courses[i]==course.id){
-                const reciever=await staff_model.findById(req.body.id)
+                const receiver=await staff_model.findById(req.body.id)
                 for(var x =0;i<course.TA.length();x++){
-                    if(course.TA[i]==reciever.id){
-                        const newreqest = await new request_model({type:'ReplacmentReq',requester:user.id,reciever:reciever.id,reason:req.body.reason})
+                    if(course.TA[i]==receiver.id){
+                        const newreqest = await new request_model({type:'ReplacmentReq',requester:user.id,receiver:receiver.id,reason:req.body.reason})
                         await newreqest.save()
                         res.send(newreqest)
                     }
@@ -1391,7 +2233,7 @@ router.route('/slotlinkingrequest')
     const course=await course_model.findOne({course:req.body.course})
     for(var i =0;i<user.courses.length();i++){
         if(user.courses[i]==course.id){
-            const newreqest = await new request_model({type:req.body.type,requester:user.id,reciever:course.courseCoordinator.id,reason:req.body.reason})
+            const newreqest = await new request_model({type:req.body.type,requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
             await newreqest.save()
             res.send(newreqest)
         }
@@ -1405,7 +2247,7 @@ router.route('/changeDayOffReq')
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
     if(department!=null){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head,newDay:req.body.newDay})
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,newDay:req.body.newDay})
         await newreqest.save()
         res.send(newreqest)
     }else{
@@ -1426,31 +2268,31 @@ router.route('/leaveReq')
             try{
             const replacementREQ= await request_model.findOne({type:'ReplacmentReq'})
             if(replacementREQ.status=='accepted'){
-            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head,replacement:replacementREQ.reciver.id})
+            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,replacement:replacementREQ.receiver.id})
             await newreqest.save()
             res.send(newreqest)
         }else{
-            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head,replacement:'null'})
+            const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null'})
             await newreqest.save()
             res.send(newreqest)   
         }
             }
             catch{
-                const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head,replacement:'null'})
+                const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null'})
                 await newreqest.save()
                 res.send(newreqest)              
             }}else{ if(req.body.type=="CompensationLeave"&&req.body.reason!=null&&department.head!=null){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head})
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head})
         await newreqest.save()
         res.send(newreqest)
     }else{if(req.body.type=="CompensationLeave"&&req.body.reason==null){
         res.send('CompensationLeave need a reason pls state yours')
-    }else{if(req.body.type=='MaternityLeave'&&user.gender=='f'){
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head})
+    }else{if(req.body.type=="MaternityLeave"&&user.gender=="F"){
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head})
         await newreqest.save()
         res.send(newreqest)
     }else{
-        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,reciever:department.head})
+        const newreqest = await new request_model({type:req.body.type,reason:req.body.reason,requester:user.id,receiver:department.head})
         await newreqest.save()
         res.send(newreqest)
     }}}
