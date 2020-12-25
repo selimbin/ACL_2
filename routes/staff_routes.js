@@ -2266,7 +2266,7 @@ router.route('/AnnualLeaveReq')
     if(department.head!=null){
         if(req.body.type=='AnnualLeave'&&req.body.date>=Date.now()&&department.head!=null){
             const replacementREQ= await request_model.findOne({type:'ReplacmentReq',requester:user.id})
-            if(replacementREQ.status=='accepted'&&replacementREQ!=null){
+            if(replacementREQ!=null&&replacementREQ.status=='accepted'){
                 const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:replacementREQ.receiver.id,date:req.body.date,amount:req.body.amount})
                 await newreqest.save()
                 res.send(newreqest)
@@ -2275,6 +2275,8 @@ router.route('/AnnualLeaveReq')
                 await newreqest.save()
                 res.send(newreqest)   
                     }
+                }else{
+                    res.send('incorrect details entered')
                 }
             }else
                  res.send('no head of department was found')
@@ -2296,6 +2298,8 @@ router.route('/AnnualLeaveReq')
         }else{
             if(req.body.type=='CompensationLeave'&&req.body.reason==null){
                 res.send('CompensationLeave need a reason pls state yours')
+        }else{
+            res.send('not right kind of leave dumdum')
         }
     }
 }
@@ -2318,7 +2322,9 @@ router.route('/MaternityLeaveReq')
                 const newreqest = await new request_model({type:'MaternityLeave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
                 await newreqest.save()
                 res.send(newreqest)
-             }
+             }else{
+                res.send('not right kind of leave or wrong gender')
+            }
             }else
                 res.send('no head of department was found')
                
@@ -2347,7 +2353,9 @@ router.route('/accidentalLeaveReq')
             await newreqest.save()
             res.send(newreqest)
     
-               }
+               }else{
+                res.send('not right kind of leave dumdum')
+            }
             }
         }else
             res.send('no head of department was found')
@@ -2363,6 +2371,11 @@ router.route('/sickleaveReq')
         if(department.head!=null){
             if(req.body.type=='sickleave'){
                  const newreqest = await new request_model({type:'sickleave',reason:req.body.reason,requester:user.id,receiver:department.head,amount:req.body.amount})
+                 await newreqest.save()
+                 res.send(newreqest)
+         
+        }else{
+            res.send('not right kind of leave dumdum')
         }
          }else
             res.send('no head of department was found')
@@ -2433,7 +2446,7 @@ router.route('/cancelRequests')
     if(requests==null){
         res.send("Incorrect request id")
     }
-    if(requests.requester==user.id){
+     if(user.id==requests.requester){
         if(requests.Status=="Pending"||requests.Date>=Date.now()){
             const cancelRequests = request_model.findByIdAndDelete(requests._id)
             res.send("Request Canceled")
