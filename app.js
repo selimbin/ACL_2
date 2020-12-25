@@ -35,9 +35,11 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                 var d = new Date(currentrequest.date);
                 var dayName = days[d.getDay()];
+                let slot1;
                 let slot;
                 if(dayName == 'Sunday'){
-                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.sunday.splice((currentrequest.slot-1),1)
                     await slot.location.pull(currentrequest.location)
                     await slot.course.pull(currentrequest.course)
@@ -49,7 +51,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.sunday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.sunday.splice((currentrequest.slot-1),1)
                     let index;
                     for(var i = 0;i<slot.location.length; i = i + 1){
@@ -68,7 +71,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.sunday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.sunday.splice((currentrequest.slot-1),1)
                     await slot.course.pull(currentrequest.course)
                     await slot.staff.pull(currentrequest.reciever)
@@ -81,7 +85,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save()
                 }
                 if(dayName == 'Monday'){
-                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.monday.splice((currentrequest.slot-1),1)
                     await slot.location.pull(currentrequest.location)
                     await slot.course.pull(currentrequest.course)
@@ -93,7 +98,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.monday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.monday.splice((currentrequest.slot-1),1)
                     let index;
                     for(var i = 0;i<slot.location.length; i = i + 1){
@@ -112,7 +118,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.monday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.monday.splice((currentrequest.slot-1),1)
                     await slot.course.pull(currentrequest.course)
                     await slot.staff.pull(currentrequest.reciever)
@@ -125,7 +132,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save()
                 }
                 if(dayName == 'Tuesday'){
-                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.tuesday.splice((currentrequest.slot-1),1)
                     await slot.location.pull(currentrequest.location)
                     await slot.course.pull(currentrequest.course)
@@ -137,7 +145,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.tuesday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.tuesday.splice((currentrequest.slot-1),1)
                     let index;
                     for(var i = 0;i<slot.location.length; i = i + 1){
@@ -156,7 +165,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.tuesday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.tuesday.splice((currentrequest.slot-1),1)
                     await slot.course.pull(currentrequest.course)
                     await slot.staff.pull(currentrequest.reciever)
@@ -169,7 +179,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save()
                 }
                 if(dayName == 'Wednesday'){
-                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.wednesday.splice((currentrequest.slot-1),1)
                     await slot.location.pull(currentrequest.location)
                     await slot.course.pull(currentrequest.course)
@@ -181,7 +192,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.wednesday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.wednesday.splice((currentrequest.slot-1),1)
                     let index;
                     for(var i = 0;i<slot.location.length; i = i + 1){
@@ -200,7 +212,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.wednesday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.wednesday.splice((currentrequest.slot-1),1)
                     await slot.course.pull(currentrequest.course)
                     await slot.staff.pull(currentrequest.reciever)
@@ -213,7 +226,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save()
                 }
                 if(dayName == 'Thursday'){
-                    slot = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.thursday.splice((currentrequest.slot-1),1)
                     await slot.location.pull(currentrequest.location)
                     await slot.course.pull(currentrequest.course)
@@ -225,7 +239,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.thursday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.thursday.splice((currentrequest.slot-1),1)
                     let index;
                     for(var i = 0;i<slot.location.length; i = i + 1){
@@ -244,7 +259,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.thursday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.thursday.splice((currentrequest.slot-1),1)
                     await slot.course.pull(currentrequest.course)
                     await slot.staff.pull(currentrequest.reciever)
@@ -257,7 +273,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save() 
                 }
                 if(dayName == 'Saturday'){
-                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.saturday.splice((currentrequest.slot-1),1)
                     await slot.location.pull(currentrequest.location)
                     await slot.course.pull(currentrequest.course)
@@ -269,7 +286,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.saturday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.saturday.splice((currentrequest.slot-1),1)
                     let index;
                     for(var i = 0;i<slot.location.length; i = i + 1){
@@ -288,7 +306,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.saturday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.saturday.splice((currentrequest.slot-1),1)
                     await slot.course.pull(currentrequest.course)
                     await slot.staff.pull(currentrequest.reciever)
@@ -317,7 +336,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                 var dayName = days[d.getDay()];
                 let slot;
                 if(dayName == 'Sunday'){
-                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.sunday.splice((currentrequest.slot-1),1)
                     await slot.location.push(currentrequest.location)
                     await slot.course.push(currentrequest.course)
@@ -329,7 +349,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.sunday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.sunday.splice((currentrequest.slot-1),1)
                     if(slot.location.length == 0){
                         await slot_model.findByIdAndUpdate(slot._id,{isEmpty:false},{new:true})
@@ -342,7 +363,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.sunday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.sunday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.sunday.splice((currentrequest.slot-1),1)
                     await slot.course.push(currentrequest.course)
                     await slot.staff.push(currentrequest.reciever)
@@ -355,7 +377,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save()
                 }
                 if(dayName == 'Monday'){
-                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.monday.splice((currentrequest.slot-1),1)
                     await slot.location.push(currentrequest.location)
                     await slot.course.push(currentrequest.course)
@@ -367,7 +390,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.monday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.monday.splice((currentrequest.slot-1),1)
                     if(slot.location.length == 0){
                         await slot_model.findByIdAndUpdate(slot._id,{isEmpty:false},{new:true})
@@ -380,7 +404,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.monday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.monday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.monday.splice((currentrequest.slot-1),1)
                     await slot.course.push(currentrequest.course)
                     await slot.staff.push(currentrequest.reciever)
@@ -393,7 +418,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save()
                 }
                 if(dayName == 'Tuesday'){
-                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.tuesday.splice((currentrequest.slot-1),1)
                     await slot.location.push(currentrequest.location)
                     await slot.course.push(currentrequest.course)
@@ -405,7 +431,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.tuesday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.tuesday.splice((currentrequest.slot-1),1)
                     if(slot.location.length == 0){
                         await slot_model.findByIdAndUpdate(slot._id,{isEmpty:false},{new:true})
@@ -418,7 +445,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.tuesday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.tuesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.tuesday.splice((currentrequest.slot-1),1)
                     await slot.course.push(currentrequest.course)
                     await slot.staff.push(currentrequest.reciever)
@@ -431,7 +459,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save()
                 }
                 if(dayName == 'Wednesday'){
-                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.wednesday.splice((currentrequest.slot-1),1)
                     await slot.location.push(currentrequest.location)
                     await slot.course.push(currentrequest.course)
@@ -443,7 +472,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.wednesday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.wednesday.splice((currentrequest.slot-1),1)
                     if(slot.location.length == 0){
                         await slot_model.findByIdAndUpdate(slot._id,{isEmpty:false},{new:true})
@@ -456,7 +486,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.wednesday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.wednesday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.wednesday.splice((currentrequest.slot-1),1)
                     await slot.course.push(currentrequest.course)
                     await slot.staff.push(currentrequest.reciever)
@@ -469,7 +500,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save()
                 }
                 if(dayName == 'Thursday'){
-                    slot = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.thursday.splice((currentrequest.slot-1),1)
                     await slot.location.push(currentrequest.location)
                     await slot.course.push(currentrequest.course)
@@ -481,7 +513,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.thursday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.thursday.splice((currentrequest.slot-1),1)
                     if(slot.location.length == 0){
                         await slot_model.findByIdAndUpdate(slot._id,{isEmpty:false},{new:true})
@@ -494,7 +527,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.thursday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.thursday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.thursday.splice((currentrequest.slot-1),1)
                     await slot.course.push(currentrequest.course)
                     await slot.staff.push(currentrequest.reciever)
@@ -507,7 +541,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.save()
                 }
                 if(dayName == 'Saturday'){
-                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.saturday.splice((currentrequest.slot-1),1)
                     await slot.location.push(currentrequest.location)
                     await slot.course.push(currentrequest.course)
@@ -519,7 +554,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.saturday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.course})
-                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.saturday.splice((currentrequest.slot-1),1)
                     if(slot.location.length == 0){
                         await slot_model.findByIdAndUpdate(slot._id,{isEmpty:false},{new:true})
@@ -532,7 +568,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
                     await currentschedule.saturday.splice((currentrequest.slot-1),0,slot)
                     await currentschedule.save()
                     currentschedule = await schedule_model.findOne({id:currentrequest.location})
-                    slot = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot1 = await currentschedule.saturday[(currentrequest.slot-1)]
+                    slot = await slot_model.findById(slot1._id);
                     await currentschedule.saturday.splice((currentrequest.slot-1),1)
                     await slot.course.push(currentrequest.course)
                     await slot.staff.push(currentrequest.reciever)
