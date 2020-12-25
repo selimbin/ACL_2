@@ -15,3 +15,8 @@ Request body: { “course” : “csen1”, reason:"can be emphty" }
 Response: shows you the new reqest made example {type:'ReplacmentReq',requester:'40-55555555',reciever:'43-6969696969',reason:"can be emphty"}
 
 
+Functionality: views all replacement requests 
+Route: /staff/viewReplacementReq
+Request type: GET
+Parameters: takes a staff id 
+Response: shows you all replacments requests example {type:'ReplacmentReq',requester:'40-55555555',reciever:'43-6969696969',reason:"can be emphty"}
