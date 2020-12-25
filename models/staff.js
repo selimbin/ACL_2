@@ -56,7 +56,8 @@ const staffSchema = new mongoose.Schema({
         unique:true
     },
     gender:{
-        type:String
+        type:String,
+        required:true
     },
     email:{
         type:String,
