@@ -17,6 +17,9 @@ const internalRequestSchema= new mongoose.Schema({
     reason:{
         type:String
     },
+    response:{
+        type:String
+    },
     requester:{
         type:String,
         required:true
@@ -34,7 +37,7 @@ const internalRequestSchema= new mongoose.Schema({
         default:"Pending"
     },
     date:{
-        type:Date
+        type:String
     },
     slot:{
         type:Number
@@ -50,7 +53,7 @@ const internalRequestSchema= new mongoose.Schema({
     },
     newDay:{
         type:String
-    },
+    }
 })
 module.exports.internalRequestSchema = internalRequestSchema
 module.exports = mongoose.model('IRS', internalRequestSchema)
