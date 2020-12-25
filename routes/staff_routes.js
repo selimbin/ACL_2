@@ -100,6 +100,7 @@ router.route('/AddLocation')
                 await newLocationschedule.thursday.push(newLocationslot)
             }
             await newLocationschedule.save()
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -173,7 +174,7 @@ router.route('/UpdateLocation')
             const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation1._id,
                 {code:UpdateCode,building:Updatebuilding,type:Updatetype,capacity:Updatecapacity},{new:true});
             await Updatedlocation.save();
-            res.send(Updatedlocation);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -443,7 +444,7 @@ router.route('/DeleteLocation')
             await schedule_model.findByIdAndDelete(locationschedule._id);
             await slot_model.deleteMany({location:Code})
             const deletedlocation = await Location_model.findByIdAndDelete(existinglocation._id);
-            res.send(deletedlocation);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -468,7 +469,7 @@ router.route('/AddFaculty')
             }
             const newFaculty = new Faculty_model({name:Name});
             await newFaculty.save();
-            res.send(newFaculty);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -508,7 +509,7 @@ router.route('/UpdateFaculty')
             }
             const Updatedfaculty = await Faculty_model.findByIdAndUpdate(existingfaculty1._id,{name:UpdateName},{new:true});
             await Updatedfaculty.save();
-            res.send(Updatedfaculty);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -562,7 +563,7 @@ router.route('/DeleteFaculty')
                 existingdepartment = await department_model.findOne({facultyname:Name})
             }
             const deletedfaculty = await Faculty_model.findByIdAndDelete(existingfaculty._id);
-            res.send(deletedfaculty);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -603,7 +604,7 @@ router.route('/AddDepartment')
             }
             await existingfaculty.departments.push(newDepartment)
             await existingfaculty.save()
-            res.send(newDepartment)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -684,7 +685,7 @@ router.route('/UpdateDepartment')
                 await newfaculty.departments.push(UpdatedDepartment)
                 await newfaculty.save()
             }
-            res.send(UpdatedDepartment)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -755,7 +756,7 @@ router.route('/DeleteDepartment')
                 await updatestaffindepartment.save();
                 staffindepartment = await staff_model.findOne({department:Name});   
             }
-            res.send(deleteddepartment);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -817,7 +818,7 @@ router.route('/AddCourse')
                 await newcourseschedule.thursday.push(newcourseslot)
             }
             await newcourseschedule.save()
-            res.send(newCourse)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -902,7 +903,7 @@ router.route('/UpdateCourse')
             const existingfaculty2 = await Faculty_model.findOne({name:existingdepartment2.facultyname});
             await existingfaculty2.departments.push(existingdepartment2);
             await existingfaculty2.save();
-            res.send(UpdatedCourse)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1165,7 +1166,7 @@ router.route('/DeleteCourse')
             await existingdepartment.save();
             await existingfaculty.departments.push(existingdepartment);
             await existingfaculty.save();
-            res.send(deletedCourse);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1269,7 +1270,7 @@ router.route('/AddStaff')
                 await newstaffschedule.thursday.push(newstaffslot)
             }
             await newstaffschedule.save()
-            res.send(newStaff);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1356,7 +1357,7 @@ router.route('/Updatetaff')
             const UpdatedStaff = await staff_model.findByIdAndUpdate(existingstaff._id,{name:Updatename,email:Updateemail,role:Updaterole,
             officelocation:Updatelocation,dayOff:Updatedayoff,department:Updatedepartment},{new:true});
             await UpdatedStaff.save();
-            res.send(UpdatedStaff);
+            res.send();
         
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -1649,7 +1650,7 @@ router.route('/DeleteStaff')
             await schedule_model.findByIdAndDelete(staffschedule._id);
             await slot_model.deleteMany({location:id})
             const deletedstaff = await staff_model.findByIdAndDelete(existingstaff._id);
-            res.send(deletedstaff);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1670,18 +1671,21 @@ router.route('/UpdateSalary')
             if(!existingstaff){
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
-            let newsalary = existingstaff.salary,missedhours = existingstaff.missedHours - 3,misseddays = existingstaff.misseddays;
+            let currentstaffattendance = await scheduleAttendance_model.findOne({id:id})
+            let misseddays = currentstaffattendance.missedDays
+            let missedhours = currentstaffattendance.missedHours - 3
+            let newsalary = existingstaff.salary
             while(misseddays != 0){
-                newsalary = newsalary/60;
+                newsalary = newsalary - newsalary/60;
                 misseddays = misseddays -1;
             }
-            while(missedhours > 1){
-                newsalary = newsalary/180;
+            while(missedhours != 0 ){
+                newsalary = newsalary - newsalary/180;
                 missedhours = missedhours - 1;
             }
             missedhours = (missedhours*100) * 60;
             while(missedhours != 0){
-                newsalary = (newsalary/180) * 60;
+                newsalary = newsalary - ((newsalary/180) * 60);
                 missedhours = missedhours - 1;
             }
             if(promotion){
@@ -1692,7 +1696,7 @@ router.route('/UpdateSalary')
             }
             const Updatedstaff = await staff_model.findByIdAndUpdate(existingstaff._id,{salary:newsalary},{new:true});
             await Updatedstaff.save();
-            res.send(Updatedstaff);
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1795,7 +1799,7 @@ router.route('/AddsignIn')
             else{
                 await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
             }
-            res.send(attendance)
+            res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1863,7 +1867,7 @@ router.route('/signOut')
                 else{
                     await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
                 }
-                res.send(attendance)
+                res.send();
             }
         } else {
             return res.status(401).json({msg:"unauthorized"});
