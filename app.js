@@ -5,11 +5,11 @@ const jwt=require('jsonwebtoken')
 const mongoose = require('mongoose')
 const {staffSchema} = require('./models/staff.js') 
 const staff_model=require('./models/staff')
-const {internalRequestSchema} = require('../models/requests.js') 
+const {internalRequestSchema} = require('./models/requests.js') 
 const requests_model = mongoose.model('IRS', internalRequestSchema)
-const {scheduleSchema} = require('../models/scheduling.js') 
+const {scheduleSchema} = require('./models/scheduling.js') 
 const schedule_model=mongoose.model("Schedule",scheduleSchema)
-const {slotSchema} = require('../models/scheduling.js') 
+const {slotSchema} = require('./models/scheduling.js') 
 const slot_model=mongoose.model("Slot",slotSchema)
 const { nextTick } = require('process')
 var schedule = require('node-schedule');
@@ -19,7 +19,7 @@ app.use(express.json())
 require('dotenv').config()
 
 const AuthenticationRoutes= require('./routes/auth')
-var j = schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
+schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
     var today = new Date()
     var week = new Date()
     var day = today.getDate() + 6
