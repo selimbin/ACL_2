@@ -43,6 +43,7 @@ const { timeStamp } = require('console');
 const { stringify } = require('querystring');
 const scheduling = require('../models/scheduling.js');
 const { Router } = require('express');
+const { resolveSoa } = require('dns');
 require('dotenv').config()
 
 //------------------------------------------------------------------
@@ -85,7 +86,7 @@ router.route('/AddLocation')
 // Update a location -----------------------------------------------
 
 router.route('/UpdateLocation')
-.post(async (req, res)=>{
+.put(async (req, res)=>{
     const {Code,newCode,Building,Type,Capacity}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -156,7 +157,7 @@ router.route('/UpdateLocation')
 // Delete a location -----------------------------------------------
 
 router.route('/DeleteLocation')
-.post(async (req, res)=>{
+.delete(async (req, res)=>{
     const {Code}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -212,7 +213,7 @@ router.route('/AddFaculty')
 // Update a faculty -------------------------------------------------
 
 router.route('/UpdateFaculty')
-.post(async (req, res)=>{
+.put(async (req, res)=>{
     const {Name,newName}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -252,7 +253,7 @@ router.route('/UpdateFaculty')
 // Delete a faculty -------------------------------------------------
 
 router.route('/DeleteFaculty')
-.post(async (req, res)=>{
+.delete(async (req, res)=>{
     const {Name}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -347,7 +348,7 @@ router.route('/AddDepartment')
 // Update a department under a faculty ------------------------------
 
 router.route('/UpdateDepartment')
-.post(async (req, res)=>{
+.put(async (req, res)=>{
     const {FacultyName,DepartmentName,newDepartmentName,newFacultyname,newHead}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -428,7 +429,7 @@ router.route('/UpdateDepartment')
 // Delete a department under a faculty ------------------------------
 
 router.route('/DeleteDepartment')
-.post(async (req, res)=>{
+.delete(async (req, res)=>{
     const {FacultyName,Name}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -539,7 +540,7 @@ router.route('/AddCourse')
 // Update a Course under a department -------------------------------
 
 router.route('/UpdateCourse')
-.post(async (req, res)=>{
+.put(async (req, res)=>{
     const {Departmentname,Code,newDepartmentname,newCode,Coverage}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -615,7 +616,7 @@ router.route('/UpdateCourse')
 // Delete a Course under a department -------------------------------
 
 router.route('/DeleteCourse')
-.post(async (req, res)=>{
+.delete(async (req, res)=>{
     const {Departmentname,Code}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -667,21 +668,23 @@ router.route('/DeleteCourse')
 })
 //------------------------------------------------------------------
 // Add a staff member ----------------------------------------------
-
 router.route('/AddStaff')
 .post(async (req,res)=>{
-    const {name,email,salary,officelocation,role,dayoff,department}=req.body;
+    const {name,email,salary,officelocation,role,dayoff,department,gender}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(role == "HR"){
-                if(dayoff != "Saturday"){
+                if(dayoff != "Sat"){
                     return res.status(400).json({msg:"HR dayoff can only be saturday!"});
                 }
+            }
+            if(!gender && gender != "male" && gender != "female"){
+                return res.status(400).json({msg:"Please enter a valid gender"});
             }
             if(!department){
                 return res.status(400).json({msg:"Please enter a valid department"});
             }
-            if(dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thuresday" && dayoff != "Saturday"){
+            if(dayoff != "Sun" && dayoff != "Mon" && dayoff != "Tues" && dayoff != "Wed" && dayoff != "Thur" && dayoff != "Sat"){
                 return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
             }
             const existinglocation = await Location_model.findOne({code:officelocation})
@@ -720,7 +723,7 @@ router.route('/AddStaff')
                 await UpdatedStaffcount.save();
             }
             const newStaff = new staff_model({id:id,name:name,email:email,password:password,role:role,salary:salary,dayOff:dayoff,officeLocation:officelocation,
-            misseddays:0,missedHours:0,department:department});
+            department:department,gender:gender});
             await newStaff.save();
             const newCapacity = existinglocation.capacity - 1;
             const Updatedlocation = await Location_model.findByIdAndUpdate(existinglocation._id,{capacity:newCapacity},{new:true});
@@ -738,7 +741,7 @@ router.route('/AddStaff')
 // Update a staff member ---------------------------------------------
 
 router.route('/Updatetaff')
-.post(async (req,res)=>{
+.put(async (req,res)=>{
     const {id,name,email,officelocation,role,dayoff,department}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -748,10 +751,10 @@ router.route('/Updatetaff')
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
             if(dayoff){
-                if(dayoff != "Saturday" && (existingstaff.role == "HR" || role == "HR")){
+                if(dayoff != "Sat" && (existingstaff.role == "HR" || role == "HR")){
                     return res.status(400).json({msg:"HR dayoff can only be saturday!"});
                 }
-                else if(dayoff != "Saturday" && dayoff != "Sunday" && dayoff != "Monday" && dayoff != "Tuesday" && dayoff != "Wednesday" && dayoff != "Thuresday"){
+                else if(dayoff != "Sat" && dayoff != "Sun" && dayoff != "Mon" && dayoff != "Tues" && dayoff != "Wed" && dayoff != "Thur"){
                     return res.status(400).json({msg:"Please enter a valid dayoff other than the weekend"});
                 }
             }
@@ -823,7 +826,7 @@ router.route('/Updatetaff')
 // Delete a staff member ---------------------------------------------
 
 router.route('/DeleteStaff')
-.post(async (req,res)=>{
+.delete(async (req,res)=>{
     const {id}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -870,7 +873,7 @@ router.route('/DeleteStaff')
 // Update Salary -----------------------------------------------------
 
 router.route('/UpdateSalary')
-.post(async (req,res)=>{
+.put(async (req,res)=>{
     const {id,promotion}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -907,50 +910,168 @@ router.route('/UpdateSalary')
     }
 })
 //--------------------------------------------------------------------
-// Add Sign in/out record --------------------------------------------
-
-router.route('/AddSigninAndOut')
-.post(async (req,res)=>{
-    const {id,Date,Timein,Timeout}=req.body;
+// Add Sign in record --------------------------------------------
+router.route('/AddsignIn')
+.post(async(req,res)=>{
+    const{id,date,Time} = req.body;
     try {
         if (req.user.role  == "HR") {
-            if(!id){
-                return res.status(400).json({msg:"Please enter a valid id"});
+            var year = date.substring(6,10);
+            var month = date.substring(0,2);
+            var date1 = date.substring(3,5);
+            var hour = Time.substring(0,2);
+            var minute = Time.substring(3,5);
+            var today = new Date();
+            today.setFullYear(year)
+            today.setMonth(month-1)
+            today.setDate(date1)
+            today.setHours(hour)
+            today.setMinutes(minute)
+            if(today.toTimeString.substring(0,2)>"19"){
+                res.send("You cannot add a sign in after 7PM")
             }
-            if(!Date){
-                return res.status(400).json({msg:"Please enter a valid Date"});
+            if(today.toTimeString.substring(0,2)<"07"){
+                res.send("You cannot add a sign in before 7AM")
             }
-            if(!Timein){
-                return res.status(400).json({msg:"Please enter a valid Timein"});
+            const user= await staff_model.findOne({id:id})
+            var attendance= await attendance_model.findOne({"id":id,"date":today.toLocaleString().substring(0,10)})
+            var schedule_attendance = null
+            if(today.toDateString().substring(8,10)<"11"){
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
             }
-            if(!Timeout){
-                return res.status(400).json({msg:"Please enter a valid Timeout"});
+            else{
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
             }
-            const existingstaff = await staff_model.findOne({id:id});
-            if(!existingstaff){
-                return res.status(400).json({msg:"Please enter a valid id"});
+            if(schedule_attendance==null){
+                if(today.toDateString().substring(8,10)<"11"){
+                    schedule_attendance = new scheduleAttendance_model({
+                        id:user.id,
+                        month:(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))
+                    })
+                    await schedule_attendance.save()
+                }
+                else{
+                    schedule_attendance = new scheduleAttendance_model({
+                        id:user.id,
+                        month:today.toLocaleString().substring(0,10)
+                    })
+                    await schedule_attendance.save()
+                }
             }
-            if(existingstaff._id == req.header._id){
-                return res.status(400).json({msg:"Can't add sign in/out for yourself!"});
+        
+            if(attendance==null){
+                attendance = new attendance_model({
+                    id:user.id,
+                    date:today.toLocaleString().substring(0,10),
+                    day:today.toUTCString().substring(0,3)
+                })
+                if(user.dayOff != today.toUTCString().substring(0,3)){
+                    var x = schedule_attendance.missedHours+8
+                    schedule_attendance.missedHours=x
+                }
+                for(var i in schedule_attendance.days){
+                    if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                        schedule_attendance.days.splice(i,1)
+                    }
+                }
+                
+                attendance.signIn.push(today)
+                schedule_attendance.days.push(attendance)
+                await attendance.save()
+            }else{
+                if(attendance.signIn.length!=attendance.signOut.length){
+                    attendance.signIn.pop()
+                    attendance.signIn.push(today)
+                }
+                else{
+                    attendance.signIn.push(today)
+                }
+                await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+        
+                for(var i in schedule_attendance.days){
+                    if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                        schedule_attendance.days.splice(i,1)
+                    }
+                }
+                schedule_attendance.days.push(attendance)
             }
-            const attendanceRecord = await attendance_model.findOne({date:Date});
-            if(!attendanceRecord){
-                return res.status(400).json({msg:"No record exists for such a date"});
+        
+            if(today.toDateString().substring(8,10)<"11"){
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
             }
-            let newTimein = Date + "T" + Timein + "Z";
-            let newTimeout = Date + "T" + Timeout + "Z";
-            newTimein = new Date('newTimein');
-            newTimeout = new Date('newTimeout');
-            const now = new Date();
-            if(newTimein > now || newTimeout > now){
-                return res.status(400).json({msg:"You cant access a date that is in the future!"});
+            else{
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
             }
-            attendanceRecord.signIn.push(newTimein);
-            attendanceRecord.signOut.push(newTimeout);
-            attendanceRecord.day = newTimein.toUTCString().substring(0,3)
-            
-            await attendance_model.findOneAndUpdate({date:Date},attendanceRecord);
-            res.send(attendanceRecord)
+            res.send(attendance)
+        } else {
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }     
+    catch (error) {
+        res.status(500).json({error:error.message});
+    }
+})
+//--------------------------------------------------------------------
+// Add Sign out record -----------------------------------------------
+router.route('/signOut')
+.post(async(req,res)=>{
+    const{id,date,Time} = req.body;
+    try {
+        if (req.user.role  == "HR") {
+            var year = date.substring(6,10);
+            var month = date.substring(0,2);
+            var date1 = date.substring(3,5);
+            var hour = Time.substring(0,2);
+            var minute = Time.substring(3,5);
+            var today = new Date();
+            today.setFullYear(year)
+            today.setMonth(month-1)
+            today.setDate(date1)
+            today.setHours(hour)
+            today.setMinutes(minute)
+            if(today.toTimeString.substring(0,2)>"19"){
+                res.send("You cannot add a sign in after 7PM")
+            }
+            if(today.toTimeString.substring(0,2)<"07"){
+                res.send("You cannot add a sign out before 7AM")
+            }
+            const user= await staff_model.findOne({id:id})
+            const attendance= await attendance_model.findOne({"id":user.id,
+                "date":today.toLocaleString().substring(0,10)})
+            var schedule_attendance = null
+            if(today.toDateString().substring(8,10)<"11"){
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+            }
+            else{
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+            }
+            if(!attendance||!schedule_attendance){
+                res.send("You did not sign in today")
+            }else{
+                if(attendance.signIn.length!=(attendance.signOut.length+1)){
+                    res.send("You did not sign in")
+                }
+                else{
+                    attendance.signOut.push(today)
+                }
+                var diff =(attendance.signOut[attendance.signOut.length-1]-attendance.signIn[attendance.signIn.length-1])/(1000*60*60)
+                diff=schedule_attendance.missedHours-diff
+                schedule_attendance.missedHours=diff
+                await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+                for(var i in schedule_attendance.days){
+                    if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                        schedule_attendance.days.splice(i,1)
+                    }
+                }
+                schedule_attendance.days.push(attendance)
+                if(today.toDateString().substring(8,10)<"11"){
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+                }
+                else{
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+                }
+                res.send(attendance)
+            }
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -962,7 +1083,7 @@ router.route('/AddSigninAndOut')
 //--------------------------------------------------------------------
 // view staff attendance ---------------------------------------------
 router.route('/ViewAttendance')
-.post(async (req,res)=>{
+.get(async (req,res)=>{
     const {id}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -983,11 +1104,16 @@ router.route('/ViewAttendance')
 //--------------------------------------------------------------------
 // View staff with missed days or hours ------------------------------
 router.route('/Viewmissed')
-.post(async (req,res)=>{
+.get(async (req,res)=>{
     try {
         if (req.user.role  == "HR") {
-            const existingstaff = await staff_model.find({missedHours:{$gte:1},misseddays:{$gte:1}});
-            res.send(existingstaff)
+            const existingattendance = await scheduleAttendance_model.find({missedHours:{$gte:1},misseddays:{$gte:1}});
+            let allstaff;
+            for(var i = 0; i< existingattendance.length; i = i+1){
+                const onestaff = await staff_model.findOne({id:existingattendance[i].id})
+                allstaff.push(onestaff)
+            }
+            res.send(allstaff)
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1061,19 +1187,60 @@ router.route('/updateProfile')
 
 router.route('/signIn')
 .post(async(req,res)=>{
-    const today =  new Date()
+    var today =  new Date()
+    // res.send(today.toTimeString())
+    if(today.toTimeString.substring(0,2)>"19"){
+        res.send("You cannot sign in after 7PM")
+    }
+    if(today.toTimeString.substring(0,2)<"07"){
+        today.setHours(7)
+        today.setMinutes(0)
+    }
     const user= await staff_model.findById(req.user._id)
-    const attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
+    var attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
+    var schedule_attendance = null
+    if(today.toDateString().substring(8,10)<"11"){
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+    }
+    else{
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+    }
+    if(schedule_attendance==null){
+        if(today.toDateString().substring(8,10)<"11"){
+            schedule_attendance = new scheduleAttendance_model({
+                id:user.id,
+                month:(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))
+            })
+            await schedule_attendance.save()
+        }
+        else{
+            schedule_attendance = new scheduleAttendance_model({
+                id:user.id,
+                month:today.toLocaleString().substring(0,10)
+            })
+            await schedule_attendance.save()
+        }
+    }
+
     if(attendance==null){
-        attendance1 = new attendance_model({
+        attendance = new attendance_model({
             id:user.id,
             date:today.toLocaleString().substring(0,10),
             day:today.toUTCString().substring(0,3)
         })
-        attendance1.signIn.push(today)
-        await attendance1.save()
-        res.send(attendance1)
-
+        if(user.dayOff != today.toUTCString().substring(0,3)){
+            var x = schedule_attendance.missedHours+8
+            schedule_attendance.missedHours=x
+        }
+        for(var i in schedule_attendance.days){
+            if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                schedule_attendance.days.splice(i,1)
+            }
+        }
+        
+        attendance.signIn.push(today)
+        schedule_attendance.days.push(attendance)
+        await attendance.save()
     }else{
         if(attendance.signIn.length!=attendance.signOut.length){
             attendance.signIn.pop()
@@ -1084,19 +1251,50 @@ router.route('/signIn')
         }
         await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
 
-        res.send(attendance)
+        for(var i in schedule_attendance.days){
+            if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                schedule_attendance.days.splice(i,1)
+            }
+        }
+        schedule_attendance.days.push(attendance)
     }
+
+    if(today.toDateString().substring(8,10)<"11"){
+        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+    }
+    else{
+        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+    }
+    res.send(attendance)
+
 })
 //--------------------------------------------------------------------
 // sign Out ----------------------------------------------------------
 
 router.route('/signOut')
 .post(async(req,res)=>{
-    const today =  new Date()
+    
+    var today =  new Date()
+    if(today.toTimeString.substring(0,2)>"19"){
+        today.setHours(19)
+        today.setMinutes(0)
+    }
+    if(today.toTimeString.substring(0,2)<"07"){
+        today.setHours(7)
+        today.setMinutes(0)
+    }
     const user= await staff_model.findById(req.user._id)
     const attendance= await attendance_model.findOne({"id":user.id,
         "date":today.toLocaleString().substring(0,10)})
-    if(!attendance){
+    // res.send(attendance.signIn.length.toString())
+    var schedule_attendance = null
+    if(today.toDateString().substring(8,10)<"11"){
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+    }
+    else{
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+    }
+    if(!attendance||!schedule_attendance){
         res.send("You did not sign in today")
     }else{
         if(attendance.signIn.length!=(attendance.signOut.length+1)){
@@ -1105,8 +1303,22 @@ router.route('/signOut')
         else{
             attendance.signOut.push(today)
         }
+        var diff =(attendance.signOut[attendance.signOut.length-1]-attendance.signIn[attendance.signIn.length-1])/(1000*60*60)
+        diff=schedule_attendance.missedHours-diff
+        schedule_attendance.missedHours=diff
         await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
-        
+        for(var i in schedule_attendance.days){
+            if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                schedule_attendance.days.splice(i,1)
+            }
+        }
+        schedule_attendance.days.push(attendance)
+        if(today.toDateString().substring(8,10)<"11"){
+            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+        }
+        else{
+            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+        }
         res.send(attendance)
     }
 })
@@ -1279,27 +1491,27 @@ router.route('/assignInstructor')
         if(course==null){
             res.send("No corresponding course")
         }else{
-            if(req.body.role=="TA"){
-                course.TA.push(user1.id)
-                res.send(course)
-                await course_model.findOneAndUpdate({code:req.body.course},course)
-                department.courses.splice(index,1)
-                department.courses.push(course)
-                await department_model.findOneAndUpdate({name:user.department}, department)
-                var faculty = await Faculty_model.findOne({name:department.facultyname})
-                for(var x in faculty.departments){
-                    if(faculty.departments[x].name==department.name){
-                        faculty.departments.splice(x,1)
-                        faculty.departments.push(department)
-                        await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
-                    }
+            // if(req.body.role=="TA"){
+            //     course.TA.push(user1.id)
+            //     res.send(course)
+            //     await course_model.findOneAndUpdate({code:req.body.course},course)
+            //     department.courses.splice(index,1)
+            //     department.courses.push(course)
+            //     await department_model.findOneAndUpdate({name:user.department}, department)
+            //     var faculty = await Faculty_model.findOne({name:department.facultyname})
+            //     for(var x in faculty.departments){
+            //         if(faculty.departments[x].name==department.name){
+            //             faculty.departments.splice(x,1)
+            //             faculty.departments.push(department)
+            //             await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
+            //         }
 
-                }
+            //     }
 
-                res.send(course)
-            }
-            else{
-                if(req.body.role=="lecturer"){
+            //     res.send(course)
+            // }
+            // else{
+                // if(req.body.role=="lecturer"){
                     course.lecturer.push(user1.id)
                     await course_model.findOneAndUpdate({code:req.body.course},course)
                     department.courses.splice(x,1)
@@ -1315,11 +1527,11 @@ router.route('/assignInstructor')
 
                     }
                     res.send(course)
-                }
-                else{
-                    res.send("Wrong instructor role choose lecturer or TA")
-                }
-            }
+                // }
+                // else{
+                    // res.send("Wrong instructor role choose lecturer or TA")
+                // }
+            // }
         }
     }else{
         res.send("You are not authorized to access this page")
@@ -1348,31 +1560,31 @@ router.route('/removeInstructor')
         if(course==null){
             res.send("No corresponding course")
         }else{
-            if(user1.role=="TA"){
-                for(var i in course.TA){
-                    if(course.TA[i]==user1.id){
-                        course.TA.splice(i,1)
-                        await course_model.findOneAndUpdate({code:req.body.course},course)
-                        department.courses.splice(index,1)
-                        department.courses.push(course)
-                        await department_model.findOneAndUpdate({name:user.department}, department)
-                        var faculty = await Faculty_model.findOne({name:department.facultyname})
-                        for(var x in faculty.departments){
-                            if(faculty.departments[x].name==department.name){
-                                faculty.departments.splice(x,1)
-                                faculty.departments.push(department)
-                                await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
-                            }
+            // if(user1.role=="TA"){
+            //     for(var i in course.TA){
+            //         if(course.TA[i]==user1.id){
+            //             course.TA.splice(i,1)
+            //             await course_model.findOneAndUpdate({code:req.body.course},course)
+            //             department.courses.splice(index,1)
+            //             department.courses.push(course)
+            //             await department_model.findOneAndUpdate({name:user.department}, department)
+            //             var faculty = await Faculty_model.findOne({name:department.facultyname})
+            //             for(var x in faculty.departments){
+            //                 if(faculty.departments[x].name==department.name){
+            //                     faculty.departments.splice(x,1)
+            //                     faculty.departments.push(department)
+            //                     await Faculty_model.findOneAndUpdate({name:department.facultyname}, faculty)
+            //                 }
         
-                        }
-                        res.send(course)
+            //             }
+            //             res.send(course)
 
-                    }
-                }
-                res.send("This instructor does not teach this course")
-            }
-            else{
-                if(req.body.role=="lecturer"){
+            //         }
+            //     }
+            //     res.send("This instructor does not teach this course")
+            // }
+            // else{
+                // if(req.body.role=="lecturer"){
                     for(var i in course.lecturer){
                         if(course.lecturer[i]==user1.id){
                             course.lecturer.splice(i,1)
@@ -1393,12 +1605,12 @@ router.route('/removeInstructor')
                     }
 
                     res.send("This instructor does not teach this course")
-                }
-                else{
-                    res.send("This staff member cannot teach this course")
-                }
+                // }
+                // else{
+                //     res.send("This staff member cannot teach this course")
+                // }
             }
-        }
+        // }
     }else{
         res.send("You are not authorized to access this page")
     }
@@ -1497,15 +1709,47 @@ router.route('/acceptRequest')
     const user= await staff_model.findById(req.user._id)
     const department = await department_model.findOne({name:user.department})
     if(department.head==user.id){
-        const request = await request_model.findOne({id:req.body.id})
+        const request = await request_model.findById(req.body._id)
         if(request==null){
             res.send("No corresponding request")
         }
         else{
-
+            var today =  new Date()
+            var schedule_attendance=null
+            if(today.toDateString().substring(8,10)<"11"){
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+            }
+            else{
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+            }
             request.status="accepted"
-            await request_model.findOneAndUpdate({id:req.body.id},request)
-
+            await request_model.findByIdAndUpdate(req.body._id,request)
+            const sender = await staff_model.findOne({id:request.requester})
+            var amount = request.amount
+            var schedule = null
+            if(request.type=="accidental"){
+                var missed = sender.leaveBalance - amount
+                sender.leaveBalance = missed
+                await sender.save()
+            }
+            if(request.type=="sick"){
+                var missed = schedule_attendance.misseddays-amount
+                schedule_attendance.misseddays = missed
+            }
+            if(request.type=="maternity"){
+                var missed = schedule_attendance.misseddays-amount
+                schedule_attendance.misseddays = missed
+            }
+            if(request.type=="compensation"){
+                var missed = schedule_attendance.misseddays-amount
+                schedule_attendance.misseddays = missed
+            }
+            if(today.toDateString().substring(8,10)<"11"){
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+            }
+            else{
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+            }
             res.send(request)
         }
     }
@@ -1521,13 +1765,13 @@ router.route('/rejectRequest')
     const user= await staff_model.findById(req.user._id)
     const department = await department_model.findOne({name:user.department})
     if(department.head==user.id){
-        const request = await request_model.findOne({id:req.body.id})
+        const request = await request_model.findById(req.body._id)
         if(request==null){
             res.send("No corresponding request")
         }
         else{
             request.status="rejected"
-            await request_model.findOneAndUpdate({id:req.body.id},request)
+            await request_model.findByIdAndUpdate(req.body._id,request)
             res.send(request)
         }
     }

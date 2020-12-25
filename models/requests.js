@@ -21,7 +21,7 @@ const internalRequestSchema= new mongoose.Schema({
         type:String,
         required:true
     },
-    reciever:{
+    receiver:{
         type:String,
         required:true
     },
@@ -32,6 +32,18 @@ const internalRequestSchema= new mongoose.Schema({
     },
     date:{
         type:Date
+    },
+    slot:{
+        type:Number
+    },
+    location:{
+        type:String
+    },
+    course:{
+        type:String
+    },
+    amount:{
+        type:Number
     },
     newDay:{
         type:String
