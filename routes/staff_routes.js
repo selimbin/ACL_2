@@ -2221,21 +2221,21 @@ router.route('/viewReplacementReq')
 .get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
-    const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
-    res.send(myrequests)
-}else
-res.send('HR cants have requests or view of any kind')
+        const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
+        res.send(myrequests)
+    }else
+        res.send('HR cants have requests or view of any kind')
 })
 router.route('/slotlinkingrequest')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
-    const course=await course_model.findOne({course:req.body.course})
-    for(var i =0;i<user.courses.length();i++){
-        if(user.courses[i]==course.id){
-            const newreqest = await new request_model({type:req.body.type,requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
-            await newreqest.save()
-            res.send(newreqest)
+        const course=await course_model.findOne({course:req.body.course})
+        for(var i =0;i<user.courses.length();i++){
+            if(user.courses[i]==course.id){
+                const newreqest = await new request_model({type:req.body.type,requester:user.id,receiver:course.courseCoordinator.id,reason:req.body.reason})
+                await newreqest.save()
+                res.send(newreqest)
         }
     }
     }else
@@ -2258,20 +2258,20 @@ res.send('HR cants have requests of any kind')
 })
 
 
-router.route('/AnnualLeave')
+router.route('/AnnualLeaveReq')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
     if(department.head!=null){
-        if(req.body.type=='AnnualLeave'&&requests.Date<=Date.now()&&department.head!=null){
+        if(req.body.type=='AnnualLeave'&&req.body.date>=Date.now()&&department.head!=null){
             const replacementREQ= await request_model.findOne({type:'ReplacmentReq',requester:user.id})
             if(replacementREQ.status=='accepted'&&replacementREQ!=null){
-                const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:replacementREQ.receiver.id})
+                const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:replacementREQ.receiver.id,date:req.body.date,amount:req.body.amount})
                 await newreqest.save()
                 res.send(newreqest)
             }else{
-                const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null'})
+                const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null',date:req.body.date})
                 await newreqest.save()
                 res.send(newreqest)   
                     }
