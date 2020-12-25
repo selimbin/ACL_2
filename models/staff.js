@@ -80,6 +80,9 @@ const staffSchema = new mongoose.Schema({
     department:{
         type:String,
     },
+    lastSalary:{
+        type:Number
+    },
     leaveBalance:{
         type:Number,
         default:2.5

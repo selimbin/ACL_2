@@ -927,33 +927,33 @@ router.route('/AddsignIn')
             today.setDate(date1)
             today.setHours(hour)
             today.setMinutes(minute)
-            if(today.toTimeString.substring(0,2)>"19"){
+            if(today.toTimeString().substring(0,2)>"19"){
                 res.send("You cannot add a sign in after 7PM")
             }
-            if(today.toTimeString.substring(0,2)<"07"){
+            if(today.toTimeString().substring(0,2)<"07"){
                 res.send("You cannot add a sign in before 7AM")
             }
             const user= await staff_model.findOne({id:id})
             var attendance= await attendance_model.findOne({"id":id,"date":today.toLocaleString().substring(0,10)})
             var schedule_attendance = null
             if(today.toDateString().substring(8,10)<"11"){
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
             }
             else{
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
             }
             if(schedule_attendance==null){
                 if(today.toDateString().substring(8,10)<"11"){
                     schedule_attendance = new scheduleAttendance_model({
                         id:user.id,
-                        month:(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))
+                        month:(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()
                     })
                     await schedule_attendance.save()
                 }
                 else{
                     schedule_attendance = new scheduleAttendance_model({
                         id:user.id,
-                        month:today.toLocaleString().substring(0,10)
+                        month:today.toLocaleString().substring(0,2)
                     })
                     await schedule_attendance.save()
                 }
@@ -963,7 +963,8 @@ router.route('/AddsignIn')
                 attendance = new attendance_model({
                     id:user.id,
                     date:today.toLocaleString().substring(0,10),
-                    day:today.toUTCString().substring(0,3)
+                    day:today.toUTCString().substring(0,3),
+                    month:today.toLocaleString().substring(0,2)
                 })
                 if(user.dayOff != today.toUTCString().substring(0,3)){
                     var x = schedule_attendance.missedHours+8
@@ -997,10 +998,10 @@ router.route('/AddsignIn')
             }
         
             if(today.toDateString().substring(8,10)<"11"){
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
             }
             else{
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
             }
             res.send(attendance)
         } else {
@@ -1029,10 +1030,10 @@ router.route('/signOut')
             today.setDate(date1)
             today.setHours(hour)
             today.setMinutes(minute)
-            if(today.toTimeString.substring(0,2)>"19"){
+            if(today.toTimeString().substring(0,2)>"19"){
                 res.send("You cannot add a sign in after 7PM")
             }
-            if(today.toTimeString.substring(0,2)<"07"){
+            if(today.toTimeString().substring(0,2)<"07"){
                 res.send("You cannot add a sign out before 7AM")
             }
             const user= await staff_model.findOne({id:id})
@@ -1040,10 +1041,10 @@ router.route('/signOut')
                 "date":today.toLocaleString().substring(0,10)})
             var schedule_attendance = null
             if(today.toDateString().substring(8,10)<"11"){
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
             }
             else{
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
             }
             if(!attendance||!schedule_attendance){
                 res.send("You did not sign in today")
@@ -1065,10 +1066,10 @@ router.route('/signOut')
                 }
                 schedule_attendance.days.push(attendance)
                 if(today.toDateString().substring(8,10)<"11"){
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
                 }
                 else{
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
                 }
                 res.send(attendance)
             }
@@ -1082,7 +1083,8 @@ router.route('/signOut')
 })
 //--------------------------------------------------------------------
 // view staff attendance ---------------------------------------------
-router.route('/ViewAttendance')
+
+router.route('/viewStaffAttendance')
 .get(async (req,res)=>{
     const {id}=req.body;
     try {
@@ -1188,11 +1190,10 @@ router.route('/updateProfile')
 router.route('/signIn')
 .post(async(req,res)=>{
     var today =  new Date()
-    // res.send(today.toTimeString())
-    if(today.toTimeString.substring(0,2)>"19"){
+    if(today.toTimeString().substring(0,2)>"19"){
         res.send("You cannot sign in after 7PM")
     }
-    if(today.toTimeString.substring(0,2)<"07"){
+    if(today.toTimeString().substring(0,2)<"07"){
         today.setHours(7)
         today.setMinutes(0)
     }
@@ -1200,23 +1201,23 @@ router.route('/signIn')
     var attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
     var schedule_attendance = null
     if(today.toDateString().substring(8,10)<"11"){
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
     }
     else{
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
     }
     if(schedule_attendance==null){
         if(today.toDateString().substring(8,10)<"11"){
             schedule_attendance = new scheduleAttendance_model({
                 id:user.id,
-                month:(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))
+                month:(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()
             })
             await schedule_attendance.save()
         }
         else{
             schedule_attendance = new scheduleAttendance_model({
                 id:user.id,
-                month:today.toLocaleString().substring(0,10)
+                month:today.toLocaleString().substring(0,2)
             })
             await schedule_attendance.save()
         }
@@ -1226,7 +1227,8 @@ router.route('/signIn')
         attendance = new attendance_model({
             id:user.id,
             date:today.toLocaleString().substring(0,10),
-            day:today.toUTCString().substring(0,3)
+            day:today.toUTCString().substring(0,3),
+            month:today.toLocaleString().substring(0,2)
         })
         if(user.dayOff != today.toUTCString().substring(0,3)){
             var x = schedule_attendance.missedHours+8
@@ -1260,10 +1262,10 @@ router.route('/signIn')
     }
 
     if(today.toDateString().substring(8,10)<"11"){
-        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
     }
     else{
-        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
     }
     res.send(attendance)
 
@@ -1275,11 +1277,11 @@ router.route('/signOut')
 .post(async(req,res)=>{
     
     var today =  new Date()
-    if(today.toTimeString.substring(0,2)>"19"){
+    if(today.toTimeString().substring(0,2)>"19"){
         today.setHours(19)
         today.setMinutes(0)
     }
-    if(today.toTimeString.substring(0,2)<"07"){
+    if(today.toTimeString().substring(0,2)<"07"){
         today.setHours(7)
         today.setMinutes(0)
     }
@@ -1289,10 +1291,10 @@ router.route('/signOut')
     // res.send(attendance.signIn.length.toString())
     var schedule_attendance = null
     if(today.toDateString().substring(8,10)<"11"){
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))})
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
     }
     else{
-        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,10)})
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
     }
     if(!attendance||!schedule_attendance){
         res.send("You did not sign in today")
@@ -1314,10 +1316,10 @@ router.route('/signOut')
         }
         schedule_attendance.days.push(attendance)
         if(today.toDateString().substring(8,10)<"11"){
-            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(((today.toDateString().substring(0,2))-1).toString()+today.toLocaleString().substring(2,10))},schedule_attendance)
+            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
         }
         else{
-            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,10)},schedule_attendance)
+            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
         }
         res.send(attendance)
     }
@@ -1340,9 +1342,78 @@ router.route('/resetPassword')
     }
 
 })
+// //--------------------------------------------------------------------
+// // view attendance ---------------------------------------------------
+
+router.route('/viewAttendance')
+.get(async (req,res)=>{
+    var today =  new Date()
+    const user= await staff_model.findById(req.user._id)
+    if(req.body.month==null){
+        const attendance = await attendance_model.find({id:user.id})
+        if(attendance==null){
+            res.send("You have not attende anything yet")
+        }
+        else{
+            res.send(attendance)
+        }
+    }
+    else{
+        const attendance = await attendance_model.find({id:user.id,month:req.body.month}) 
+        if(attendance==null){
+            res.send("You have no attende in this month")
+        }
+        else{
+            res.send(attendance)
+        }
+    }
+})
+// //--------------------------------------------------------------------
+// // view Missing Days ---------------------------------------------------
+
+router.route('/viewMissingDays')
+.get(async(req,res)=>{
+    var today =  new Date()
+    const user= await staff_model.findById(req.user._id)
+    var schedule_attendance = null
+    if(today.toDateString().substring(8,10)<"11"){
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+    }
+    else{
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+    }
+    if(schedule_attendance==null){
+        res.send("You're missing days have not yet been calculated this month")
+    }
+    else{
+        res.send(schedule_attendance.missedDays.toString())
+    }
+})
+// //--------------------------------------------------------------------
+// // view Missing Hours ---------------------------------------------------
+
+router.route('/viewMissingHours')
+.get(async(req,res)=>{
+    var today =  new Date()
+    const user= await staff_model.findById(req.user._id)
+    var schedule_attendance = null
+    if(today.toDateString().substring(8,10)<"11"){
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+    }
+    else{
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+    }
+    if(schedule_attendance==null){
+        res.send("You're missing hours have not yet been calculated this month")
+    }
+    else{
+        res.send(schedule_attendance.missedHours.toString())
+    }
+})
 
 //--------------------------------------------------------------------
 // view Schedule -----------------------------------------------------
+
 router.route('/viewschedule')
 .get(async(req,res)=>{
     const user= await staff_model.findById(req.user._id)
