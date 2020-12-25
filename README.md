@@ -6,6 +6,9 @@
 
 PORT = 3000
 
+/Seed should be run at the very start to initialize staff count and input one HR member:
+Route: /seed/Seed
+
 *Any staff member functionalities*<br>
 
 Functionality: Log In<br>
