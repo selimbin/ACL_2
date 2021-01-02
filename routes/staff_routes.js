@@ -3907,133 +3907,145 @@ router.route('/Rejectslotlinkingreq').put(async (req,res)=>{
 
 
 
-router.route('/Addslot').post(async (req,res)=>{
-    const cord= await staff_model.findById(req.user._id);
-    const {course_code,slot_no,day,location,type,compensation}=req.body;
-    if(!course_code || !slot_no || !day || !location ||!type || !compensation){
-        return res.status(400).json({msg:"Please enter location,type,compensation(true,false),slot_no,day and course_code"});
-    }
-
-    if(req.body.slot_no>5)
-    return res.status(400).json({msg:"Enter a valid slot_no"});
-    if(type != "tut" && type !="lab")
-    return res.status(400).json({msg:"The type is eaither tut or lab"});
-
-    const course =  await course_model.findOne({code: req.body.course_code});
-    if(!course)
-    return res.status(400).json({msg:"Please enter a valid course"}); 
+    router.route('/Addslot').post(async (req,res)=>{
+        const cord= await staff_model.findById(req.user._id);
+        const {course_code,slot_no,day,location,type,compensation}=req.body;
+        if(!course_code || !slot_no || !day || !location ||!type || !compensation){
+            return res.status(400).json({msg:"Please enter location,type,compensation(true,false),slot_no,day and course_code"});
+        }
     
-    if(cord.id == course.courseCoordinator){
- 
-        const cor =  await schedule_model.findOne({id:  req.body.course_code});
-        const loc =  await schedule_model.findOne({id:  req.body.location});
-
-        if(!cor)
-        return res.status(400).json({msg:"Please enter a valid course(schedule)"}); 
-
-        if(!loc)
-    return res.status(400).json({msg:"Please enter a valid location(schedule)"}); 
-      
+        if(req.body.slot_no>5)
+        return res.status(400).json({msg:"Enter a valid slot_no"});
+        if(type != "tut" && type !="lab")
+        return res.status(400).json({msg:"The type is eaither tut or lab"});
     
-        var slot =cor.saturday[slot_no-1];
-        var slotloc =loc.saturday[slot_no-1];
-    switch(day) {
-        case "saturday":
-             slot =cor.saturday[slot_no-1];
-             slotloc =loc.saturday[slot_no-1];
-          break;
-        case "sunday":
-             slot =cor.sunday[slot_no-1];
-             slotloc =loc.sunday[slot_no-1];
-          break;
-        case "monday":
-             slot =cor.monday[slot_no-1];
-             slotloc =loc.monday[slot_no-1];
-          break;
-        case "tuesday":
-             slot =cor.tuesday[slot_no-1];
-             slotloc =loc.tuesday[slot_no-1];
-          break;
-        case "wednesday":
-             slot =cor.wednesday[slot_no-1];
-             slotloc =loc.wednesday[slot_no-1];
-            break;
-        case "thursday":
-             slot =cor.thursday[slot_no-1];
-             slotloc =loc.thursday[slot_no-1];
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      }
-
-      const em = "";
-      await slot.location.push(location);
-      await slot.type.push(type);
-      await slot.staff.push(em);
-      await slot.compensation.push(compensation);
-
-      await slotloc.location.push(location);
-      await slotloc.type.push(type);
-      await slotloc.staff.push(em);
-      await slotloc.compensation.push(compensation);
-
-
-    slot.isEmpty=false;
-    slotloc.isEmpty=false;
-
-    await slot.save();
-    await slotloc.save();
-    
-    
-    switch(day) {
-        case "saturday":
-           cor.saturday.splice(slot_no-1,1,slot)
-           
-           loc.saturday.splice(slot_no-1,1,slotloc)
-          break;
-        case "sunday":
-            cor.sunday.splice(slot_no-1,1,slot)
-           
-           loc.sunday.splice(slot_no-1,1,slotloc)
-          break;
-        case "monday":
-            cor.monday.splice(slot_no-1,1,slot)
-            
-            loc.monday.splice(slot_no-1,1,slotloc)
-          break;
-        case "tuesday":
-            cor.tuesday.splice(slot_no-1,1,slot)
-          
-           loc.tuesday.splice(slot_no-1,1,slotloc)
-          break;
-        case "wednesday":
-            cor.wednesday.splice(slot_no-1,1,slot)
+        const course =  await course_model.findOne({code: req.body.course_code});
+        if(!course)
+        return res.status(400).json({msg:"Please enter a valid course"}); 
         
-            loc.wednesday.splice(slot_no-1,1,slotloc)
-            break;
-        case "thursday":
-            cor.thursday.splice(slot_no-1,1,slot)
-           
-            loc.thursday.splice(slot_no-1,1,slotloc)
-             
-                break;        
-           }
-
-          
-           var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
-          
-           var loc3 = await schedule_model.findOneAndUpdate({id: req.body.location},loc);
-   
-           
-    res.send("done");
+        if(cord.id == course.courseCoordinator){
+     
+            const cor =  await schedule_model.findOne({id:  req.body.course_code});
+            const loc =  await schedule_model.findOne({id:  req.body.location});
     
-    }
-    else{
-        return res.status(401).json({msg:"unauthorized"}); 
-
-    }
-    })  ;
-
+            if(!cor)
+            return res.status(400).json({msg:"Please enter a valid course(schedule)"}); 
+    
+            if(!loc)
+        return res.status(400).json({msg:"Please enter a valid location(schedule)"}); 
+          
+        
+            var slot =cor.saturday[slot_no-1];
+            var slotloc =loc.saturday[slot_no-1];
+        switch(day) {
+            case "saturday":
+                if(!loc.saturday[slot_no-1].isEmpty)
+                return res.status(400).json({msg:"this location is used in this slot"});
+                 slot =cor.saturday[slot_no-1];
+                 slotloc =loc.saturday[slot_no-1];
+              break;
+            case "sunday":
+                if(!loc.sunday[slot_no-1].isEmpty)
+                return res.status(400).json({msg:"this location is used in this slot"});
+                 slot =cor.sunday[slot_no-1];
+                 slotloc =loc.sunday[slot_no-1];
+              break;
+            case "monday":
+                if(!loc.monday[slot_no-1].isEmpty)
+                return res.status(400).json({msg:"this location is used in this slot"});
+                 slot =cor.monday[slot_no-1];
+                 slotloc =loc.monday[slot_no-1];
+              break;
+            case "tuesday":
+                if(!loc.tuesday[slot_no-1].isEmpty)
+                return res.status(400).json({msg:"this location is used in this slot"});
+                 slot =cor.tuesday[slot_no-1];
+                 slotloc =loc.tuesday[slot_no-1];
+              break;
+            case "wednesday":
+                if(!loc.wednesday[slot_no-1].isEmpty)
+                return res.status(400).json({msg:"this location is used in this slot"});
+                 slot =cor.wednesday[slot_no-1];
+                 slotloc =loc.wednesday[slot_no-1];
+                break;
+            case "thursday":
+                if(!loc.thursday[slot_no-1].isEmpty)
+                return res.status(400).json({msg:"this location is used in this slot"});
+                 slot =cor.thursday[slot_no-1];
+                 slotloc =loc.thursday[slot_no-1];
+                    break;        
+            default:
+                return res.status(400).json({msg:"Enter a valid day/no upper case"});
+          }
+    
+          const em = "";
+          await slot.location.push(location);
+          await slot.type.push(type);
+          await slot.staff.push(em);
+          await slot.compensation.push(compensation);
+    
+          await slotloc.location.push(location);
+          await slotloc.type.push(type);
+          await slotloc.staff.push(em);
+          await slotloc.compensation.push(compensation);
+    
+    
+        slot.isEmpty=false;
+        slotloc.isEmpty=false;
+    
+        await slot.save();
+        await slotloc.save();
+        
+        
+        switch(day) {
+            case "saturday":
+               cor.saturday.splice(slot_no-1,1,slot)
+               
+               loc.saturday.splice(slot_no-1,1,slotloc)
+              break;
+            case "sunday":
+                cor.sunday.splice(slot_no-1,1,slot)
+               
+               loc.sunday.splice(slot_no-1,1,slotloc)
+              break;
+            case "monday":
+                cor.monday.splice(slot_no-1,1,slot)
+                
+                loc.monday.splice(slot_no-1,1,slotloc)
+              break;
+            case "tuesday":
+                cor.tuesday.splice(slot_no-1,1,slot)
+              
+               loc.tuesday.splice(slot_no-1,1,slotloc)
+              break;
+            case "wednesday":
+                cor.wednesday.splice(slot_no-1,1,slot)
+            
+                loc.wednesday.splice(slot_no-1,1,slotloc)
+                break;
+            case "thursday":
+                cor.thursday.splice(slot_no-1,1,slot)
+               
+                loc.thursday.splice(slot_no-1,1,slotloc)
+                 
+                    break;        
+               }
+    
+               console.log(slotloc.isEmpty)
+              
+               var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
+              
+               var loc3 = await schedule_model.findOneAndUpdate({id: req.body.location},loc);
+       
+               
+        res.send("done");
+        
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"}); 
+    
+        }
+        })  ;
 
 
 router.route('/updateslot').put(async (req,res)=>{
