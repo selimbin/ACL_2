@@ -17,7 +17,7 @@ export class AddStaff extends Component {
 
     mySubmitHandler = async event => {
         event.preventDefault();
-        await axios.post("http://localhost:5000/staff/AddStaff", {
+        await axios.post("", {
             name: this.state.name,
             email: this.state.email,
             officelocation: this.state.officelocation,
