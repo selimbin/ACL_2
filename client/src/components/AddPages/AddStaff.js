@@ -15,6 +15,7 @@ export class AddStaff extends Component {
         dayoff: '',
         salary: null
     };
+    
 
     mySubmitHandler = event => {
         event.preventDefault();
@@ -41,6 +42,7 @@ export class AddStaff extends Component {
         .then((res) => toast.success("Staff added successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }    
+
 
     myChangeHandler = (event) => {
         let nam = event.target.name;
