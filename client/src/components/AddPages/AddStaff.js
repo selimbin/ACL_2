@@ -17,18 +17,10 @@ export class AddStaff extends Component {
     };
     
 
-<<<<<<< HEAD
-    mySubmitHandler = async event => {
-        const headers = { 
-            'token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ'
-        };
-        const info={
-=======
     mySubmitHandler = event => {
         event.preventDefault();
 
         const staff = {
->>>>>>> c949ea99c0cc39b8a7a2bcd99da72aa207113c17
             name: this.state.name,
             email: this.state.email,
             officelocation: this.state.officelocation,
@@ -36,12 +28,6 @@ export class AddStaff extends Component {
             department: this.state.department,
             role: this.state.role,
             dayoff: this.state.dayoff,
-<<<<<<< HEAD
-            salary: this.state.salary
-        }
-        event.preventDefault();
-        await axios.post('http://localhost:5000/staff/AddStaff', info, { headers }).then((res) => alert("idk" + res)).catch((err) => alert("OH I KNOW" + err))
-=======
             salary: this.state.salary,
         };
 
@@ -55,7 +41,6 @@ export class AddStaff extends Component {
         })
         .then((res) => toast.success("Staff added successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
->>>>>>> c949ea99c0cc39b8a7a2bcd99da72aa207113c17
     }    
 
 
