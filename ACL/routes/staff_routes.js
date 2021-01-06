@@ -1179,7 +1179,7 @@ router.route('/DeleteCourse')
 // Add a staff member ----------------------------------------------
 router.route('/AddStaff')
 .post(async (req,res)=>{
-    const {name,email,salary,officelocation,role,dayOff,department,gender}=req.body;
+    const {name,email,salary,officelocation,role,dayoff,department,gender}=req.body;
     try {
         if (req.user.role  == "HR") {
             if(role == "HR"){
@@ -1187,8 +1187,17 @@ router.route('/AddStaff')
                     return res.status(400).json({msg:"HR dayoff can only be saturday!"});
                 }
             }
+            if(!role){
+                return res.status(400).json({msg:"Please enter a valid role"});
+            }
+            if(!name){
+                return res.status(400).json({msg:"Please enter a valid name"});
+            }
+            if(!email){
+                return res.status(400).json({msg:"Please enter a valid email"});
+            }
             if(!salary || salary <= 0){
-                return res.status(400).json({msg:"Please enter a valid Salaray"});
+                return res.status(400).json({msg:"Please enter a valid Salary"});
             }
             if(!gender && gender != "M" && gender != "F"){
                 return res.status(400).json({msg:"Please enter a valid gender"});

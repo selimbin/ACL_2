@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import axios from "axios";
-// import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './AddPage.css'
 
 export class AddStaff extends Component {
@@ -15,9 +16,10 @@ export class AddStaff extends Component {
         salary: null
     };
 
-    mySubmitHandler = async event => {
+    mySubmitHandler = event => {
         event.preventDefault();
-        await axios.post("", {
+
+        const staff = {
             name: this.state.name,
             email: this.state.email,
             officelocation: this.state.officelocation,
@@ -26,7 +28,18 @@ export class AddStaff extends Component {
             role: this.state.role,
             dayoff: this.state.dayoff,
             salary: this.state.salary,
-        }).then((res) => alert("idk" + res)).catch((err) => alert("OH I KNOW" + err))
+        };
+
+        axios.post("http://localhost:5000/staff/AddStaff", staff,{
+            headers:
+            {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type":"application/JSON",
+                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
+            }
+        })
+        .then((res) => toast.success("Staff added successfully",{position: toast.POSITION.TOP_CENTER}))
+        .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }    
 
     myChangeHandler = (event) => {
@@ -40,6 +53,7 @@ export class AddStaff extends Component {
             <div class="AddPage">
                 <div class="container">
                     <form onSubmit={this.mySubmitHandler}>
+                    <ToastContainer />
                     <div class="row">
                         <div class="col-25">
                             <label for="name">Name</label>
