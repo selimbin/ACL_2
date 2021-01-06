@@ -14,10 +14,13 @@ export class AddStaff extends Component {
         dayoff: '',
         salary: null
     };
+    
 
     mySubmitHandler = async event => {
-        event.preventDefault();
-        await axios.post("http://localhost:5000/staff/AddStaff", {
+        const headers = { 
+            'token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ'
+        };
+        const info={
             name: this.state.name,
             email: this.state.email,
             officelocation: this.state.officelocation,
@@ -25,9 +28,12 @@ export class AddStaff extends Component {
             department: this.state.department,
             role: this.state.role,
             dayoff: this.state.dayoff,
-            salary: this.state.salary,
-        }).then((res) => alert("idk" + res)).catch((err) => alert("OH I KNOW" + err))
+            salary: this.state.salary
+        }
+        event.preventDefault();
+        await axios.post('http://localhost:5000/staff/AddStaff', info, { headers }).then((res) => alert("idk" + res)).catch((err) => alert("OH I KNOW" + err))
     }    
+
 
     myChangeHandler = (event) => {
         let nam = event.target.name;
