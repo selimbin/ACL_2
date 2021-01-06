@@ -16,6 +16,7 @@ const scheduleAttendance_model = mongoose.model('ScheduleAttendance', scheduleAt
 const { nextTick } = require('process')
 var schedule = require('node-schedule');
 const app =express()
+let cors = require('cors');
 app.use(express.json())
 // app.use('',staff_routes)
 require('dotenv').config()
@@ -617,6 +618,7 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
 });
 app.use('/seed', seed_routes)
 app.use('', AuthenticationRoutes)
+app.use(cors());
 
 app.use(async(req, res, next)=>{
     const token= req.headers.token
