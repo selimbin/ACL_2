@@ -15,7 +15,7 @@ export class AddCourse extends Component {
         event.preventDefault();
 
         const course = {
-            Departmentname: this.state.department,
+            Departmentname: this.state.departmentname,
             Code: this.state.code,
             totalSlots: this.state.totalslots,
         };
@@ -45,7 +45,7 @@ export class AddCourse extends Component {
                     <ToastContainer />
                     <div class="row">
                         <div class="col-25">
-                            <label for="code">Course Code</label>
+                            <label htmlfor="code">Course Code</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="code" name="code" placeholder="Enter the course code.." onChange={this.myChangeHandler}></input>
@@ -53,22 +53,22 @@ export class AddCourse extends Component {
                     </div>
                     <div class="row">
                         <div class="col-25">
-                            <label for="department">Department</label>
+                            <label htmlfor="departmentname">Department</label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="department" name="department" placeholder="Enter this course's department.." onChange={this.myChangeHandler}></input>
+                            <input type="text" id="departmentname" name="departmentname" placeholder="Enter this course's department.." onChange={this.myChangeHandler}></input>
                         </div>
                     </div> 
                     <div class="row">
                         <div class="col-25">
-                            <label for="slots">Total Slots</label>
+                            <label htmlfor="totalslots">Total Slots</label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="slots" name="slots" placeholder="Enter the Total number of slots.." onChange={this.myChangeHandler}></input>
+                            <input type="text" id="totalslots" name="totalslots" placeholder="Enter the Total number of slots.." onChange={this.myChangeHandler}></input>
                         </div>
                     </div>  
                     <div class="row">
-                        <input type="submit" value="Submit"></input>
+                        <input type="submit" value="Add"></input>
                     </div>
                     </form>
                 </div>

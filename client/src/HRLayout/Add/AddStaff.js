@@ -5,7 +5,7 @@ import Addstaff from "../../components/AddPages/AddStaff";
 export class AddStaff extends Component {
     render() {
         return (
-            <div class="AddPage">
+            <div>
                 <Navbar/>
                 <Addstaff/>
             </div>

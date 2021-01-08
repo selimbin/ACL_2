@@ -5,7 +5,7 @@ import Addfaculty from "../../components/AddPages/AddFaculty";
 export class AddFaculty extends Component {
     render() {
         return (
-            <div class="AddPage">
+            <div>
                 <Navbar/>
                 <Addfaculty/>
             </div>
