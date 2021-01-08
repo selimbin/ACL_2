@@ -56,7 +56,7 @@ export class AddStaff extends Component {
                     <ToastContainer />
                     <div class="row">
                         <div class="col-25">
-                            <label for="name">Name</label>
+                            <label htmlfor="name">Name</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="name" name="name" placeholder="Enter the name.." onChange={this.myChangeHandler}></input>
@@ -64,7 +64,7 @@ export class AddStaff extends Component {
                     </div>
                     <div class="row">
                         <div class="col-25">
-                            <label for="email">Email</label>
+                            <label htmlfor="email">Email</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="email" name="email" placeholder="Enter the email.." onChange={this.myChangeHandler}></input>
@@ -72,7 +72,7 @@ export class AddStaff extends Component {
                     </div> 
                     <div class="row">
                         <div class="col-25">
-                            <label for="officelocation">Office Location</label>
+                            <label htmlfor="officelocation">Office Location</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="officelocation" name="officelocation" placeholder="Enter the office location.." onChange={this.myChangeHandler}></input>
@@ -80,7 +80,7 @@ export class AddStaff extends Component {
                     </div> 
                     <div class="row">
                         <div class="col-25">
-                            <label for="gender">Gender</label>
+                            <label htmlfor="gender">Gender</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="gender" name="gender" placeholder="Enter the Gender.." onChange={this.myChangeHandler}></input>
@@ -88,7 +88,7 @@ export class AddStaff extends Component {
                     </div> 
                     <div class="row">
                         <div class="col-25">
-                            <label for="department">Department</label>
+                            <label htmlfor="department">Department</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="department" name="department" placeholder="Enter the Department.." onChange={this.myChangeHandler}></input>
@@ -96,7 +96,7 @@ export class AddStaff extends Component {
                     </div> 
                     <div class="row">
                         <div class="col-25">
-                            <label for="role">Academic Role</label>
+                            <label htmlfor="role">Academic Role</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="role" name="role" placeholder="Enter the role.." onChange={this.myChangeHandler}></input>
@@ -104,7 +104,7 @@ export class AddStaff extends Component {
                     </div> 
                     <div class="row">
                         <div class="col-25">
-                            <label for="dayoff">dayoff</label>
+                            <label htmlfor="dayoff">dayoff</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="dayoff" name="dayoff" placeholder="Enter the dayoff.." onChange={this.myChangeHandler}></input>
@@ -112,14 +112,14 @@ export class AddStaff extends Component {
                     </div> 
                     <div class="row">
                         <div class="col-25">
-                            <label for="salary">Salary</label>
+                            <label htmlfor="salary">Salary</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="salary" name="salary" placeholder="Enter the Salary.." onChange={this.myChangeHandler}></input>
                         </div>
                     </div> 
                     <div class="row">
-                        <input type="submit" value="Submit"></input>
+                        <input type="submit" value="Add"></input>
                     </div>
                     </form>
                 </div>

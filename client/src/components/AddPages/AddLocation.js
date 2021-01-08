@@ -47,7 +47,7 @@ export class AddLocation extends Component {
                     <ToastContainer />
                     <div class="row">
                         <div class="col-25">
-                            <label for="code">Location Code</label>
+                            <label htmlfor="code">Location Code</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="code" name="code" placeholder="Enter the code.." onChange={this.myChangeHandler}></input>
@@ -55,7 +55,7 @@ export class AddLocation extends Component {
                     </div>
                     <div class="row">
                         <div class="col-25">
-                            <label for="building">Location's Building</label>
+                            <label htmlfor="building">Location's Building</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="building" name="building" placeholder="Enter the Building name.." onChange={this.myChangeHandler}></input>
@@ -63,7 +63,7 @@ export class AddLocation extends Component {
                     </div>
                     <div class="row">
                         <div class="col-25">
-                            <label for="type">Location Type</label>
+                            <label htmlfor="type">Location Type</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="type" name="type" placeholder="Enter the Type.." onChange={this.myChangeHandler}></input>
@@ -71,14 +71,14 @@ export class AddLocation extends Component {
                     </div>
                     <div class="row">
                         <div class="col-25">
-                            <label for="capacity">Capacity</label>
+                            <label htmlfor="capacity">Capacity</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="capacity" name="capacity" placeholder="Enter the Capacity.." onChange={this.myChangeHandler}></input>
                         </div>
                     </div>
                     <div class="row">
-                        <input type="submit" value="Submit"></input>
+                        <input type="submit" value="Add"></input>
                     </div>
                     </form>
                 </div>

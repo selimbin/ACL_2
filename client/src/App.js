@@ -3,14 +3,31 @@ import Navbar from "./components/Navbar/Navbar";
 import axios from 'axios';
 import {BrowserRouter as Router,Link,Route} from 'react-router-dom'
 import './App.css';
-// Images ------------
+// Images ----------------------
 // import viewprofile from './Images/View_Profile.png';
-// Routes ------------
+// Add Routes ------------------
 import AddStaff from './HRLayout/Add/AddStaff'
 import AddDepartment from './HRLayout/Add/AddDepartment'
 import AddFaculty from './HRLayout/Add/AddFaculty'
 import AddCourse from './HRLayout/Add/AddCourse'
 import AddLocation from './HRLayout/Add/AddLocation'
+import AddSignInOut from './HRLayout/Add/AddSignInOut'
+// Update Routes ---------------
+import UpdateStaff from './HRLayout/Update/UpdateStaff'
+import UpdateDepartment from './HRLayout/Update/UpdateDepartment'
+import UpdateFaculty from './HRLayout/Update/UpdateFaculty'
+import UpdateCourse from './HRLayout/Update/UpdateCourse'
+import UpdateLocation from './HRLayout/Update/UpdateLocation'
+import UpdateSalary from './HRLayout/Update/UpdateSalary'
+// Delete Routes ---------------
+import DeleteStaff from './HRLayout/Delete/DeleteStaff'
+import DeleteDepartment from './HRLayout/Delete/DeleteDepartment'
+import DeleteFaculty from './HRLayout/Delete/DeleteFaculty'
+import DeleteCourse from './HRLayout/Delete/DeleteCourse'
+import DeleteLocation from './HRLayout/Delete/DeleteLocation'
+// View Routes ------------------
+import ViewMissing from './HRLayout/View/ViewMissing'
+import ViewStaffAttendance from './HRLayout/View/ViewStaffAttendance'
 
 export class App extends Component {
   render() {
@@ -48,7 +65,35 @@ export class App extends Component {
       <Route exact path ="/addcourse" component = {AddCourse}>
       </Route>
       <Route exact path ="/addlocation" component = {AddLocation}>
-      </Route>      
+      </Route>
+      <Route exact path ="/addsigninout" component = {AddSignInOut}>
+      </Route>
+      <Route exact path ="/updatestaff" component = {UpdateStaff}>
+      </Route>
+      <Route exact path ="/updatedepartment" component = {UpdateDepartment}>
+      </Route>
+      <Route exact path ="/updatefaculty" component = {UpdateFaculty}>
+      </Route>
+      <Route exact path ="/updatecourse" component = {UpdateCourse}>
+      </Route>
+      <Route exact path ="/updatelocation" component = {UpdateLocation}>
+      </Route>
+      <Route exact path ="/updatesalary" component = {UpdateSalary}>
+      </Route>
+      <Route exact path ="/deletestaff" component = {DeleteStaff}>
+      </Route>
+      <Route exact path ="/deletedepartment" component = {DeleteDepartment}>
+      </Route>
+      <Route exact path ="/deletefaculty" component = {DeleteFaculty}>
+      </Route>
+      <Route exact path ="/deletecourse" component = {DeleteCourse}>
+      </Route>
+      <Route exact path ="/deletelocation" component = {DeleteLocation}>
+      </Route>
+      <Route exact path ="/viewmissing" component = {ViewMissing}>
+      </Route>
+      <Route exact path ="/viewstaffattendance" component = {ViewStaffAttendance}>
+      </Route>
       </Router>
     )
   }
