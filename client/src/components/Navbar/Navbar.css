@@ -149,73 +149,42 @@
     display: block;
   }
 
-  /* General button style */
-.btn {
-    border: none;
-    font-size: inherit;
-    color: inherit;
-    background: none;
-    cursor: pointer;
-    padding: 25px 80px;
+  .button {
     display: inline-block;
-    outline: none;
+    border-radius: 4px;
+    background-color: #585655;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 18px;
+    padding: 10px;
+    width: 120px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+  }
+  
+  .button span {
+    cursor: pointer;
+    display: inline-block;
     position: relative;
-    -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-    transition: all 0.3s;
+    transition: 0.5s;
   }
   
-  .btn:after {
-    content: '';
+  .button span:after {
+    content: '\00bb';
     position: absolute;
-    z-index: -1;
-    -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-    transition: all 0.3s;
-  }
-  
-  /* Pseudo elements for icons */
-  .btn:before {
-    font-family: 'FontAwesome';
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    position: relative;
-    -webkit-font-smoothing: antialiased;
-  }
-  
-  
-  /* Icon separator */
-  .btn-sep {
-    padding: 25px 60px 25px 120px;
-  }
-  
-  .btn-sep:before {
-    background: rgba(46, 43, 43, 0.15);
-  }
-  
-  /* Button 1 */
-  .btn-1 {
-    background: #555757;
-    color: #fff;
-  }
-  
-  .btn-1:hover {
-    background: #2980b9;
-  }
-  
-  .btn-1:active {
-    background: #2980b9;
-    top: 2px;
-  }
-  
-  .btn-1:before {
-    position: absolute;
-    height: 100%;
-    left: 0;
+    opacity: 0;
     top: 0;
-    line-height: 3;
-    width: 60px;
+    right: -20px;
+    transition: 0.5s;
+  }
+  
+  .button:hover span {
+    padding-right: 25px;
+  }
+  
+  .button:hover span:after {
+    opacity: 1;
+    right: 0;
   }
