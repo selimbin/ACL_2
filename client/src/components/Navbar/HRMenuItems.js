@@ -6,22 +6,12 @@ export const MenuItems = [
         dropdown: [
             {
                 title: 'View Profile',
-                url: '#',
+                url: 'viewprofile',
                 cName: 'nav-links',
             },
             {
                 title: 'Update Profile',
                 url: '#',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Sign In',
-                url: 'Home',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Sgn Out',
-                url: 'Home',
                 cName: 'nav-links',
             },
             {
