@@ -6,7 +6,7 @@ export const MenuItems = [
         dropdown: [
             {
                 title: 'View Profile',
-                url: '#',
+                url: 'viewprofile',
                 cName: 'nav-links',
             },
             {
