@@ -28,6 +28,7 @@ import DeleteLocation from './HRLayout/Delete/DeleteLocation'
 // View Routes ------------------
 import ViewMissing from './HRLayout/View/ViewMissing'
 import ViewStaffAttendance from './HRLayout/View/ViewStaffAttendance'
+import Login from './Login';
 
 export class App extends Component {
   render() {
@@ -93,7 +94,8 @@ export class App extends Component {
       <Route exact path ="/viewmissing" component = {ViewMissing}>
       </Route>
       <Route exact path ="/viewstaffattendance" component = {ViewStaffAttendance}>
-      </Route>
+      </Route>      
+      <Route  exact path="/login" component={Login} />
       </Router>
     )
   }
