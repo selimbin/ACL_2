@@ -42,14 +42,14 @@ export class AddFaculty extends Component {
                     <ToastContainer />
                     <div class="row">
                         <div class="col-25">
-                            <label for="name">Faculty name</label>
+                            <label htmlfor="name">Faculty name</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="name" name="name" placeholder="Enter the name.." onChange={this.myChangeHandler}></input>
                         </div>
                     </div>
                     <div class="row">
-                        <input type="submit" value="Submit"></input>
+                        <input type="submit" value="Add"></input>
                     </div>
                     </form>
                 </div>

@@ -5,7 +5,7 @@ import Addlocation from "../../components/AddPages/AddLocation";
 export class AddLocation extends Component {
     render() {
         return (
-            <div class="AddPage">
+            <div>
                 <Navbar/>
                 <Addlocation/>
             </div>

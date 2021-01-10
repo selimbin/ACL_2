@@ -5,7 +5,7 @@ import Addcourse from "../../components/AddPages/AddCourse";
 export class AddCourse extends Component {
     render() {
         return (
-            <div class="AddPage">
+            <div>
                 <Navbar/>
                 <Addcourse/>
             </div>
