@@ -11,6 +11,7 @@ import AddDepartment from './HRLayout/Add/AddDepartment'
 import AddFaculty from './HRLayout/Add/AddFaculty'
 import AddCourse from './HRLayout/Add/AddCourse'
 import AddLocation from './HRLayout/Add/AddLocation'
+import Login from './Login';
 
 export class App extends Component {
   render() {
@@ -49,6 +50,7 @@ export class App extends Component {
       </Route>
       <Route exact path ="/addlocation" component = {AddLocation}>
       </Route>      
+      <Route  exact path="/login" component={Login} />
       </Router>
     )
   }
