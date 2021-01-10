@@ -1291,11 +1291,14 @@ router.route('/AddStaff')
 //--------------------------------------------------------------------
 // Update a staff member ---------------------------------------------
 
-router.route('/Updatetaff')
+router.route('/UpdateStaff')
 .put(async (req,res)=>{
     const {id,name,email,officelocation,role,dayoff,department}=req.body;
     try {
         if (req.user.role  == "HR") {
+            if(!id){
+                return res.status(400).json({msg:"Please enter a valid id"});
+            }
             const existingstaff = await staff_model.findOne({id:id})
             let Updatename = name,Updateemail = existingstaff.email,Updaterole = role,Updatelocation = officelocation,Updatedayoff = dayoff,Updatedepartment = department;
             if(!existingstaff){
@@ -1681,6 +1684,9 @@ router.route('/UpdateSalary')
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
             let currentstaffattendance = await scheduleAttendance_model.findOne({id:id})
+            if(!currentstaffattendance){
+                return res.status(400).json({msg:"This staff has no sign in/out records yet!"});
+            }
             let misseddays = currentstaffattendance.missedDays
             let missedhours = currentstaffattendance.missedHours - 3
             let newsalary = existingstaff.salary
@@ -1721,11 +1727,39 @@ router.route('/AddsignIn')
     const{id,date,Time} = req.body;
     try {
         if (req.user.role  == "HR") {
+            if(!id || !date || !Time){
+                return res.status(400).json({msg:"Please enter a valid id, date and Time"});
+            }
+            const existingstaff = await staff_model.findOne({id:id});
+            if(!existingstaff){
+                return res.status(400).json({msg:"No Staff with this id exists"});
+            }
+            if(date.substring(2,3) != ("/") && date.substring(5,6) != ("/")){
+                return res.status(400).json({msg:"Please enter a valid date format Ex: 01/07/2021"});
+            }
+            if(Time.substring(2,3) != (":")){
+                return res.status(400).json({msg:"Please enter a valid Time format Ex: 10:30"});
+            }
             var year = date.substring(6,10);
+            if(year.length != 4){
+                return res.status(400).json({msg:"Please enter a valid Year"});
+            }
             var month = date.substring(0,2);
+            if(month.length != 2 || month <= 0 || month >= 13){
+                return res.status(400).json({msg:"Please enter a valid month between 01 and 12"});
+            }
             var date1 = date.substring(3,5);
+            if(date1.length != 2 || date1 <=0 || date1 >= 32){
+                return res.status(400).json({msg:"Please enter a valid Date between 01 and 31"});
+            }
             var hour = Time.substring(0,2);
+            if(hour.length != 2 || hour < 0 || hour > 24){
+                return res.status(400).json({msg:"Please enter a valid hour between 00 and 23"});
+            }
             var minute = Time.substring(3,5);
+            if(minute.length != 2 || minute < 0 || minute > 59){
+                return res.status(400).json({msg:"Please enter a valid minute between 00 and 59"});
+            }
             var today = new Date();
             today.setFullYear(year)
             today.setMonth(month-1)
@@ -1733,10 +1767,10 @@ router.route('/AddsignIn')
             today.setHours(hour)
             today.setMinutes(minute)
             if(today.toTimeString().substring(0,2)>"19"){
-                res.send("You cannot add a sign in after 7PM")
+                return res.status(400).json({msg:"You cannot add a sign in after 7PM"});
             }
             if(today.toTimeString().substring(0,2)<"07"){
-                res.send("You cannot add a sign in before 7AM")
+                return res.status(400).json({msg:"You cannot add a sign in before 7AM"});
             }
             const user= await staff_model.findOne({id:id})
             var attendance= await attendance_model.findOne({"id":id,"date":today.toLocaleString().substring(0,10)})
@@ -1824,11 +1858,39 @@ router.route('/AddsignOut')
     const{id,date,Time} = req.body;
     try {
         if (req.user.role  == "HR") {
+            if(!id || !date || !Time){
+                return res.status(400).json({msg:"Please enter a valid id, date and Time"});
+            }
+            const existingstaff = await staff_model.findOne({id:id});
+            if(!existingstaff){
+                return res.status(400).json({msg:"No Staff with this id exists"});
+            }
+            if(date.substring(2,3) != ("/") && date.substring(5,6) != ("/")){
+                return res.status(400).json({msg:"Please enter a valid date format Ex: 01/07/2021"});
+            }
+            if(Time.substring(2,3) != ":"){
+                return res.status(400).json({msg:"Please enter a valid Time format Ex: 10:30"});
+            }
             var year = date.substring(6,10);
+            if(year.length != 4){
+                return res.status(400).json({msg:"Please enter a valid Year"});
+            }
             var month = date.substring(0,2);
+            if(month.length != 2 || month <= 0 || month >= 13){
+                return res.status(400).json({msg:"Please enter a valid month between 01 and 12"});
+            }
             var date1 = date.substring(3,5);
+            if(date1.length != 2 || date1 <=0 || date1 >= 32){
+                return res.status(400).json({msg:"Please enter a valid Date between 01 and 31"});
+            }
             var hour = Time.substring(0,2);
+            if(hour.length != 2 || hour < 0 || hour > 24){
+                return res.status(400).json({msg:"Please enter a valid hour between 00 and 23"});
+            }
             var minute = Time.substring(3,5);
+            if(minute.length != 2 || minute < 0 || minute > 59){
+                return res.status(400).json({msg:"Please enter a valid minute between 00 and 59"});
+            }
             var today = new Date();
             today.setFullYear(year)
             today.setMonth(month-1)
@@ -1836,10 +1898,10 @@ router.route('/AddsignOut')
             today.setHours(hour)
             today.setMinutes(minute)
             if(today.toTimeString().substring(0,2)>"19"){
-                res.send("You cannot add a sign in after 7PM")
+                return res.status(400).json({msg:"You cannot add a sign out after 7PM"});
             }
             if(today.toTimeString().substring(0,2)<"07"){
-                res.send("You cannot add a sign out before 7AM")
+                return res.status(400).json({msg:"You cannot add a sign out before 7AM"});
             }
             const user= await staff_model.findOne({id:id})
             const attendance= await attendance_model.findOne({"id":user.id,
@@ -1852,10 +1914,10 @@ router.route('/AddsignOut')
                 schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
             }
             if(!attendance||!schedule_attendance){
-                res.send("You did not sign in today")
+                return res.status(400).json({msg:"You did not sign in today"});
             }else{
                 if(attendance.signIn.length!=(attendance.signOut.length+1)){
-                    res.send("You did not sign in")
+                    return res.status(400).json({msg:"You did not sign in"});
                 }
                 else{
                     attendance.signOut.push(today)
@@ -1890,7 +1952,7 @@ router.route('/AddsignOut')
 // view staff attendance ---------------------------------------------
 
 router.route('/viewStaffAttendance')
-.get(async (req,res)=>{
+.post(async (req,res)=>{
     const {id}=req.body;
     try {
         if (req.user.role  == "HR") {
@@ -1899,7 +1961,7 @@ router.route('/viewStaffAttendance')
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
             const staffAttendance = await scheduleAttendance_model.findOne({id:id});
-            res.send(staffAttendance);
+            res.send(staffAttendance.days);
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
@@ -1918,14 +1980,30 @@ router.route('/Viewmissed')
             let allstaff = [];
             for(var i = 0; i< existingattendance.length; i = i+1){
                 const onestaff = await staff_model.findOne({id:existingattendance[i].id})
-                allstaff.push(onestaff)
+                if(onestaff){
+                    allstaff.push({name:onestaff.name,id:onestaff.id,missedDays:existingattendance[i].missedDays,missedHours:existingattendance[i].missedHours})
+                }
             }
             existingattendance = await scheduleAttendance_model.find({missedDays:{$gte:1}});
             for(var i = 0; i< existingattendance.length; i = i+1){
                 const onestaff = await staff_model.findOne({id:existingattendance[i].id})
-                allstaff.push(onestaff)
+                if(onestaff){
+                    allstaff.push({name:onestaff.name,id:onestaff.id,missedDays:existingattendance[i].missedDays,missedHours:existingattendance[i].missedHours})
+                }
             }
-            res.send(allstaff)
+            let unique = [allstaff[0]];
+            for(var i = 1; i < allstaff.length; i++){
+                let found = false;
+                for(var j = 0; j < unique.length; j++){
+                    if(allstaff[i].id == unique[j].id){
+                        found = true;
+                    }
+                }
+                if(found == false){
+                    unique.push(allstaff[i]);
+                }
+            }
+            res.send(unique)
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
