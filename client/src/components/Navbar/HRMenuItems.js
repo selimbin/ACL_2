@@ -15,16 +15,6 @@ export const MenuItems = [
                 cName: 'nav-links',
             },
             {
-                title: 'Sign In',
-                url: 'Home',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Sgn Out',
-                url: 'Home',
-                cName: 'nav-links',
-            },
-            {
                 title: 'Reset Password',
                 url: '#',
                 cName: 'nav-links',

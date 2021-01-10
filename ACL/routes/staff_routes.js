@@ -1960,8 +1960,33 @@ router.route('/viewStaffAttendance')
             if(!existingstaff){
                 return res.status(400).json({msg:"Please enter a valid id"});
             }
-            const staffAttendance = await scheduleAttendance_model.findOne({id:id});
-            res.send(staffAttendance.days);
+            const staffAttendance = await scheduleAttendance_model.find({id:id});
+            let allstaffattendance = [];
+            for(var i = 0;i < staffAttendance.length; i++){
+                allstaffattendance.push(staffAttendance[i].days);
+            }
+            let allstaffattendance2 = [];
+            for(var i = 0; i<allstaffattendance.length;i++){
+                for(var j = 0; j<allstaffattendance[i].length;j++){
+                    const oldattendance = allstaffattendance[i][j];
+                    let fixedsigns = oldattendance.signIn
+                    let newsigns1 = [];
+                    for(var k = 0;k<fixedsigns.length;k++){
+                        newsigns1.push(fixedsigns[k]);
+                        newsigns1.push(" / ");
+                    }
+                    let fixedsigns2 = oldattendance.signOut
+                    let newsigns2 = [];
+                    for(var k = 0;k<fixedsigns2.length;k++){
+                        newsigns2.push(fixedsigns2[k]);
+                        newsigns2.push(" / ");
+                    }
+                    let jsonattendance = {date:allstaffattendance[i][j].date,month:allstaffattendance[i][j].month,id:allstaffattendance[i][j].id,
+                    day:allstaffattendance[i][j].day,signIn:newsigns1,signOut:newsigns2}
+                    allstaffattendance2.push(jsonattendance);
+                }
+            }
+            res.send(allstaffattendance2);
         } else {
             return res.status(401).json({msg:"unauthorized"});
         }
