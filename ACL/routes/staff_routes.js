@@ -2273,28 +2273,25 @@ router.route('/resetPassword')
 // // view attendance ---------------------------------------------------
 
 router.route('/viewAttendance')
-.get(async (req,res)=>{
+.post(async (req,res)=>{
+    const {month} = req.body;
     try{
         var today =  new Date()
+        let attendance;
+        let finalattendance = [];
         const user= await staff_model.findById(req.user._id)
-        if(req.body.month==null){
-            const attendance = await attendance_model.find({id:user.id})
-            if(attendance==null){
-                res.send("You have not attende anything yet")
-            }
-            else{
-                res.send(attendance)
-            }
+        if(!month){
+            attendance = await attendance_model.find({id:user.id})
         }
         else{
-            const attendance = await attendance_model.find({id:user.id,month:req.body.month}) 
-            if(attendance==null){
-                res.send("You have no attende in this month")
+            if(month < 0 || month > 12){
+                return res.status(400).json({msg:"Please enter a valid month"});
             }
             else{
-                res.send(attendance)
+                attendance = await attendance_model.find({id:user.id,month:month})
             }
         }
+        res.send(attendance);
     }
     catch(error){
         res.status(500).json({error:error.message});
@@ -2316,7 +2313,7 @@ router.route('/viewMissingDays')
             schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
         }
         if(schedule_attendance==null){
-            res.send("You're missing days have not yet been calculated this month")
+            return res.status(400).json({msg:"Your missing days have not yet been calculated this month"});
         }
         else{
             res.send(schedule_attendance.missedDays.toString())
@@ -2342,7 +2339,7 @@ router.route('/viewMissingHours')
             schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
         }
         if(schedule_attendance==null){
-            res.send("You're missing hours have not yet been calculated this month")
+            return res.status(400).json({msg:"Your missing hours have not yet been calculated this month"});
         }
         else{
             res.send(schedule_attendance.missedHours.toString())

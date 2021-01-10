@@ -24,7 +24,7 @@ class Navbar extends Component {
                                         <a Class={item.cName} href ={item.url}>
                                             {item.title}
                                         </a>
-                                        <ul Class="dropdown-content">
+                                        <div Class="dropdown-content">
                                             {item.dropdown.map((item,index) => {
                                                 return (
                                                     <li key={index}>
@@ -34,7 +34,7 @@ class Navbar extends Component {
                                                     </li>
                                                 )
                                             })}
-                                        </ul>
+                                        </div>
                                     </div>
                                 </li>
                             )
