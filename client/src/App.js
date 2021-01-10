@@ -30,6 +30,8 @@ import ViewMissing from './HRLayout/View/ViewMissing'
 import ViewStaffAttendance from './HRLayout/View/ViewStaffAttendance'
 // Services Routes
 import ViewProfile from './GeneralLayout/ViewProfile'
+import Login from './Login';
+
 
 export class App extends Component {
   render() {
@@ -98,6 +100,8 @@ export class App extends Component {
       </Route>
       <Route exact path ="/viewprofile" component = {ViewProfile}>
       </Route>
+      </Route>      
+      <Route  exact path="/login" component={Login} />
       </Router>
     )
   }
