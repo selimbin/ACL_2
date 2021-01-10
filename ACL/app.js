@@ -617,8 +617,8 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
     }
 });
 app.use('/seed', seed_routes)
-app.use('', AuthenticationRoutes)
 app.use(cors());
+app.use('', AuthenticationRoutes)
 
 app.use(async(req, res, next)=>{
     const token= req.headers.token
