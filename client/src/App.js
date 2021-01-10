@@ -41,24 +41,6 @@ export class App extends Component {
         <div class="App">
           <Navbar/>
         </div>
-        {/* <div Class="flexContainer">
-          <div class="container">
-            <a href = "Ops">
-              <img Class="Images" src= {viewprofile} alt= 'View profile icon' />
-              <div class="overlay">
-                  <div class="text">View Profile</div>
-              </div>
-            </a>
-          </div> 
-          <div class="container2">
-            <a href = "Ops">
-              <img Class="Images" src= {viewprofile} alt= 'View profile icon' />
-              <div class="overlay">
-                  <div class="text">View Profile</div>
-              </div>
-            </a>
-          </div> 
-        </div> */}
       </Route>
       <Route exact path ="/addstaff" component = {AddStaff}>
       </Route>
@@ -99,9 +81,9 @@ export class App extends Component {
       <Route exact path ="/viewstaffattendance" component = {ViewStaffAttendance}>
       </Route>
       <Route exact path ="/viewprofile" component = {ViewProfile}>
-      </Route>
       </Route>      
-      <Route  exact path="/login" component={Login} />
+      <Route  exact path="/login" component={Login}>
+      </Route>
       </Router>
     )
   }

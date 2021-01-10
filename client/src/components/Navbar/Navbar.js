@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { MenuItems } from "./HRMenuItems";
 import './Navbar.css'
-import { Button } from "../Button"
-
 
 class Navbar extends Component {
     state = { clicked: false }
@@ -42,7 +40,7 @@ class Navbar extends Component {
                             )
                         })}
                     </ul>
-                    <button class="btn btn-1 btn-sep icon-info">LogOut</button>
+                    <button class="button"><span>LogOut </span></button>
                 </nav>
             )
         }
