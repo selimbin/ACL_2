@@ -7,19 +7,17 @@ import './ViewPage.css'
 export class ViewStaffAttendance extends Component {
     state = {
         id:'',
-        staff:[axios],
-        signins:[],
-        signouts:[]
+        staff:[axios]
     }
 
-    mySubmitHandler = event => {
+    mySubmitHandler = async event => {
         event.preventDefault();
 
         const staff = {
             id:this.state.id
         }
 
-        axios.post("http://localhost:5000/staff/viewStaffAttendance", staff ,{
+        await axios.post("http://localhost:5000/staff/viewStaffAttendance", staff ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -27,7 +25,7 @@ export class ViewStaffAttendance extends Component {
                 "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
             }
         })
-        .then(res =>this.setState({staff:res.data,signins:res.data[0].signIn,signouts:res.data[0].signOut}))
+        .then(res => this.setState({staff:res.data}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
 
@@ -70,16 +68,8 @@ export class ViewStaffAttendance extends Component {
                                     <td>{item.month}</td>
                                     <td>{item.day}</td>
                                     <td>{item.date}</td>
-                                    <td>{this.state.signins.map((n) => {
-                                        return (
-                                            <li>{n}</li>
-                                        )
-                                    })}</td>
-                                    <td>{this.state.signouts.map((n) => {
-                                        return (
-                                            <li>{n}</li>
-                                        )
-                                    })}</td>
+                                    <td>{item.signIn}</td>
+                                    <td>{item.signOut}</td>
                                 </tr>
                             )
                         })}

@@ -4,7 +4,6 @@ import axios from 'axios';
 import {BrowserRouter as Router,Link,Route} from 'react-router-dom'
 import './App.css';
 // Images ----------------------
-// import viewprofile from './Images/View_Profile.png';
 // Add Routes ------------------
 import AddStaff from './HRLayout/Add/AddStaff'
 import AddDepartment from './HRLayout/Add/AddDepartment'
@@ -28,34 +27,22 @@ import DeleteLocation from './HRLayout/Delete/DeleteLocation'
 // View Routes ------------------
 import ViewMissing from './HRLayout/View/ViewMissing'
 import ViewStaffAttendance from './HRLayout/View/ViewStaffAttendance'
+// Services Routes --------------
+import ViewProfile from './GeneralLayout/ViewProfile'
+import ViewAttendance from './GeneralLayout/ViewAttendance'
+import ViewMissingDaysHours from './GeneralLayout/ViewMissingDaysHours'
 import Login from './Login';
+// Home Routes ------------------
+import HrHome from './HrHome'
+
 
 export class App extends Component {
   render() {
     return (
       <Router> 
-      <Route path ="/Home">
+      <Route path ="/">
         <div class="App">
-          <Navbar/>
         </div>
-        {/* <div Class="flexContainer">
-          <div class="container">
-            <a href = "Ops">
-              <img Class="Images" src= {viewprofile} alt= 'View profile icon' />
-              <div class="overlay">
-                  <div class="text">View Profile</div>
-              </div>
-            </a>
-          </div> 
-          <div class="container2">
-            <a href = "Ops">
-              <img Class="Images" src= {viewprofile} alt= 'View profile icon' />
-              <div class="overlay">
-                  <div class="text">View Profile</div>
-              </div>
-            </a>
-          </div> 
-        </div> */}
       </Route>
       <Route exact path ="/addstaff" component = {AddStaff}>
       </Route>
@@ -94,8 +81,17 @@ export class App extends Component {
       <Route exact path ="/viewmissing" component = {ViewMissing}>
       </Route>
       <Route exact path ="/viewstaffattendance" component = {ViewStaffAttendance}>
-      </Route>      
-      <Route  exact path="/login" component={Login} />
+      </Route>
+      <Route exact path ="/viewprofile" component = {ViewProfile}>
+      </Route>
+      <Route exact path ="/viewattendance" component = {ViewAttendance}>
+      </Route>
+      <Route exact path ="/viewmissingdayshours" component = {ViewMissingDaysHours}>
+      </Route>     
+      <Route  exact path="/login" component={Login}>
+      </Route>
+      <Route  exact path="/HrHome" component={HrHome}>
+      </Route>
       </Router>
     )
   }

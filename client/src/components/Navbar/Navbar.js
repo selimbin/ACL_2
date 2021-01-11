@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { MenuItems } from "./HRMenuItems";
 import './Navbar.css'
-import { Button } from "../Button"
-
 
 class Navbar extends Component {
     state = { clicked: false }
@@ -26,7 +24,7 @@ class Navbar extends Component {
                                         <a Class={item.cName} href ={item.url}>
                                             {item.title}
                                         </a>
-                                        <ul Class="dropdown-content">
+                                        <div Class="dropdown-content">
                                             {item.dropdown.map((item,index) => {
                                                 return (
                                                     <li key={index}>
@@ -36,13 +34,13 @@ class Navbar extends Component {
                                                     </li>
                                                 )
                                             })}
-                                        </ul>
+                                        </div>
                                     </div>
                                 </li>
                             )
                         })}
                     </ul>
-                    <button class="btn btn-1 btn-sep icon-info">LogOut</button>
+                    <button class="button"><span>LogOut </span></button>
                 </nav>
             )
         }
