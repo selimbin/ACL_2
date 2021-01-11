@@ -2329,7 +2329,7 @@ router.route('/viewMissingHours')
 })
 
 //--------------------------------------------------------------------
-// view Schedule -----------------------------------------------------
+// Tony Start -----------------------------------------------------
 
 router.route('/viewschedule')
 .get(async(req,res)=>{
@@ -2339,6 +2339,16 @@ router.route('/viewschedule')
     res.send(Schedule)
 }else
 res.send('HR cants view schedules of any kind')
+})
+
+router.route('/viewReplacementReq')
+.get(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    if(user.role!='HR'){
+        const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
+        res.send(myrequests)
+    }else
+        res.send('HR cants have requests or view of any kind')
 })
 
 router.route('/sendReplacmentReq')
@@ -2367,15 +2377,6 @@ router.route('/sendReplacmentReq')
 res.send('HR cants have requests of any kind')
 })
 
-router.route('/viewReplacementReq')
-.get(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-        const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
-        res.send(myrequests)
-    }else
-        res.send('HR cants have requests or view of any kind')
-})
 router.route('/slotlinkingrequest')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
@@ -2410,7 +2411,6 @@ router.route('/changeDayOffReq')
 res.send('HR cants have requests of any kind')
 })
 
-
 router.route('/AnnualLeaveReq')
 .post(async(req,res)=>{
     if(req.body.date==null||req.body.date.length!=10){
@@ -2439,10 +2439,10 @@ router.route('/AnnualLeaveReq')
                 
         }else
         res.send('HR cants have requests of any kind')
-    })
+})
 
-    router.route('/CompensationLeaveReq')
-    .post(async(req,res)=>{
+router.route('/CompensationLeaveReq')
+.post(async(req,res)=>{
         if(req.body.date==null||req.body.date.length!=10){
             res.send("Enter date request will take effect of format MM/DD/YYYY")
         }
@@ -2467,9 +2467,7 @@ router.route('/AnnualLeaveReq')
 }      
    else
    res.send('HR cants have requests of any kind')
-                })
-
-
+})
 
 router.route('/MaternityLeaveReq')
 .post(async(req,res)=>{
@@ -2493,13 +2491,6 @@ router.route('/MaternityLeaveReq')
     }else
        res.send('HR cants have requests of any kind')
 })
-
-
-
-
-
-
-
 
 router.route('/accidentalLeaveReq')
 .post(async(req,res)=>{
@@ -2528,6 +2519,7 @@ router.route('/accidentalLeaveReq')
    }else
    res.send('HR cants have requests of any kind') 
 })
+
 router.route('/sickleaveReq')
 .post(async(req,res)=>{
     if(req.body.date==null||req.body.date.length!=10){
@@ -2552,9 +2544,8 @@ router.route('/sickleaveReq')
         res.send('HR cants have requests of any kind')
 })
 
-
- router.route('/Notification')
- .get(async(req,res)=>{
+router.route('/Notification')
+.get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
      const reqests = await request_model.findOne({requester:user.id})
@@ -2563,7 +2554,7 @@ router.route('/sickleaveReq')
      }
     }else
     res.send('HR cant be notified of anything')
- })
+})
 
 router.route('/viewAcceptedRequests')
 .get(async(req,res)=>{
@@ -2638,6 +2629,9 @@ router.route('/cancelRequests')
     }else
     res.send('HR cants have requests of any kind')
 })
+
+//Tony ends here
+
 //--------------------------------------------------------------------
 // HOD assign instructor ---------------------------------------------
 
