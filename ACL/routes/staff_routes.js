@@ -2046,7 +2046,7 @@ router.route('/logout')
         const user=await staff_model.findById(req.user._id);
         user.token = null
         await staff_model.findOneAndUpdate({_id:req.user._id},user)
-        res.send("logged out")
+        res.status(400).json({msg:"logged out"})
     }
     catch(error){
         res.status(500).json({error:error.message});

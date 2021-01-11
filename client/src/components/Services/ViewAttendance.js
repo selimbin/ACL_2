@@ -23,7 +23,7 @@ export class ViewAttendance extends Component {
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxYTk0NTQyOTY3MTA2ZjRlNmQ0ZTciLCJyb2xlIjoibGVjdHVyZXIiLCJpYXQiOjE2MTAzMDIwOTF9.FLCkX5Zsjk_omdH-M4k_diewI28Vl22uLlEgG_kEjNE",
+                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmZjMTNjN2RmNWMyZDBjMTNjZjhmMGIiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MTAzNTYyODR9.jgfhhVw69vXLLY54BGFEkK3XixGdoDkg7KgzCgTsqMg",
             }
         }).then(
           res => this.setState({attendance:res.data}))
