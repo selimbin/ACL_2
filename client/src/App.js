@@ -1,6 +1,4 @@
 import React, { Component } from 'react'
-import Navbar from "./components/Navbar/Navbar";
-import axios from 'axios';
 import {BrowserRouter as Router,Link,Route} from 'react-router-dom'
 import './App.css';
 // Images ----------------------

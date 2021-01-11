@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { MenuItems } from "./HRMenuItems";
-import { useHistory } from "react-router-dom";
 import axios from "axios";
 import './Navbar.css'
 
@@ -18,9 +17,10 @@ class Navbar extends Component {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ"
+                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmZjMTNjN2RmNWMyZDBjMTNjZjhmMGIiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MTA0MDA1MDZ9.-i-mNE4ZyzEa3N_UJADpbq3d_lZV4e8siRvspLcuhf4"
             }})
         .then((res) => window.location.href='/Login')
+        .catch((err) => console.log(err.eresponse.data.msg))
     }  
 
     render(){
@@ -54,7 +54,7 @@ class Navbar extends Component {
                             )
                         })}
                     </ul>
-                    <button href="Login" class="button" onClick={this.logout} ><span>LogOut </span></button>
+                    <button class="button" onClick={this.logout} ><span>LogOut </span></button>
                 </nav>
             )
         }
