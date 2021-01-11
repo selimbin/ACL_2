@@ -3,14 +3,18 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
+import useToken from '../useToken.js';
 
 export class ViewStaffAttendance extends Component {
+    // const [token, setToken] = useState();
+    
     state = {
         id:'',
         staff:[axios]
     }
 
     mySubmitHandler = async event => {
+        const { token, setToken } = useToken();
         event.preventDefault();
 
         const staff = {
@@ -22,7 +26,7 @@ export class ViewStaffAttendance extends Component {
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
+                "token":token,
             }
         })
         .then(res => this.setState({staff:res.data}))

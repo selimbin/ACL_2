@@ -51,9 +51,9 @@ router.route('/Seed')
         let password = "alisaad"
         const salt= await bcrypt.genSalt(10)
         password = await bcrypt.hash(password, salt)
-        const newStaff = new Staff_model({id:"HR-ali",name:"Ali Saad",email:"ali.othman@guc.edu.eg",password:"alisaad",
+        const newStaff = new Staff_model({id:"HR-ali",name:"Ali Saad",email:"ali.othman@guc.edu.eg",password:password,
         role:"HR",salary:100000,dayOff:"saturday",officeLocation:"A1-105",
-        misseddays:0,missedHours:0,department:"IDK"});
+        misseddays:0,missedHours:0,department:"IDK",gender:"M"});
         await newStaff.save();
         const seedStaffcount = new Staffcount_model({id:"1",HR:1,Academic:1});
         await seedStaffcount.save();

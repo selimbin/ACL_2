@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import Navbar from "./components/Navbar/Navbar";
 import axios from 'axios';
-import {BrowserRouter as Router,Link,Route} from 'react-router-dom'
+import {BrowserRouter as Router,Link,Route,Switch} from 'react-router-dom'
 import './App.css';
 // Images ----------------------
 // import viewprofile from './Images/View_Profile.png';
@@ -31,62 +31,89 @@ import ViewStaffAttendance from './HRLayout/View/ViewStaffAttendance'
 // Services Routes
 import ViewProfile from './GeneralLayout/ViewProfile'
 import Login from './Login';
+import useToken from './components/useToken.js';
 
 
-export class App extends Component {
-  render() {
-    return (
-      <Router> 
-      <Route path ="/Home">
-        <div class="App">
-          <Navbar/>
-        </div>
-      </Route>
-      <Route exact path ="/addstaff" component = {AddStaff}>
-      </Route>
-      <Route exact path ="/adddepartment" component = {AddDepartment}>
-      </Route>
-      <Route exact path ="/addfaculty" component = {AddFaculty}>
-      </Route>
-      <Route exact path ="/addcourse" component = {AddCourse}>
-      </Route>
-      <Route exact path ="/addlocation" component = {AddLocation}>
-      </Route>
-      <Route exact path ="/addsigninout" component = {AddSignInOut}>
-      </Route>
-      <Route exact path ="/updatestaff" component = {UpdateStaff}>
-      </Route>
-      <Route exact path ="/updatedepartment" component = {UpdateDepartment}>
-      </Route>
-      <Route exact path ="/updatefaculty" component = {UpdateFaculty}>
-      </Route>
-      <Route exact path ="/updatecourse" component = {UpdateCourse}>
-      </Route>
-      <Route exact path ="/updatelocation" component = {UpdateLocation}>
-      </Route>
-      <Route exact path ="/updatesalary" component = {UpdateSalary}>
-      </Route>
-      <Route exact path ="/deletestaff" component = {DeleteStaff}>
-      </Route>
-      <Route exact path ="/deletedepartment" component = {DeleteDepartment}>
-      </Route>
-      <Route exact path ="/deletefaculty" component = {DeleteFaculty}>
-      </Route>
-      <Route exact path ="/deletecourse" component = {DeleteCourse}>
-      </Route>
-      <Route exact path ="/deletelocation" component = {DeleteLocation}>
-      </Route>
-      <Route exact path ="/viewmissing" component = {ViewMissing}>
-      </Route>
-      <Route exact path ="/viewstaffattendance" component = {ViewStaffAttendance}>
-      </Route>
-      <Route exact path ="/viewprofile" component = {ViewProfile}>
-      </Route>      
-      <Route  exact path="/login" component={Login}>
-      </Route>
-      </Router>
-    )
+
+function App(){
+  // render() {
+  const { token, setToken } = useToken();
+  if(!token) {
+    return <Login setToken={setToken} />
   }
+    return (
+      <div className="wrapper">
+      <BrowserRouter>
+        <Switch>
+          <Route path="/Home">
+            < div class="App">
+              <Navbar/>
+            </div>
+          </Route>
+          <Route path="/addStaff"> 
+            <AddStaff />
+          </Route>
+          <Route path="/viewstaffattendance">
+            <ViewStaffAttendance />
+          </Route>
+          <Route path="/adddepartment">
+            <AddDepartment />
+          </Route>
+        </Switch>
+
+      </BrowserRouter>
+      </div>
+      // <Router> 
+      // <Route path ="/Home">
+      //   <div class="App">
+      //     <Navbar/>
+      //   </div>
+      // </Route>
+      // <Route exact path ="/addstaff" component = {AddStaff}>
+      // </Route>
+      // <Route exact path ="/adddepartment" component = {AddDepartment}>
+      // </Route>
+      // <Route exact path ="/addfaculty" component = {AddFaculty}>
+      // </Route>
+      // <Route exact path ="/addcourse" component = {AddCourse}>
+      // </Route>
+      // <Route exact path ="/addlocation" component = {AddLocation}>
+      // </Route>
+      // <Route exact path ="/addsigninout" component = {AddSignInOut}>
+      // </Route>
+      // <Route exact path ="/updatestaff" component = {UpdateStaff}>
+      // </Route>
+      // <Route exact path ="/updatedepartment" component = {UpdateDepartment}>
+      // </Route>
+      // <Route exact path ="/updatefaculty" component = {UpdateFaculty}>
+      // </Route>
+      // <Route exact path ="/updatecourse" component = {UpdateCourse}>
+      // </Route>
+      // <Route exact path ="/updatelocation" component = {UpdateLocation}>
+      // </Route>
+      // <Route exact path ="/updatesalary" component = {UpdateSalary}>
+      // </Route>
+      // <Route exact path ="/deletestaff" component = {DeleteStaff}>
+      // </Route>
+      // <Route exact path ="/deletedepartment" component = {DeleteDepartment}>
+      // </Route>
+      // <Route exact path ="/deletefaculty" component = {DeleteFaculty}>
+      // </Route>
+      // <Route exact path ="/deletecourse" component = {DeleteCourse}>
+      // </Route>
+      // <Route exact path ="/deletelocation" component = {DeleteLocation}>
+      // </Route>
+      // <Route exact path ="/viewmissing" component = {ViewMissing}>
+      // </Route>
+      // <Route exact path ="/viewstaffattendance" component = {ViewStaffAttendance}>
+      // </Route>
+      // <Route exact path ="/viewprofile" component = {ViewProfile}>
+      // </Route>      
+      // <Route  exact path="/login" component={Login}>
+      // </Route>
+      // </Router>
+    );
+  // }
 }
 
 export default App;

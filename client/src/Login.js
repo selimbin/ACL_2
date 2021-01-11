@@ -12,6 +12,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import axios from "axios";
+import PropTypes from 'prop-types';
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -60,8 +61,8 @@ const useStyles = makeStyles((theme) => ({
 }));
   
 
-export default function Login() {
-
+export default function Login({ setToken }) {
+  // let history = useHistory();
   var state={
     email:'',
     password:''
@@ -85,7 +86,7 @@ export default function Login() {
 }
   const handleClick = event => {
     event.preventDefault();
-    var self = this;
+    // var self = this;
     const payload={
       email:state.email,
       password:state.password
@@ -98,6 +99,7 @@ export default function Login() {
       }
     })
     .then(function (response) {
+      // alert("here")
       // console.log(response);
       if(response.data == 'You need to sign up first or incorrect email'){
         console.log("Username does not exists");
@@ -108,22 +110,27 @@ export default function Login() {
         alert("username password do not match")
       }
       else{
-        console.log("Login successfull");
+        // console.log("Login successfull");
         // alert(response.data)
-        var uploadScreen=[];
-        uploadScreen.push(<UploadScreen appContext={self.props.appContext}/>)
-        self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
+        // var uploadScreen=[];
+        // uploadScreen.push(<UploadScreen appContext={self.props.appContext}/>)
+        // self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
+        setToken(response.data);
+        // return;
+        // history.push("/Home");
       }
     })
     .catch(function (error) {
+      alert(error)
       console.log(error);
     });
     }
 
-  const history = useHistory();
+  
   const classes = useStyles(); 
   
   return (
+    <div className='login-wrapper'>
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
@@ -176,5 +183,9 @@ export default function Login() {
         </div>
       </Grid>
     </Grid>
-  );
+    </div>
+  )
 }
+Login.propTypes = {
+  setToken: PropTypes.func.isRequired
+};
