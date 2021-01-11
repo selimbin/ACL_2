@@ -52,9 +52,9 @@ export class DeleteDepartment extends Component {
                             <label htmlfor="DepartmentName">Department name</label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="DepartmentName" name="DepartmentName" placeholder="Enter the Department name.." onChange={this.myChangeHandler}></input>
+                            <input type="text" id="DepartmentName" name="DepartmentName" placeholder="Enter the Department name.." onChange></input>
                         </div>
-                    </div>
+                    </div>={this.myChangeHandler}
                     <div class="row">
                         <input type="submit" value="Delete"></input>
                     </div>

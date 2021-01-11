@@ -11,12 +11,12 @@ export const MenuItems = [
             },
             {
                 title: 'Update Profile',
-                url: '#',
+                url: 'updateprofile',
                 cName: 'nav-links',
             },
             {
                 title: 'Reset Password',
-                url: '#',
+                url: 'resetpassword',
                 cName: 'nav-links',
             },
             {

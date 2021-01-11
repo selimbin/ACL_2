@@ -31,6 +31,8 @@ import ViewStaffAttendance from './HRLayout/View/ViewStaffAttendance'
 import ViewProfile from './GeneralLayout/ViewProfile'
 import ViewAttendance from './GeneralLayout/ViewAttendance'
 import ViewMissingDaysHours from './GeneralLayout/ViewMissingDaysHours'
+import ResetPassword from './GeneralLayout/ResetPassword'
+import UpdateProfile from './GeneralLayout/UpdateProfile'
 import Login from './Login';
 // Home Routes ------------------
 import HrHome from './HrHome'
@@ -91,6 +93,10 @@ export class App extends Component {
       <Route  exact path="/login" component={Login}>
       </Route>
       <Route  exact path="/HrHome" component={HrHome}>
+      </Route>
+      <Route  exact path="/resetpassword" component={ResetPassword}>
+      </Route>
+      <Route  exact path="/updateprofile" component={UpdateProfile}>
       </Route>
       </Router>
     )
