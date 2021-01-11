@@ -2252,7 +2252,14 @@ router.route('/signOut')
 
 router.route('/resetPassword')
 .put(async(req,res)=>{
+    const {oldPassword,newPassword} = req.body
     try{
+        if(!oldPassword || !newPassword){
+            return res.status(400).json({msg:"Please enter your old and new passwords"});
+        }
+        if(newPassword.length < 5){
+            return res.status(400).json({msg:"Your new password's length should be atleast 6"});
+        }
         const user= await staff_model.findById(req.user._id)
         const correctPassword= await bcrypt.compare(req.body.oldPassword, user.password)
         if(correctPassword){
@@ -2262,7 +2269,7 @@ router.route('/resetPassword')
             await staff_model.findByIdAndUpdate(req.user._id,user)
             res.send("Password Changed");
         }else{
-            res.send("wrong insertion")
+            return res.status(400).json({msg:"wrong insertion"});
         }
     }
     catch(error){
