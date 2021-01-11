@@ -4,7 +4,6 @@ import axios from 'axios';
 import {BrowserRouter as Router,Link,Route} from 'react-router-dom'
 import './App.css';
 // Images ----------------------
-// import viewprofile from './Images/View_Profile.png';
 // Add Routes ------------------
 import AddStaff from './HRLayout/Add/AddStaff'
 import AddDepartment from './HRLayout/Add/AddDepartment'
@@ -28,18 +27,25 @@ import DeleteLocation from './HRLayout/Delete/DeleteLocation'
 // View Routes ------------------
 import ViewMissing from './HRLayout/View/ViewMissing'
 import ViewStaffAttendance from './HRLayout/View/ViewStaffAttendance'
-// Services Routes
+// Services Routes --------------
 import ViewProfile from './GeneralLayout/ViewProfile'
+import ViewAttendance from './GeneralLayout/ViewAttendance'
+import ViewMissingDaysHours from './GeneralLayout/ViewMissingDaysHours'
+import ResetPassword from './GeneralLayout/ResetPassword'
+import UpdateProfile from './GeneralLayout/UpdateProfile'
 import Login from './Login';
+// Home Routes ------------------
+import HrHome from './HrHome'
+import HodHome from './HODHome'
+import CCHome from './CCHome'
 
 
 export class App extends Component {
   render() {
     return (
       <Router> 
-      <Route path ="/Home">
+      <Route path ="/">
         <div class="App">
-          <Navbar/>
         </div>
       </Route>
       <Route exact path ="/addstaff" component = {AddStaff}>
@@ -81,8 +87,22 @@ export class App extends Component {
       <Route exact path ="/viewstaffattendance" component = {ViewStaffAttendance}>
       </Route>
       <Route exact path ="/viewprofile" component = {ViewProfile}>
-      </Route>      
+      </Route>
+      <Route exact path ="/viewattendance" component = {ViewAttendance}>
+      </Route>
+      <Route exact path ="/viewmissingdayshours" component = {ViewMissingDaysHours}>
+      </Route>     
       <Route  exact path="/login" component={Login}>
+      </Route>
+      <Route  exact path="/HrHome" component={HrHome}>
+      </Route>
+      <Route  exact path="/HodHome" component={HodHome}>
+      </Route>
+      <Route  exact path="/CCHome" component={CCHome}>
+      </Route>
+      <Route  exact path="/resetpassword" component={ResetPassword}>
+      </Route>
+      <Route  exact path="/updateprofile" component={UpdateProfile}>
       </Route>
       </Router>
     )
