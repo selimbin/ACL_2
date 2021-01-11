@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "./components/Navbar/Navbar";
 import viewprofile from './components/Images/View_Profile.png';
 import signin from './components/Images/SignIn.jpg';

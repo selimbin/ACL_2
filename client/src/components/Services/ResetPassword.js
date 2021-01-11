@@ -23,7 +23,7 @@ export class ResetPassword extends Component {
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmZjMTNjN2RmNWMyZDBjMTNjZjhmMGIiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MTAzNTYyODR9.jgfhhVw69vXLLY54BGFEkK3XixGdoDkg7KgzCgTsqMg",
+                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmZjMTNjN2RmNWMyZDBjMTNjZjhmMGIiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MTA0MDA1MDZ9.-i-mNE4ZyzEa3N_UJADpbq3d_lZV4e8siRvspLcuhf4",
             }
         })
         .then((res) => toast.success("Password Reset successfully",{position: toast.POSITION.TOP_CENTER}))

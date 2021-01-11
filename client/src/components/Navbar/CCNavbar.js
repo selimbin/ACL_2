@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { MenuItems } from "./CCMenuItems";
-import { useHistory } from "react-router-dom";
 import axios from "axios";
 import './Navbar.css'
 
