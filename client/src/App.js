@@ -36,6 +36,8 @@ import UpdateProfile from './GeneralLayout/UpdateProfile'
 import Login from './Login';
 // Home Routes ------------------
 import HrHome from './HrHome'
+import HodHome from './HODHome'
+import CCHome from './CCHome'
 
 
 export class App extends Component {
@@ -93,6 +95,10 @@ export class App extends Component {
       <Route  exact path="/login" component={Login}>
       </Route>
       <Route  exact path="/HrHome" component={HrHome}>
+      </Route>
+      <Route  exact path="/HodHome" component={HodHome}>
+      </Route>
+      <Route  exact path="/CCHome" component={CCHome}>
       </Route>
       <Route  exact path="/resetpassword" component={ResetPassword}>
       </Route>

@@ -20,7 +20,7 @@ class Navbar extends Component {
                 "Content-Type":"application/JSON",
                 "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ"
             }})
-        window.location.href='/Login'
+        .then((res) => window.location.href='/Login')
     }  
 
     render(){
