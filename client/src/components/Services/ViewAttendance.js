@@ -24,6 +24,7 @@ export class ViewAttendance extends Component {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
                 "token":sessionStorage.getItem('token')
+
             }
         }).then(
           res => this.setState({attendance:res.data}))

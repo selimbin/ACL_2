@@ -2079,24 +2079,47 @@ router.route('/viewProfile')
 router.route('/updateProfile')
 .put(async(req,res)=>{
     try{
+        if(!req.body.officeLocation && !req.body.email && !req.body.dayOff && !req.body.oldPassword && !req.body.newPassword){
+            res.status(400).json({msg:"Nothing has been entered yet"})
+        }
         const user= await staff_model.findById(req.user._id)
         if(req.body.officeLocation){
-            user.officeLocation=req.body.officeLocation
+            const location = await Location_model.findOne({code:req.body.officeLocation});
+            if(!location){
+                res.status(400).json({msg:"the location you entered doesn't exist"});
+            }
+            else{
+                if(location.type != "office" || location.capacity == 0){
+                    res.status(400).json({msg:"the location must be an office with atleast 1 empty space"});
+                }
+                else{
+                    user.officeLocation=req.body.officeLocation
+                }
+            }
         }
         if(req.body.email){
             user.email=req.body.email
         }
         if(req.body.dayOff){
+            if(user.role == "HR"){
+                res.status(400).json({msg:"HR can't change their dayoff"})
+            }
             user.dayOff=req.body.dayOff
         }
-        if(req.body.oldPassword!=null&&req.body.newPassword!=null){
+        if(req.body.newPassword && !req.body.oldPassword){
+            res.status(400).json({msg:"you need to enter your old password in order to change it"})
+        }
+        if(!req.body.newPassword && req.body.oldPassword){
+            res.status(400).json({msg:"please enter your new password"})
+        }
+        if(req.body.oldPassword && req.body.newPassword ){
             const correctPassword= await bcrypt.compare(req.body.oldPassword, user.password)
             if(correctPassword){
                     const salt= await bcrypt.genSalt(10)
                     req.body.newPassword = await bcrypt.hash(req.body.newPassword, salt) 
                     user.password=req.body.newPassword
             }else{
-                return res.status(400).json({msg:"Wrong insertion"});
+                res.status(400).json({msg:"the password you entered is incorrect"})
             }
         }
 

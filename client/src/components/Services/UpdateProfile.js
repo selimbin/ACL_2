@@ -30,6 +30,7 @@ export class UpdateProfile extends Component {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
                 "token":sessionStorage.getItem('token')
+
             }
         })
         .then((res) => toast.success("Profile Updated successfully",{position: toast.POSITION.TOP_CENTER}))
