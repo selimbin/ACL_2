@@ -7,6 +7,7 @@ import './App.css';
 // import viewprofile from './Images/View_Profile.png';
 // Add Routes ------------------
 import AddStaff from './HRLayout/Add/AddStaff'
+import Addslot from './CCLayout/Add/Addslot'
 import AddDepartment from './HRLayout/Add/AddDepartment'
 import AddFaculty from './HRLayout/Add/AddFaculty'
 import AddCourse from './HRLayout/Add/AddCourse'
@@ -43,6 +44,8 @@ export class App extends Component {
         </div>
       </Route>
       <Route exact path ="/addstaff" component = {AddStaff}>
+      </Route>
+      <Route exact path ="/addslot" component = {Addslot}>
       </Route>
       <Route exact path ="/adddepartment" component = {AddDepartment}>
       </Route>
