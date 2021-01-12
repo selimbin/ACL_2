@@ -2,23 +2,23 @@ import React, { Component } from 'react';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './UpdatePage.css'
+import './ResetPassword.css'
 
-export class UpdateFaculty extends Component {
+export class ResetPassword extends Component {
     state = {
-        name: '',
-        newname: '',
+        oldpassword: '',
+        newpassword: '',
     };
 
     mySubmitHandler = event => {
         event.preventDefault();
 
-        const faculty = {
-            Name: this.state.name,
-            newName: this.state.newname,
+        const password = {
+            oldPassword: this.state.oldpassword,
+            newPassword: this.state.newpassword,
         };
 
-        axios.put("http://localhost:5000/staff/UpdateFaculty", faculty,{
+        axios.put("http://localhost:5000/staff/resetPassword", password,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -26,7 +26,7 @@ export class UpdateFaculty extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then((res) => toast.success("Faculty Updated successfully",{position: toast.POSITION.TOP_CENTER}))
+        .then((res) => toast.success("Password Reset successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }    
 
@@ -37,26 +37,26 @@ export class UpdateFaculty extends Component {
     }
     render() {
         return (
-            <div class="UpdatePage">
+            <div class="ResetPage">
             <div class="container">
                 <form onSubmit={this.mySubmitHandler}>
                 <ToastContainer />
                 <div class="row">
                     <div class="col-10">
-                        <label htmlfor="name">Current Faculty name</label>
+                        <label htmlfor="oldpassword">Old Password</label>
                     </div>
                     <div class="col-15">
-                        <input type="text" id="name" name="name" placeholder="Enter the current faculty name.." onChange={this.myChangeHandler}></input>
+                        <input type="text" id="oldpassword" name="oldpassword" placeholder="Enter Your old password.." onChange={this.myChangeHandler}></input>
                     </div>
                     <div class="col-10">
-                        <label htmlfor="newname">new Faculty Name</label>
+                        <label htmlfor="newpassword">New Password</label>
                     </div>
                     <div class="col-15">
-                        <input type="text" id="newname" name="newname" placeholder="Enter the new name.." onChange={this.myChangeHandler}></input>
+                        <input type="text" id="newpassword" name="newpassword" placeholder="Enter your new pasword.." onChange={this.myChangeHandler}></input>
                     </div>
                 </div>
                 <div class="row">
-                    <input type="submit" value="Update"></input>
+                    <input type="submit" value="Reset"></input>
                 </div>
                 </form>
             </div>
@@ -65,4 +65,4 @@ export class UpdateFaculty extends Component {
     }
 }
 
-export default UpdateFaculty
+export default ResetPassword

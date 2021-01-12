@@ -2,29 +2,29 @@ import React, { Component } from 'react';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './UpdatePage.css'
+import './UpdateProfile.css'
 
-export class UpdateDepartment extends Component {
+export class UpdateProfile extends Component {
     state = {
-        facultyname: '',
-        departmentname: '',
-        newdepartmentname: '',
-        newfacultyname: '',
-        head: '',
+        oldPassword: '',
+        newPassword: '',
+        officeLocation: '',
+        email: '',
+        dayOff: '',
     };
 
     mySubmitHandler = event => {
         event.preventDefault();
 
-        const department = {
-            FacultyName: this.state.facultyname,
-            DepartmentName: this.state.departmentname,
-            newDepartmentName: this.state.newdepartmentname,
-            newFacultyname: this.state.newfacultyname,
-            newHead: this.state.head,
+        const profile = {
+            oldPassword: this.state.oldPassword,
+            newPassword: this.state.newPassword,
+            officeLocation: this.state.officeLocation,
+            email: this.state.email,
+            dayOff: this.state.dayOff,
         };
 
-        axios.put("http://localhost:5000/staff/UpdateDepartment", department,{
+        axios.put("http://localhost:5000/staff/updateProfile", profile,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -32,7 +32,7 @@ export class UpdateDepartment extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then((res) => toast.success("Department Updated successfully",{position: toast.POSITION.TOP_CENTER}))
+        .then((res) => toast.success("Profile Updated successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }    
 
@@ -43,46 +43,46 @@ export class UpdateDepartment extends Component {
     }
     render() {
         return (
-            <div class="UpdatePage">
+            <div class="UpdateProfilePage">
             <div class="container">
                 <form onSubmit={this.mySubmitHandler}>
                 <ToastContainer />
                 <div class="row">
                     <div class="col-10">
-                        <label htmlfor="facultyname">Current Faculty name</label>
+                        <label htmlfor="oldPassword">Old Password</label>
                     </div>
                     <div class="col-15">
-                        <input type="text" id="facultyname" name="facultyname" placeholder="Enter the current faculty name.." onChange={this.myChangeHandler}></input>
+                        <input type="text" id="oldPassword" name="oldPassword" placeholder="Enter your old password.." onChange={this.myChangeHandler}></input>
                     </div>
                     <div class="col-10">
-                        <label htmlfor="DepartmentName">Current Department</label>
+                        <label htmlfor="newPassword">New Password</label>
                     </div>
                     <div class="col-15">
-                        <input type="text" id="DepartmentName" name="DepartmentName" placeholder="Enter the current department.." onChange={this.myChangeHandler}></input>
+                        <input type="text" id="newPassword" name="newPassword" placeholder="Enter your new password.." onChange={this.myChangeHandler}></input>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-25">
-                        <label htmlfor="newfacultyname">New Faculty name</label>
+                        <label htmlfor="officeLocation">New Office Location</label>
                     </div>
                     <div class="col-75">
-                        <input type="text" id="newfacultyname" name="newfacultyname" placeholder="Enter the new faculty name.." onChange={this.myChangeHandler}></input>
+                        <input type="text" id="officeLocation" name="officeLocation" placeholder="Enter your new office location.." onChange={this.myChangeHandler}></input>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-25">
-                        <label htmlfor="newdepartmentname">New Department name</label>
+                        <label htmlfor="email">New Email</label>
                     </div>
                     <div class="col-75">
-                        <input type="text" id="newdepartmentname" name="newdepartmentname" placeholder="Enter the new department name.." onChange={this.myChangeHandler}></input>
+                        <input type="text" id="email" name="email" placeholder="Enter your new email.." onChange={this.myChangeHandler}></input>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-25">
-                        <label htmlfor="head">new Head of department</label>
+                        <label htmlfor="dayOff">New Dayoff</label>
                     </div>
                     <div class="col-75">
-                        <input type="text" id="head" name="head" placeholder="Enter the new head of department.." onChange={this.myChangeHandler}></input>
+                        <input type="text" id="dayOff" name="dayOff" placeholder="Enter your new dayoff.." onChange={this.myChangeHandler}></input>
                     </div>
                 </div>  
                 <div class="row">
@@ -95,4 +95,4 @@ export class UpdateDepartment extends Component {
     }
 }
 
-export default UpdateDepartment
+export default UpdateProfile

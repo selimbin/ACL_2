@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
 }));
   
 
-export default function Login({ setToken }) {
+export default function Login() {
   // let history = useHistory();
   var state={
     email:'',
@@ -99,13 +99,12 @@ export default function Login({ setToken }) {
       }
     })
     .then(function (response) {
-      // alert("here")
       // console.log(response);
-      if(response.data == 'You need to sign up first or incorrect email'){
+      if(response.data.code==401){
         console.log("Username does not exists");
         alert("Username does not exist");
       }
-      else if(response.data == 'Incorrect Password'){
+      else if(response.data.code == 400){
         console.log("Username password do not match");
         alert("username password do not match")
       }
@@ -115,7 +114,19 @@ export default function Login({ setToken }) {
         // var uploadScreen=[];
         // uploadScreen.push(<UploadScreen appContext={self.props.appContext}/>)
         // self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
-        setToken(response.data);
+        // setToken(response.data);
+        sessionStorage.setItem("token", response.data.token);
+        if(response.data.role=="HR"){
+          window.location.href='/HrHome' 
+        }
+        if(response.data.role=="TA"){
+          window.location.href='/HrHome' 
+
+        }
+        if(response.data.role=="lecturer"){
+
+        }
+        // alert("here")
         // return;
         // history.push("/Home");
       }

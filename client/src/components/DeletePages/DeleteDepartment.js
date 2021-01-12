@@ -17,7 +17,7 @@ export class DeleteDepartment extends Component {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ"
+                "token":sessionStorage.getItem('token')
             },
             data: {
                 FacultyName: this.state.facultyname,
@@ -52,9 +52,9 @@ export class DeleteDepartment extends Component {
                             <label htmlfor="DepartmentName">Department name</label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="DepartmentName" name="DepartmentName" placeholder="Enter the Department name.." onChange={this.myChangeHandler}></input>
+                            <input type="text" id="DepartmentName" name="DepartmentName" placeholder="Enter the Department name.." onChange></input>
                         </div>
-                    </div>
+                    </div>={this.myChangeHandler}
                     <div class="row">
                         <input type="submit" value="Delete"></input>
                     </div>

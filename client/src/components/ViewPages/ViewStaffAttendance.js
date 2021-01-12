@@ -14,7 +14,6 @@ export class ViewStaffAttendance extends Component {
     }
 
     mySubmitHandler = async event => {
-        const { token, setToken } = useToken();
         event.preventDefault();
 
         const staff = {
@@ -26,7 +25,7 @@ export class ViewStaffAttendance extends Component {
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":token,
+                "token":sessionStorage.getItem('token')
             }
         })
         .then(res => this.setState({staff:res.data}))
