@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import Navbar from "./components/Navbar/Navbar";
+import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Navbar from "./components/Navbar/CCNavbar";
 import viewprofile from './components/Images/View_Profile.png';
 import signin from './components/Images/SignIn.jpg';
 import signout from './components/Images/SignOut.jpg';

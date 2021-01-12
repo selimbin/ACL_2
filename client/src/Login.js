@@ -111,7 +111,6 @@ export default function Login() {
         console.log("Login successfull");
         // alert(response.data)
         var uploadScreen=[];
-        uploadScreen.push(<UploadScreen appContext={self.props.appContext}/>)
         self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
       }
     })

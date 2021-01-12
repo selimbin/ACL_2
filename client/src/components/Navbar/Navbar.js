@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MenuItems } from "./HRMenuItems";
+import axios from "axios";
 import './Navbar.css'
 
 class Navbar extends Component {
@@ -8,6 +9,19 @@ class Navbar extends Component {
     handleClick = () => {
         this.setState({clicked: !this.state.clicked})
     }
+
+    logout = event => {
+        event.preventDefault();
+
+        axios.post("http://localhost:5000/staff/logout", {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type":"application/JSON",
+                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmZjMTNjN2RmNWMyZDBjMTNjZjhmMGIiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MTA0MDA1MDZ9.-i-mNE4ZyzEa3N_UJADpbq3d_lZV4e8siRvspLcuhf4"
+            }})
+        .then((res) => window.location.href='/Login')
+        .catch((err) => console.log(err.eresponse.data.msg))
+    }  
 
     render(){
         return(
@@ -40,7 +54,7 @@ class Navbar extends Component {
                             )
                         })}
                     </ul>
-                    <button class="button"><span>LogOut </span></button>
+                    <button class="button" onClick={this.logout} ><span>LogOut </span></button>
                 </nav>
             )
         }

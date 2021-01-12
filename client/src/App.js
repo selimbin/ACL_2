@@ -1,6 +1,4 @@
 import React, { Component } from 'react'
-import Navbar from "./components/Navbar/Navbar";
-import axios from 'axios';
 import {BrowserRouter as Router,Link,Route} from 'react-router-dom'
 import './App.css';
 // Images ----------------------
@@ -31,9 +29,13 @@ import ViewStaffAttendance from './HRLayout/View/ViewStaffAttendance'
 import ViewProfile from './GeneralLayout/ViewProfile'
 import ViewAttendance from './GeneralLayout/ViewAttendance'
 import ViewMissingDaysHours from './GeneralLayout/ViewMissingDaysHours'
+import ResetPassword from './GeneralLayout/ResetPassword'
+import UpdateProfile from './GeneralLayout/UpdateProfile'
 import Login from './Login';
 // Home Routes ------------------
 import HrHome from './HrHome'
+import HodHome from './HODHome'
+import CCHome from './CCHome'
 
 
 export class App extends Component {
@@ -91,6 +93,14 @@ export class App extends Component {
       <Route  exact path="/login" component={Login}>
       </Route>
       <Route  exact path="/HrHome" component={HrHome}>
+      </Route>
+      <Route  exact path="/HodHome" component={HodHome}>
+      </Route>
+      <Route  exact path="/CCHome" component={CCHome}>
+      </Route>
+      <Route  exact path="/resetpassword" component={ResetPassword}>
+      </Route>
+      <Route  exact path="/updateprofile" component={UpdateProfile}>
       </Route>
       </Router>
     )
