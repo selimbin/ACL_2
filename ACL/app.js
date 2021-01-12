@@ -13,6 +13,8 @@ const {slotSchema} = require('./models/scheduling.js')
 const slot_model=mongoose.model("Slot",slotSchema)
 const {scheduleAttendance} = require('./models/scheduling.js') 
 const scheduleAttendance_model = mongoose.model('ScheduleAttendance', scheduleAttendance)
+const {attendanceSchema} = require('./models/scheduling.js') 
+const attendance_model = mongoose.model('Attendance', attendanceSchema)
 const { nextTick } = require('process')
 var schedule = require('node-schedule');
 const app =express()
@@ -618,11 +620,115 @@ const AuthenticationRoutes= require('./routes/auth')
 // });
 app.use(cors());
 app.use('/seed', seed_routes)
+app.use(async(req, res, next)=>{
+    const token= req.headers.token
+    var today =  new Date()
+    try{
+        const staff = await staff_model.find()
+        
+        var tester = null
+        if(today.getDate()<11){
+            
+            if(today.getMonth()==0){
+                tester = "12" 
+            }else{
+                if(today.getMonth()<10){
+                    tester = "0"+(parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+                else{
+                    tester = (parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+            }
+        }
+        else{
+            tester = today.toISOString().substring(5,7)
+        }
+        
+        var num = new Date(today.getFullYear(), (today.getMonth()+1), 0).getDate()
+        var schedule = null
+
+        for(var i in staff){
+            schedule = await scheduleAttendance_model.findOne({id:staff[i].id,month:tester})
+
+            if(!schedule){
+                schedule = new scheduleAttendance_model({
+                    id:staff[i].id,
+                    month:tester
+                })
+
+                await schedule.save()
+            }
+            
+            
+            var now = today.getDate()
+            var missingDays=0
+            var attendance = null
+            var last = null
+            if(now<11){
+
+                last= today
+                last.setMonth(today.getMonth())
+                for(var j=11; j<num;j++){
+                    last.setDate(j)
+                    if(last.toUTCString().substring(0,3)!=staff[i].dayOff&&last.toUTCString().substring(0,3)!="Fri"){
+                        attendance= await attendance_model.findOne({"id":staff[i].id,"date":last.toISOString().substring(0,10)})
+                        if(!attendance){
+                            missingDays = missingDays + 1
+                        }
+                    }
+                
+                }
+                last = today
+                for(var k=1; k<now;k++){
+                    last.setDate(k)
+                    if(last.toUTCString().substring(0,3)!=staff[i].dayOff&&last.toUTCString().substring(0,3)!="Fri"){
+                        attendance= await attendance_model.findOne({"id":staff[i].id,"date":last.toISOString().substring(0,10)})
+
+                        if(!attendance){
+                            missingDays = missingDays + 1
+                        }
+                    }
+                
+                }
+
+                schedule.missedDays = missingDays 
+                await scheduleAttendance_model.findOneAndUpdate({"id":staff[i].id,"month":tester},schedule)
+
+
+            }
+            else{
+                last= today
+                
+                for(var j=11; j<=now;j++){
+                    last.setDate(j)
+                    
+                    if(last.toUTCString().substring(0,3)!=staff[i].dayOff&&last.toUTCString().substring(0,3)!="Fri"){
+                        attendance= await attendance_model.findOne({"id":staff[i].id,"date":last.toISOString().substring(0,10)})
+                        if(!attendance){
+                            missingDays = missingDays + 1
+                        }
+                    }
+                
+                }
+                schedule.missedDays = missingDays 
+                await scheduleAttendance_model.findOneAndUpdate({"id":staff[i].id,"month":tester},schedule)
+
+            }
+        }
+        
+        next()
+    }
+    catch(error){
+        res.status(400).send({error:error.message})
+    }
+})
+
 app.use('', AuthenticationRoutes)
+
+
 
 app.use(async(req, res, next)=>{
     const token= req.headers.token
-
     if(!token)  
     {
         return res.status(401).status('Access denied')
