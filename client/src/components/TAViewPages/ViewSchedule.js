@@ -34,7 +34,7 @@ export class ViewSchedule extends Component{
         this.setState({[nam]: val});
     }
     render() {
-        return (
+        /*return (
             <div class="ViewPage">
                 <div class="container">
                     <form onSubmit={this.mySubmitHandler}>
@@ -83,7 +83,7 @@ export class ViewSchedule extends Component{
                 </table>
             </div>
         )
-    }
+    }*/
 }
-
-export default ViewSchedule
+}
+//export default ViewSchedule
