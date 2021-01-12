@@ -14,18 +14,18 @@ export class AddchangeDayOffReq extends Component {
     mySubmitHandler = event => {
         event.preventDefault();
 
-        const course = {
+        const request = {
             id: this.state.id,
             newdayoff:this.state.newdayoff,
             reason:this.state.reason
         };
 
-        axios.post("http://localhost:5000/staff/changeDayOffReq", course,{
+        axios.post("http://localhost:5000/staff/changeDayOffReq", request,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
+                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxYTk2ODQyOTY3MTA2ZjRlNmQ0ZTgiLCJyb2xlIjoiVEEiLCJpYXQiOjE2MTA0NTc0NTR9.rIBD0gkNKz0kr2qj6FgaYlVlgczx5avb48KAAU-emok",
             }
         })
         .then((res) => toast.success("Request added successfully",{position: toast.POSITION.TOP_CENTER}))

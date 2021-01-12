@@ -16,7 +16,7 @@ export class AddAnnualLeaveReq extends Component {
     mySubmitHandler = event => {
         event.preventDefault();
 
-        const course = {
+        const request = {
             id: this.state.id,
             Replacement:this.state.Replacement,
             date:this.state.date,
@@ -24,7 +24,7 @@ export class AddAnnualLeaveReq extends Component {
 
         };
 
-        axios.post("http://localhost:5000/staff/AnnualLeaveReq", course,{
+        axios.post("http://localhost:5000/staff/AnnualLeaveReq", request,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",

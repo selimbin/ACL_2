@@ -616,8 +616,8 @@ const AuthenticationRoutes= require('./routes/auth')
 
 //     }
 // });
-app.use('/seed', seed_routes)
 app.use(cors());
+app.use('/seed', seed_routes)
 app.use('', AuthenticationRoutes)
 
 app.use(async(req, res, next)=>{

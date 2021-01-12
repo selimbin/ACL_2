@@ -15,7 +15,7 @@ export class AddCompensationLeaveReq extends Component {
     mySubmitHandler = event => {
         event.preventDefault();
 
-        const course = {
+        const request = {
             id: this.state.id,
             reason:this.state.reason,
             date:this.state.date,
@@ -23,7 +23,7 @@ export class AddCompensationLeaveReq extends Component {
 
         };
 
-        axios.post("http://localhost:5000/staff/CompensationLeaveReq", course,{
+        axios.post("http://localhost:5000/staff/CompensationLeaveReq", request,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",

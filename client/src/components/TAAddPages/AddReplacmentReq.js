@@ -16,7 +16,7 @@ export class AddReplacmentReq extends Component {
     mySubmitHandler = event => {
         event.preventDefault();
 
-        const course = {
+        const request = {
             id: this.state.id,
             course: this.state.code,
             date:this.state.date,
@@ -24,7 +24,7 @@ export class AddReplacmentReq extends Component {
             reason:this.state.reason
         };
 
-        axios.post("http://localhost:5000/staff/sendReplacmentReq", course,{
+        axios.post("http://localhost:5000/staff/sendReplacmentReq", request,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",

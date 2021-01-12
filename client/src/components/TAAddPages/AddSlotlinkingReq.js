@@ -18,7 +18,7 @@ export class AddSlotlinkingReq extends Component {
     mySubmitHandler = event => {
         event.preventDefault();
 
-        const course = {
+        const request = {
             id: this.state.id,
             course: this.state.code,
             date:this.state.date,
@@ -28,7 +28,7 @@ export class AddSlotlinkingReq extends Component {
             location:this.state.location
         };
 
-        axios.post("http://localhost:5000/staff/slotlinkingrequest", course,{
+        axios.post("http://localhost:5000/staff/slotlinkingrequest", request,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",

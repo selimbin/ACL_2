@@ -2452,15 +2452,23 @@ router.route('/changeDayOffReq')
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
+    const newdayoff=req.body.newDay;
     if(department!=null){
-        const newreqest = await new request_model({type:'changeDayOffReq',reason:req.body.reason,requester:user.id,receiver:department.head,newDay:req.body.newDay})
+        if((newdayoff=='Sat'||newdayoff=='Sun'||newdayoff=='Mon'||newdayoff=='Tue'||newdayoff=='Wed'||newdayoff=='Thr')&&newdayoff!='Fri'){
+        const newreqest = await new request_model({type:'changeDayOffReq',reason:req.body.reason,requester:user.id,receiver:department.head,newDay:newdayoff})
         await newreqest.save()
         res.send(newreqest)
     }else{
+        //res.send('Please enter correct abreviation of a work day ')
+        return res.status(400).json({msg:"Please enter correct abreviation of a work day "});
+    }
+    }else{
+        return res.status(400).json({msg:"no head of department was found"});
         res.send('no head of department was found')
     }
 }else
-res.send('HR cants have requests of any kind')
+    return res.status(400).json({msg:"HR cants have requests of any kind"});
+    //res.send('HR cants have requests of any kind')
 })
 
 router.route('/AnnualLeaveReq')
@@ -2668,7 +2676,12 @@ router.route('/cancelRequests')
         if(requests.requester==user.id){
             const date = new Date(requests.date)
             if(requests.Status=="Pending"||date>=today){
-                const cancelRequests = request_model.findByIdAndDelete(requests._id)
+                try {
+                    const cancelRequests = request_model.findByIdAndDelete(requests._id) 
+                } catch (error) {
+                    res.send("has already been canceled before or does not exist to be canceled")
+                }
+
                 res.send("Request Canceled")
             }
             else{

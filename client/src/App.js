@@ -3,6 +3,7 @@ import {BrowserRouter as Router,Link,Route} from 'react-router-dom'
 import './App.css';
 // Images ----------------------
 // Add Routes ------------------
+import Tony1 from'./components/TAAddPages/AddchangeDayOffReq'
 import AddStaff from './HRLayout/Add/AddStaff'
 import AddDepartment from './HRLayout/Add/AddDepartment'
 import AddFaculty from './HRLayout/Add/AddFaculty'
@@ -101,6 +102,8 @@ export class App extends Component {
       <Route  exact path="/resetpassword" component={ResetPassword}>
       </Route>
       <Route  exact path="/updateprofile" component={UpdateProfile}>
+      </Route>
+      <Route  exact path="/Tony1" component={Tony1}>
       </Route>
       </Router>
     )

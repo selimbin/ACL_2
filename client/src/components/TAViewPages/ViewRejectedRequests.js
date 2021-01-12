@@ -4,19 +4,19 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
 
-export class ViewSchedule extends Component{
+export class ViewRejectedRequests extends Component{
     state = {
         id:'',
-        Schedule:[axios]
+        Requests:[axios]
     }
 
     mySubmitHandler = event => {
     event.preventDefault();
 
-    const Schedule = {
+    const Requests = {
         id:this.state.id
     }
-    axios.post("http://localhost:5000/staff/viewSchedule", Schedule ,{
+    axios.post("http://localhost:5000/staff/viewRejectedRequests", Requests ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -24,7 +24,7 @@ export class ViewSchedule extends Component{
                 "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
             }
         })
-        .then(res =>this.setState({Schedule:res.data}))
+        .then(res =>this.setState({viewRejectedRequests:res.data}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
 
@@ -44,36 +44,25 @@ export class ViewSchedule extends Component{
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th>Slot1</th>
-                        <th>Slot2</th>
-                        <th>Slot3</th>
-                        <th>Slot4</th>
-                        <th>Slot5</th>
+                        <th>type</th>
+                        <th>reason</th>
+                        <th>reciever</th>
+
                     </tr>
                     {this.state.staff.map((item) => {
                             return (
                                 <tr>
-                                    <td>{this.state.Slot1.map((n) => {
+                                    <td>{this.state.type.map((n) => {
                                         return (
                                             <li>{n}</li>
                                         )
                                     })}</td>
-                                    <td>{this.state.Slot2.map((n) => {
+                                    <td>{this.state.reason.map((n) => {
                                         return (
                                             <li>{n}</li>
                                         )
                                     })}</td>
-                                    <td>{this.state.Slot3.map((n) => {
-                                        return (
-                                            <li>{n}</li>
-                                        )
-                                    })}</td>
-                                    <td>{this.state.Slot4.map((n) => {
-                                        return (
-                                            <li>{n}</li>
-                                        )
-                                    })}</td>
-                                    <td>{this.state.Slot5.map((n) => {
+                                    <td>{this.state.reciever.map((n) => {
                                         return (
                                             <li>{n}</li>
                                         )
@@ -87,4 +76,4 @@ export class ViewSchedule extends Component{
     }
 
 }
-export default ViewSchedule
+export default ViewRejectedRequests
