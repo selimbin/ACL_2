@@ -11,22 +11,22 @@ export const MenuItems = [
             },
             {
                 title: 'Update Profile',
-                url: '#',
+                url: 'updateprofile',
                 cName: 'nav-links',
             },
             {
                 title: 'Reset Password',
-                url: '#',
+                url: 'resetpassword',
                 cName: 'nav-links',
             },
             {
                 title: 'View my attendance record',
-                url: '#',
+                url: 'viewattendance',
                 cName: 'nav-links',
             },
             {
                 title: 'view my missing days & hours',
-                url: '#',
+                url: 'viewmissingdayshours',
                 cName: 'nav-links',
             },
         ]
@@ -156,7 +156,7 @@ export const MenuItems = [
     },
     {
         title: 'Home',
-        url: 'Home',
+        url: 'HrHome',
         cName: 'nav-links',
         dropdown: []
     },

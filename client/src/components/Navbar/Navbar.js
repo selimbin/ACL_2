@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MenuItems } from "./HRMenuItems";
+import axios from "axios";
 import './Navbar.css'
 
 class Navbar extends Component {
@@ -8,6 +9,20 @@ class Navbar extends Component {
     handleClick = () => {
         this.setState({clicked: !this.state.clicked})
     }
+
+    logout = event => {
+        event.preventDefault();
+
+        axios.post("http://localhost:5000/staff/logout", {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type":"application/JSON",
+                "token":sessionStorage.getItem('token')
+          
+            }})
+        .then((res) => window.location.href='/Login')
+        .catch((err) => console.log(err.eresponse.data.msg))
+    }  
 
     render(){
         return(
@@ -24,7 +39,7 @@ class Navbar extends Component {
                                         <a Class={item.cName} href ={item.url}>
                                             {item.title}
                                         </a>
-                                        <ul Class="dropdown-content">
+                                        <div Class="dropdown-content">
                                             {item.dropdown.map((item,index) => {
                                                 return (
                                                     <li key={index}>
@@ -34,13 +49,13 @@ class Navbar extends Component {
                                                     </li>
                                                 )
                                             })}
-                                        </ul>
+                                        </div>
                                     </div>
                                 </li>
                             )
                         })}
                     </ul>
-                    <button class="button"><span>LogOut </span></button>
+                    <button class="button" onClick={this.logout} ><span>LogOut </span></button>
                 </nav>
             )
         }

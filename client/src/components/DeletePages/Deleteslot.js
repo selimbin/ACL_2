@@ -63,7 +63,7 @@ export class Deleteslot extends Component {
                         <div class="col-25">
                             <label htmlfor="slot_no">period</label>
                         </div>
-                        <div class="col-75">
+                        <div class="col-25">
                             <input type="number" id="slot_no" name="slot_no" placeholder="Enter the period number .." onChange={this.myChangeHandler}></input>
                         </div>
                     </div> 
@@ -71,7 +71,7 @@ export class Deleteslot extends Component {
                         <div class="col-25">
                             <label htmlfor="day">Day</label>
                         </div>
-                        <div class="col-75">
+                        <div class="col-25">
                             <input type="text" id="day" name="day" placeholder="Enter the day.." onChange={this.myChangeHandler}></input>
                         </div>
                     </div>  
