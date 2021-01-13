@@ -109,26 +109,27 @@ export default function Login() {
         alert("username password do not match")
       }
       else{
-        // console.log("Login successfull");
-        // alert(response.data)
-        // var uploadScreen=[];
-        // uploadScreen.push(<UploadScreen appContext={self.props.appContext}/>)
-        // self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
-        // setToken(response.data);
         sessionStorage.setItem("token", response.data.token);
         if(response.data.role=="HR"){
+          sessionStorage.setItem("role", "HR");
           window.location.href='/HrHome' 
         }
         if(response.data.role=="TA"){
-          window.location.href='/HrHome' 
+          sessionStorage.setItem("role", "TA");
+          window.location.href='/CCHome' 
 
         }
         if(response.data.role=="lecturer"){
+          if(response.data.isHOD=="true"){
+            sessionStorage.setItem("role", "HOD");
+            window.location.href='/HODHome' 
+          }
+          else{
+            sessionStorage.setItem("role", "Lec");
+            window.location.href='/LecHome' 
+          }
 
         }
-        // alert("here")
-        // return;
-        // history.push("/Home");
       }
     })
     .catch(function (error) {

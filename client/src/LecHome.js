@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Navbar from "./components/Navbar/CCNavbar";
+import Navbar from "./components/Navbar/LecNavbar";
 import viewprofile from './components/Images/View_Profile.png';
 import signin from './components/Images/SignIn.jpg';
 import signout from './components/Images/SignOut.jpg';
-import './CCHome.css'
+import './LecHome.css'
 
-export class HrHome extends Component {
+export class LecHome extends Component {
     render() {
         return (
             <div class="home">
@@ -52,4 +49,4 @@ export class HrHome extends Component {
     }
 }
 
-export default HrHome
+export default LecHome

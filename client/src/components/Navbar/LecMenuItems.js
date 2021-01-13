@@ -32,44 +32,54 @@ export const MenuItems = [
         ]
     },
     {
-        title: 'Course Coordinator',
+        title: 'Manage Courses',
         url: '#',
         cName: 'nav-links',
         dropdown: [
             {
-                title: 'View Slot Linking Requests',
-                url: 'viewSlotLinkingRequestsCC',
+                title: 'View Course Coverage',
+                url: 'viewMyCoverage',
                 cName: 'nav-links',
             },
             {
-                title: 'Accept Slot Linking Request',
-                url: 'acceptSlotLinkingRequest',
+                title: 'View Course Slot Assignment',
+                url: 'viewCourseSlotAssignment',
                 cName: 'nav-links',
             },
             {
-                title: 'Reject Slot Linking Requests',
-                url: 'rejectSlotLinkingRequest',
+                title: 'View All Staff in Department',
+                url: 'viewDepStaff',
                 cName: 'nav-links',
             },
             {
-                title: 'Add Course Slot',
-                url: 'addCourseSlot',
+                title: 'Assign Member to Course Slot',
+                url: 'assignAcadCourse',
                 cName: 'nav-links',
             },
             {
-                title: 'Update Course Slot',
-                url: 'updateCourseSlot',
+                title: 'Update Course Assignment',
+                url: 'updateCourseAssignment',
                 cName: 'nav-links',
             },
             {
-                title: 'Delete Course Slot',
-                url: 'deleteCourseSlot',
+                title: 'Delete Course Assignment',
+                url: 'deleteCourseAssignment',
+                cName: 'nav-links',
+            },
+            {
+                title: 'Remove Assigned Member from Course',
+                url: 'removeMemberCourse',
+                cName: 'nav-links',
+            },
+            {
+                title: 'Assign Member as Course Coordinator',
+                url: 'assignMemberCourseCoordinator',
                 cName: 'nav-links',
             }
         ]
     },
     {
-        title: 'Requests',
+        title: 'Request',
         url: '#',
         cName: 'nav-links',
         dropdown: [
@@ -112,7 +122,7 @@ export const MenuItems = [
     },
     {
         title: 'Home',
-        url: 'CCHome',
+        url: 'LecHome',
         cName: 'nav-links',
         dropdown: []
     },
