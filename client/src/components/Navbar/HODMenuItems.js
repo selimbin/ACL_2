@@ -32,131 +32,161 @@ export const MenuItems = [
         ]
     },
     {
-        title: 'View',
+        title: 'Manage Department',
         url: '#',
         cName: 'nav-links',
         dropdown: [
             {
-                title: 'Staff attendance record',
-                url: 'viewstaffattendance',
+                title: 'Assign Staff to Course',
+                url: 'assignStaff',
                 cName: 'nav-links',
             },
             {
-                title: 'All staff with missing days/hours',
-                url: 'viewmissing',
+                title: 'Remove Staff From Course',
+                url: 'removeStaffHOD',
                 cName: 'nav-links',
             },
+            {
+                title: 'Update Staff in Course',
+                url: 'updateStaffHOD',
+                cName: 'nav-links',
+            },
+            {
+                title: 'View Staff in Department',
+                url: 'viewDepStaff',
+                cName: 'nav-links',
+            },
+            {
+                title: 'View Day Off/Leave of Staff',
+                url: 'viewStaffDayOffHOD',
+                cName: 'nav-links',
+            },
+            {
+                title: 'View Course Coverage',
+                url: 'viewCourseCoverage',
+                cName: 'nav-links',
+            },
+            {
+                title: 'View Teaching Assignments',
+                url: 'viewTeachingAssignments',
+                cName: 'nav-links',
+            }
         ]
     },
     {
-        title: 'Add',
+        title: 'Manage Requests',
         url: '#',
         cName: 'nav-links',
         dropdown: [
             {
-                title: 'Staff',
-                url: 'addstaff',
+                title: 'View Change Day Off/Leave Requests',
+                url: 'viewDayOffReqHOD',
                 cName: 'nav-links',
             },
             {
-                title: 'Department',
-                url: 'adddepartment',
+                title: 'Accept Request',
+                url: 'acceptHODRequests',
                 cName: 'nav-links',
             },
             {
-                title: 'Faculty',
-                url: 'addfaculty',
+                title: 'Reject Request',
+                url: 'rejectHODRequests',
                 cName: 'nav-links',
-            },
-            {
-                title: 'Course',
-                url: 'addcourse',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Location',
-                url: 'addlocation',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Staff Sign In/Out',
-                url: 'addsigninout',
-                cName: 'nav-links',
-            },
+            }
         ]
     },
     {
-        title: 'Update',
+        title: 'Manage Courses',
         url: '#',
         cName: 'nav-links',
         dropdown: [
             {
-                title: 'Staff',
-                url: 'updatestaff',
+                title: 'View Course Coverage',
+                url: 'viewMyCoverage',
                 cName: 'nav-links',
             },
             {
-                title: 'Department',
-                url: 'updatedepartment',
+                title: 'View Course Slot Assignment',
+                url: 'viewCourseSlotAssignment',
                 cName: 'nav-links',
             },
             {
-                title: 'Faculty',
-                url: 'updatefaculty',
+                title: 'View All Staff in Department',
+                url: 'viewDepStaff',
                 cName: 'nav-links',
             },
             {
-                title: 'Course',
-                url: 'updatecourse',
+                title: 'Assign Member to Course Slot',
+                url: 'assignAcadCourse',
                 cName: 'nav-links',
             },
             {
-                title: 'Location',
-                url: 'updatelocation',
+                title: 'Update Course Assignment',
+                url: 'updateCourseAssignment',
                 cName: 'nav-links',
             },
             {
-                title: 'Salary',
-                url: 'updatesalary',
+                title: 'Delete Course Assignment',
+                url: 'deleteCourseAssignment',
                 cName: 'nav-links',
             },
+            {
+                title: 'Remove Assigned Member from Course',
+                url: 'removeMemberCourse',
+                cName: 'nav-links',
+            },
+            {
+                title: 'Assign Member as Course Coordinator',
+                url: 'assignMemberCourseCoordinator',
+                cName: 'nav-links',
+            }
         ]
     },
     {
-        title: 'Delete',
+        title: 'Request',
         url: '#',
         cName: 'nav-links',
         dropdown: [
             {
-                title: 'Staff',
-                url: 'deletestaff',
+                title: 'Send Replacement Request',
+                url: 'sendReplacementRequest',
                 cName: 'nav-links',
             },
             {
-                title: 'Department',
-                url: 'deletedepartment',
+                title: 'View Replacement Request',
+                url: 'viewReplacementRequest',
                 cName: 'nav-links',
             },
             {
-                title: 'Faculty',
-                url: 'deletefaculty',
+                title: 'Send Slot Linking Request',
+                url: 'sendSlotLinkingReq',
                 cName: 'nav-links',
             },
             {
-                title: 'Course',
-                url: 'deletecourse',
+                title: 'Change Day Off Request',
+                url: 'changeDayOffReq',
                 cName: 'nav-links',
             },
             {
-                title: 'Location',
-                url: 'deletelocation',
+                title: 'Submit Leave Request',
+                url: 'submitLeaveRequest',
                 cName: 'nav-links',
             },
+            {
+                title: 'View Status of all Requests',
+                url: 'viewRequestStatus',
+                cName: 'nav-links',
+            },
+            {
+                title: 'Cancel Request',
+                url: 'cancelRequest',
+                cName: 'nav-links',
+            }
         ]
     },
     {
         title: 'Home',
-        url: 'HrHome',
+        url: 'HODHome',
         cName: 'nav-links',
         dropdown: []
     },
