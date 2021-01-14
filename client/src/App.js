@@ -43,80 +43,21 @@ import useToken from './components/useToken';
 import HrHome from './HrHome'
 import HodHome from './HODHome'
 import CCHome from './CCHome'
+import LecHome from './LecHome'
+//HOD Manage Department Routes
+import AssignStaffCourse from './HODLayout/ManageDepartment/AssignStaffCourse'
+import DeleteStaffCourse from './HODLayout/ManageDepartment/DeleteStaffCourse'
+import UpdateStaffCourse from './HODLayout/ManageDepartment/UpdateStaffCourse'
+import ViewDepartmentStaff from './HODLayout/ManageDepartment/ViewDepartmentStaff'
+import ViewCourseCoverageHOD from './HODLayout/ManageDepartment/ViewCourseCoverageHOD'
+import ViewDayOffStaff from './HODLayout/ManageDepartment/ViewDayOffStaff'
+import ViewDepTeachAssign from './HODLayout/ManageDepartment/ViewDepTeachAssign'
+import AcceptRequests from './HODLayout/ManageRequests/AcceptRequests'
+import RejectRequests from './HODLayout/ManageRequests/RejectRequests'
+import ViewDayOffRequests from './HODLayout/ManageRequests/ViewDayOffRequests'
 
-
-// export class App extends Component {
-//   render() {
-//     return (
-      // <Router> 
-      // <Route path ="/">
-      //   <div class="App">
-      //   </div>
-      // </Route>
-      // <Route exact path ="/addstaff" component = {AddStaff}>
-      // </Route>
-      // <Route exact path ="/adddepartment" component = {AddDepartment}>
-      // </Route>
-      // <Route exact path ="/addfaculty" component = {AddFaculty}>
-      // </Route>
-      // <Route exact path ="/addcourse" component = {AddCourse}>
-      // </Route>
-      // <Route exact path ="/addlocation" component = {AddLocation}>
-      // </Route>
-      // <Route exact path ="/addsigninout" component = {AddSignInOut}>
-      // </Route>
-      // <Route exact path ="/updatestaff" component = {UpdateStaff}>
-      // </Route>
-      // <Route exact path ="/updatedepartment" component = {UpdateDepartment}>
-      // </Route>
-      // <Route exact path ="/updatefaculty" component = {UpdateFaculty}>
-      // </Route>
-      // <Route exact path ="/updatecourse" component = {UpdateCourse}>
-      // </Route>
-      // <Route exact path ="/updatelocation" component = {UpdateLocation}>
-      // </Route>
-      // <Route exact path ="/updatesalary" component = {UpdateSalary}>
-      // </Route>
-      // <Route exact path ="/deletestaff" component = {DeleteStaff}>
-      // </Route>
-      // <Route exact path ="/deletedepartment" component = {DeleteDepartment}>
-      // </Route>
-      // <Route exact path ="/deletefaculty" component = {DeleteFaculty}>
-      // </Route>
-      // <Route exact path ="/deletecourse" component = {DeleteCourse}>
-      // </Route>
-      // <Route exact path ="/deletelocation" component = {DeleteLocation}>
-      // </Route>
-      // <Route exact path ="/viewmissing" component = {ViewMissing}>
-      // </Route>
-      // <Route exact path ="/viewstaffattendance" component = {ViewStaffAttendance}>
-      // </Route>
-      // <Route exact path ="/viewprofile" component = {ViewProfile}>
-      // </Route>
-      // <Route exact path ="/viewattendance" component = {ViewAttendance}>
-      // </Route>
-      // <Route exact path ="/viewmissingdayshours" component = {ViewMissingDaysHours}>
-      // </Route>     
-      // <Route  exact path="/login" component={Login}>
-      // </Route>
-      // <Route  exact path="/HrHome" component={HrHome}>
-      // </Route>
-      // <Route  exact path="/HodHome" component={HodHome}>
-      // </Route>
-      // <Route  exact path="/CCHome" component={CCHome}>
-      // </Route>
-      // <Route  exact path="/resetpassword" component={ResetPassword}>
-      // </Route>
-      // <Route  exact path="/updateprofile" component={UpdateProfile}>
-      // </Route>
-      // </Router>
-//     )
-//   }
 function App() {
-  // localStorage.setItem('token',"")
-  // const { token1, setToken } = useToken();
-  // alert(sessionStorage.getItem('token'))
- /* var token = null
+  var token = null
   token = sessionStorage.getItem("token");
   if(token==null) {
     return <Login />
@@ -125,14 +66,12 @@ function App() {
       <div className="wrapper">
       <Router>
         <Switch>
-         <Route path ="/HrHome" component={HrHome}>
-           <div class="App">
-            <Navbar/>
-           </div>
+         <Route path ="/HrHome">
+           <HrHome />
          </Route>
           <Route exact path ="/addstaff" component = {AddStaff}>
           </Route>
-          <Route exact path ="/addslotCC" component = {Addslot}>
+          <Route exact path ="/Login" component = {Login}>
           </Route>
           <Route exact path ="/adddepartment" component = {AddDepartment}>
           </Route>
@@ -182,10 +121,34 @@ function App() {
           </Route>
           <Route  exact path="/CCHome" component={CCHome}>
           </Route>
+          <Route  exact path="/LecHome" component={LecHome}>
+          </Route>
           <Route  exact path="/resetpassword" component={ResetPassword}>
           </Route>
           <Route  exact path="/updateprofile" component={UpdateProfile}>
           </Route>
+
+          <Route exact path ="/assignStaff" component = {AssignStaffCourse}>
+          </Route>
+          <Route exact path ="/removeStaffHOD" component = {DeleteStaffCourse}>
+          </Route>
+          <Route exact path ="/updateStaffHOD" component = {UpdateStaffCourse}>
+          </Route>
+          <Route exact path ="/viewDepStaff" component = {ViewDepartmentStaff}>
+          </Route>
+          <Route exact path ="/viewStaffDayOffHOD" component = {ViewDayOffStaff}>
+          </Route>
+          <Route exact path ="/viewCourseCoverage" component = {ViewCourseCoverageHOD}>
+          </Route>
+          <Route exact path ="/viewTeachingAssignments" component = {ViewDepTeachAssign}>
+          </Route>
+          <Route exact path ="/acceptHODRequests" component = {AcceptRequests}>
+          </Route>
+          <Route exact path ="/rejectHODRequests" component = {RejectRequests}>
+          </Route>
+          <Route exact path ="/viewDayOffReqHOD" component = {ViewDayOffRequests}>
+          </Route>
+          
         </Switch>
         
       </Router>

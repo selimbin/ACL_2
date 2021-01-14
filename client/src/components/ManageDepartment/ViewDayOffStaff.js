@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import axios from "axios";
+import axios from "axios"; 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
 
-export class ViewStaffAttendance extends Component {
-    
+
+export class ViewDayOffStaff extends Component {
     state = {
         id:'',
         staff:[axios]
@@ -17,8 +17,7 @@ export class ViewStaffAttendance extends Component {
         const staff = {
             id:this.state.id
         }
-
-        await axios.post("http://localhost:5000/staff/viewStaffAttendance", staff ,{
+        await axios.post("http://localhost:5000/staff/viewDayOff", staff ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -35,6 +34,7 @@ export class ViewStaffAttendance extends Component {
         let val = event.target.value;
         this.setState({[nam]: val});
     }
+
     render() {
         return (
             <div class="ViewPage">
@@ -43,10 +43,10 @@ export class ViewStaffAttendance extends Component {
                     <ToastContainer />
                     <div class="row">
                         <div class="col-25">
-                            <label htmlfor="id">ID</label>
+                            <label htmlfor="id">Staff ID (optional)</label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="id" name="id" placeholder="Enter the Staff id.." onChange={this.myChangeHandler}></input>
+                            <input type="text" id="id" name="id" placeholder="Enter Staff ID if you want to view this member's info, if empty you will view entire department info .." onChange={this.myChangeHandler}></input>
                         </div>
                     </div>
                     <div class="row">
@@ -57,20 +57,16 @@ export class ViewStaffAttendance extends Component {
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th>month</th>
-                        <th>day</th>
-                        <th>date</th>
-                        <th>SignIns</th>
-                        <th>SignOuts</th>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>day off</th>
                     </tr>
                     {this.state.staff.map((item) => {
                             return (
                                 <tr>
-                                    <td>{item.month}</td>
-                                    <td>{item.day}</td>
-                                    <td>{item.date}</td>
-                                    <td>{item.signIn}</td>
-                                    <td>{item.signOut}</td>
+                                    <td>{item.id}</td>
+                                    <td>{item.name}</td>
+                                    <td>{item.dayOff}</td>
                                 </tr>
                             )
                         })}
@@ -80,4 +76,4 @@ export class ViewStaffAttendance extends Component {
     }
 }
 
-export default ViewStaffAttendance
+export default ViewDayOffStaff

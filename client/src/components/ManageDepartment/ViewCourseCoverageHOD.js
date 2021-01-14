@@ -4,13 +4,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
 
-export class ViewMissing extends Component {
+export class ViewCourseCoverageHOD extends Component {
     state = {staff:[
         axios 
     ]}
 
     componentDidMount(){
-        axios.get("http://localhost:5000/staff/Viewmissed",{
+        axios.get("http://localhost:5000/staff/viewCourseCoverage",{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -19,23 +19,21 @@ export class ViewMissing extends Component {
             }
         }).then(
           res =>this.setState({staff:res.data}),toast.warning("Loading might take some time",{position: toast.POSITION.TOP_CENTER}))
-      }
+    }
     render() {
         return (
             <div class="ViewPage">
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th>id</th>
-                        <th>name</th>
-                        <th>day off</th>
+                        <th>Course Code</th>
+                        <th>Course Coverage</th>
                     </tr>
                     {this.state.staff.map((item) => {
                             return (
                                 <tr>
-                                    <td>{item.id}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.dayOff}</td>
+                                    <td>{item.code}</td>
+                                    <td>{item.coverage}</td>
                                 </tr>
                             )
                         })}
@@ -45,4 +43,4 @@ export class ViewMissing extends Component {
     }
 }
 
-export default ViewMissing
+export default ViewCourseCoverageHOD
