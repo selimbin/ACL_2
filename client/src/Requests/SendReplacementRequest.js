@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Navbar from "../components/Navbar/HODNavbar";
 import LecNavbar from "../components/Navbar/LecNavbar";
 import TANavbar from "../components/Navbar/CCNavbar";
-import RepReq from "../components/ManageDepartment/DeleteStaffCourse";
+import RepReq from "../components/Requests/AddReplacmentReq";
 
 export class SendReplacementRequest extends Component {
     render() {

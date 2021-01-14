@@ -3,7 +3,6 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
-import useToken from '../useToken.js';
 
 export class Viewslotlinkingreq extends Component {
     // const [token, setToken] = useState();
@@ -20,7 +19,7 @@ export class Viewslotlinkingreq extends Component {
             course_code:this.state.course_code
         }
 
-        await axios.get("http://localhost:5000/staff/viewslotlinkingreq", course ,{
+        await axios.post("http://localhost:5000/staff/viewslotlinkingreq", course ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -48,7 +47,7 @@ export class Viewslotlinkingreq extends Component {
                             <label htmlfor="course_code">Course Code</label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="course_code" name="course_code" placeholder="Enter the Staff id.." onChange={this.myChangeHandler}></input>
+                            <input type="text" id="course_code" name="course_code" placeholder="Enter Course code.." onChange={this.myChangeHandler}></input>
                         </div>
                     </div>
                     <div class="row">
@@ -59,7 +58,7 @@ export class Viewslotlinkingreq extends Component {
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th>id</th>
+                        <th>_id</th>
                         <th>status</th>
                         <th>requester</th>
                         <th>slot</th>
@@ -68,7 +67,7 @@ export class Viewslotlinkingreq extends Component {
                     {this.state.requests.map((item) => {
                             return (
                                 <tr>
-                                    <td>{item.id}</td>
+                                    <td>{item._id}</td>
                                     <td>{item.status}</td>
                                     <td>{item.requester}</td>
                                     <td>{item.slot}</td>

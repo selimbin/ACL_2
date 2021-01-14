@@ -23,7 +23,7 @@ export class Viewcoverage extends Component {
             courses:array
         }
 
-        await axios.get("http://localhost:5000/staff/viewcoverage", course ,{
+        await axios.post("http://localhost:5000/staff/viewcoverage", course ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",

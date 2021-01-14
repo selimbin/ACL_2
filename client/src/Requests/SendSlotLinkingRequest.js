@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Navbar from "../components/Navbar/HODNavbar";
 import LecNavbar from "../components/Navbar/LecNavbar";
 import TANavbar from "../components/Navbar/CCNavbar";
-import SlotReq from "../components/ManageDepartment/DeleteStaffCourse";
+import SlotReq from "../components/Requests/AddSlotlinkingReq";
 
 export class SendSlotLinkingRequest extends Component {
     render() {

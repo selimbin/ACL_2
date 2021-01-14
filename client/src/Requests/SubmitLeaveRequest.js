@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Navbar from "../components/Navbar/HODNavbar";
 import LecNavbar from "../components/Navbar/LecNavbar";
 import TANavbar from "../components/Navbar/CCNavbar";
-import LeaveReq from "../components/ManageDepartment/DeleteStaffCourse";
+import LeaveReq from "../components/Requests/SubmitLeaveRequest";
 
 export class SubmitLeaveRequest extends Component {
     render() {

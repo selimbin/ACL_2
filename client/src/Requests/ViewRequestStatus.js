@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Navbar from "../components/Navbar/HODNavbar";
 import LecNavbar from "../components/Navbar/LecNavbar";
 import TANavbar from "../components/Navbar/CCNavbar";
-import ViewReq from "../components/ManageDepartment/DeleteStaffCourse";
+import ViewReq from "../components/Requests/ViewRequests";
 
 export class ViewRequestStatus extends Component {
     render() {

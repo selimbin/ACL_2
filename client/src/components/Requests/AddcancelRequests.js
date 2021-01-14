@@ -59,4 +59,4 @@ export class AddcancelRequests extends Component {
     }
 }
 
-export default AddchangeDayOffReq
+export default AddcancelRequests 
