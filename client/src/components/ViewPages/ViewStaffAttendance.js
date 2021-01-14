@@ -3,10 +3,8 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
-import useToken from '../useToken.js';
 
 export class ViewStaffAttendance extends Component {
-    // const [token, setToken] = useState();
     
     state = {
         id:'',
@@ -25,7 +23,7 @@ export class ViewStaffAttendance extends Component {
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":sessionStorage.getItem('token')
+                "token":sessionStorage.getItem('token') 
             }
         })
         .then(res => this.setState({staff:res.data}))

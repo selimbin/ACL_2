@@ -28,16 +28,14 @@ export class ViewMissing extends Component {
                     <tr>
                         <th>id</th>
                         <th>name</th>
-                        <th>missed days</th>
-                        <th>missed hours</th>
+                        <th>day off</th>
                     </tr>
                     {this.state.staff.map((item) => {
                             return (
                                 <tr>
                                     <td>{item.id}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.missedDays}</td>
-                                    <td>{item.missedHours}</td>
+                                    <td>{item.dayOff}</td>
                                 </tr>
                             )
                         })}

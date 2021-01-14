@@ -2750,12 +2750,16 @@ router.route('/assignInstructor')
         const department = await department_model.findOne({name:user.department})
         const user1=await staff_model.findOne({id:req.body.id})
         if(user1==null){
-            res.send("There is no corresponding instructor")
+            return res.status(400).json({msg:"Please enter a valid Staff ID"});
         }
         if(department.head==user.id){
             var index= null
             var course = null 
-            const check= await course_model.findOne({code:req.body.course}) 
+            var check = null
+            check= await course_model.findOne({code:req.body.course}) 
+            if(check==null){
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
+            }
             for(var x in department.courses){
                 if(department.courses[x].code==check.code){
                     course=department.courses[x]
@@ -2763,7 +2767,7 @@ router.route('/assignInstructor')
                 }
             }
             if(course==null){
-                res.send("No corresponding course")
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
             }else{
                         course.lecturer.push(user1.id)
                         var coverage = ((course.TA.length+course.lecturer.length)/course.totalSlots)/100
@@ -2784,11 +2788,11 @@ router.route('/assignInstructor')
                         res.send()
             }
         }else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"You Cannot Access This Page"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2801,7 +2805,7 @@ router.route('/removeInstructor')
         const department = await department_model.findOne({name:user.department})
         const user1=await staff_model.findOne({id:req.body.id})
         if(user1==null){
-            res.send("There is no corresponding instructor")
+            return res.status(400).json({msg:"Please enter a valid Staff ID"});
         }
         if(department.head==user.id){
             var course = null
@@ -2813,7 +2817,7 @@ router.route('/removeInstructor')
                 }
             }
             if(course==null){
-                res.send("No corresponding course")
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
             }else{
                         for(var i in course.lecturer){
                             if(course.lecturer[i]==user1.id){
@@ -2834,10 +2838,10 @@ router.route('/removeInstructor')
                             }
                         }
 
-                        res.send("This instructor does not teach this course")
-                }
+                        return res.status(400).json({msg:"This instructor does not teach this course"});
+                    }
         }else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
@@ -2850,17 +2854,23 @@ router.route('/removeInstructor')
 router.route('/updateInstructor')
 .put(async(req,res)=>{
     try{
+        var user1=null
+        var user2=null
         const user= await staff_model.findById(req.user._id)
         const department = await department_model.findOne({name:user.department})
-        const user1=await staff_model.findOne({id:req.body.oldID})
-        const user2=await staff_model.findOne({id:req.body.newID})
+        user1=await staff_model.findOne({id:req.body.oldID})
+        user2=await staff_model.findOne({id:req.body.newID})
         if(user1==null||user2==null){
-            res.send("There is no corresponding instructor")
+            return res.status(400).json({msg:"Please enter a valid Staff ID's"});
         }
         if(department.head==user.id){
             var index= null
             var course = null 
-            const check= await course_model.findOne({code:req.body.course}) 
+            var check = null
+            check= await course_model.findOne({code:req.body.course}) 
+            if(check == null){
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
+            }
             for(var x in department.courses){
                 if(department.courses[x].code==check.code){
                     course=department.courses[x]
@@ -2868,7 +2878,7 @@ router.route('/updateInstructor')
                 }
             }
             if(course==null){
-                res.send("No corresponding course")
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
             }else{
                 for(var i in course.lecturer){
                     if(course.lecturer[i]==user1.id){
@@ -2888,24 +2898,24 @@ router.route('/updateInstructor')
                 }
             }
         }else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
 // HOD view staff ----------------------------------------------------
 
 router.route('/viewStaff')
-.get(async(req,res)=>{
+.post(async(req,res)=>{
     try{
         const user= await staff_model.findById(req.user._id)
         const department = await department_model.findOne({name:user.department})
         if(department.head==user.id){
             if(req.body.view=="department"){
-                info = await staff_model.find({department:user.department})
+                var info = await staff_model.find({department:user.department})
                 res.send(info)
             }
             else{
@@ -2917,10 +2927,10 @@ router.route('/viewStaff')
                         }
                     }
                     if(course==null){
-                        res.send("You cannot access this course")
+                        return res.status(400).json({msg:"You cannot view this course"});
                     }
                     else{
-                        const staff = []
+                        let staff = []
                         var TA1= null
                         for(var i in course.TA){
                             TA1 = await staff_model.findOne({id:course.TA[i]})
@@ -2934,34 +2944,45 @@ router.route('/viewStaff')
                     }
                 }
                 else{
-                    res.send("Please enter view")
+                    return res.status(400).json({msg:"Enter Correct view"});
                 }
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
 // HOD view dayOff ---------------------------------------------------
 
 router.route('/viewDayOff')
-.get(async(req,res)=>{
+.post(async(req,res)=>{
     try{
         const user= await staff_model.findById(req.user._id)
         const department = await department_model.findOne({name:user.department})
         if(department.head==user.id){
             if(req.body.id){
-                const staff= await staff_model.findOne({id:req.body.id})
+                var staff = null
+                staff= await staff_model.findOne({id:req.body.id})
+                if(staff==null){
+                    return res.status(400).json({msg:"Please enter a valid Staff ID's"});
+                }
                 if(staff.department==user.department){
-                    res.send(staff.dayOff)
+                    const result = {
+                        "name":staff.name,
+                        "id":staff.id,
+                        "dayOff":staff.dayOff
+                    }
+                    var x = []
+                    x.push(result)
+                    res.send(x)
                 }
                 else{
-                    res.send("This staff member is not in your department")
+                    return res.status(400).json({msg:"Staff Member Not in department"});
                 }
             }
             else{
@@ -2970,11 +2991,11 @@ router.route('/viewDayOff')
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2987,15 +3008,19 @@ router.route('/viewChangeDayOff')
         const department = await department_model.findOne({name:user.department})
         if(department.head==user.id){
             // const requests = await request_model.find({receiver:user.id,type:"changedayoffRequest"}) 
-            const requests = await request_model.find({receiver:user.id}) 
+            var requests = null
+            requests = await request_model.find({receiver:user.id}) 
+            if(requests == null){
+                return res.status(400).json({msg:"No Requests Present"});
+            }
             res.send(requests)
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -3009,7 +3034,7 @@ router.route('/acceptRequest')
         if(department.head==user.id){
             const request = await request_model.findById(req.body._id)
             if(request==null){
-                res.send("No corresponding request")
+                return res.status(400).json({msg:"No Corresponding Request"});
             }
             else{
                 var today =  new Date()
@@ -3025,6 +3050,9 @@ router.route('/acceptRequest')
                 const sender = await staff_model.findOne({id:request.requester})
                 var amount = request.amount
                 var schedule = null
+                if(request.type!="accidentalLeave"||request.type!="annualLeave"||request.type!="sick"||request.type!="maternity"||request.type!="compensation"){
+                    return res.status(400).json({msg:"Enter correct request type: (accidentalLeave, annualLeave, sick, maternity or compensation)"});
+                }
                 if(request.type=="accidentalLeave"){
                     var missed = sender.leaveBalance - amount
                     sender.leaveBalance = missed
@@ -3053,15 +3081,16 @@ router.route('/acceptRequest')
                 else{
                     await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
                 }
+
                 res.send()
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }   
     catch(error){   
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -3075,7 +3104,7 @@ router.route('/rejectRequest')
         if(department.head==user.id){
             const request = await request_model.findById(req.body._id)
             if(request==null){
-                res.send("No corresponding request")
+                return res.status(400).json({msg:"No Corresponding Course"});
             }
             else{
                 request.status="rejected"
@@ -3092,11 +3121,11 @@ router.route('/rejectRequest')
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -3110,25 +3139,25 @@ router.route('/viewCourseCoverage')
         if(department.head==user.id){
             const coverage = await course_model.find({departmentname:user.department},'code coverage')
             if(coverage==null){
-                res.send("No courses in your department")
+                return res.status(400).json({msg:"No courses in your department"});
             }
             else{
                 res.send(coverage)
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 
 //--------------------------------------------------------------------
 // HOD view course Assignments ---------------------------------------
 router.route('/viewAssignments')
-.get(async(req,res)=>{
+.post(async(req,res)=>{
     try{
         const user= await staff_model.findById(req.user._id)
         const department = await department_model.findOne({name:user.department})
@@ -3142,13 +3171,13 @@ router.route('/viewAssignments')
             }
 
             if(course==null){
-                res.send("There is no corresponding course")
+                return res.status(400).json({msg:"There is no Corresponding Course"});
             }
             else{
                 const schedule = await schedule_model.findOne({id:course.code})
                 // const slots = await slot_model.find({course:course.code})
                 if(schedule==null){
-                    res.send("Course does not yet have a schedule")
+                    return res.status(400).json({msg:"Course Does Not Yet Have a Schedule"});
                 }
                 else{
                     res.send(schedule)
@@ -3156,11 +3185,11 @@ router.route('/viewAssignments')
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 
