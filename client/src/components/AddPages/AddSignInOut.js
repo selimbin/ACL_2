@@ -78,7 +78,7 @@ export class AddSignInOut extends Component {
                             <label htmlfor="date">Date</label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="date" name="date" placeholder="Enter the date Ex: 01/07/2021" onChange={this.myChangeHandler}></input>
+                            <input type="text" id="date" name="date" placeholder="Enter the date Ex: 2021-07-31" onChange={this.myChangeHandler}></input>
                         </div>
                     </div> 
                     <div class="row">

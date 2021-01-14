@@ -3,12 +3,6 @@ const mongoose = require('mongoose')
 const {staffSchema} = require('../models/staff.js')
 
 const internalRequestSchema= new mongoose.Schema({
-  id:{
-        type:String,
-        required:true,
-        minlength:6,
-        auto:true
-    },
     type:{
         type:String,
         required:true,

@@ -7,7 +7,6 @@ import {BrowserRouter as Router,Link,Route,Switch} from 'react-router-dom'
 import './App.css';
 // Images ----------------------
 // Add Routes ------------------
-import Tony1 from'./components/TAAddPages/AddchangeDayOffReq'
 import AddStaff from './HRLayout/Add/AddStaff'
 import AddDepartment from './HRLayout/Add/AddDepartment'
 import AddFaculty from './HRLayout/Add/AddFaculty'
@@ -69,7 +68,14 @@ import DeleteCourseSlot from './CourseCoordinatorLayout/DeleteCourseSlot'
 import RejectSlotLinking from './CourseCoordinatorLayout/RejectSlotLinking'
 import UpdateCourseSlot from './CourseCoordinatorLayout/UpdateCourseSlot'
 import ViewSlotLinkingRequests from './CourseCoordinatorLayout/ViewSlotLinkingRequests'
-
+//Academic Staff Routes
+import CancelRequests from './Requests/CancelRequest'
+import ChangeDayOffRequest from './Requests/ChangeDayOffRequest'
+import SendReplacementRequest from './Requests/SendReplacementRequest'
+import SendSlotLinkingRequest from './Requests/SendSlotLinkingRequest'
+import ViewReplacementRequest from './Requests/ViewReplacementRequest'
+import ViewRequestStatus from './Requests/ViewRequestStatus'
+import SubmitLeaveRequest from './Requests/SubmitLeaveRequest'
 
 
 function App() {
@@ -194,6 +200,22 @@ function App() {
           <Route exact path ="/updateCourseSlot" component = {UpdateCourseSlot}>
           </Route>
           <Route exact path ="/viewSlotLinkingRequestsCC" component = {ViewSlotLinkingRequests}>
+          </Route>
+
+
+          <Route exact path ="/cancelRequest" component = {CancelRequests}>
+          </Route>
+          <Route exact path ="/changeDayOffReq" component = {ChangeDayOffRequest}>
+          </Route>
+          <Route exact path ="/sendReplacementRequest" component = {SendReplacementRequest}>
+          </Route>
+          <Route exact path ="/sendSlotLinkingReq" component = {SendSlotLinkingRequest}>
+          </Route>
+          <Route exact path ="/submitLeaveRequest" component = {SubmitLeaveRequest}>
+          </Route>
+          <Route exact path ="/viewReplacementRequest" component = {ViewReplacementRequest}>
+          </Route>
+          <Route exact path ="/viewRequestStatus" component = {ViewRequestStatus}>
           </Route>
 
 

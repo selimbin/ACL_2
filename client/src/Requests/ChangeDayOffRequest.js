@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import Navbar from ".../components/Navbar/HODNavbar";
-import LecNavbar from ".../components/Navbar/LecNavbar";
+import Navbar from "../components/Navbar/HODNavbar";
+import LecNavbar from "../components/Navbar/LecNavbar";
 import TANavbar from "../components/Navbar/CCNavbar";
-import ChangeDOReq from "../components/ManageDepartment/DeleteStaffCourse";
+import ChangeDOReq from "../components/Requests/AddchangeDayOffReq";
 
 export class ChangeDayOffRequest extends Component {
     render() {

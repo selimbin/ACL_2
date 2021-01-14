@@ -23,7 +23,7 @@ export class Viewslotassignment extends Component {
             courses:array
         }
 
-        await axios.get("http://localhost:5000/staff/viewslotassignment", course ,{
+        await axios.post("http://localhost:5000/staff/viewslotassignment", course ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
