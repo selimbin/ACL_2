@@ -8,6 +8,7 @@ import './App.css';
 // Images ----------------------
 // Add Routes ------------------
 import AddStaff from './HRLayout/Add/AddStaff'
+import Addslot from './CCLayout/Add/Addslot'
 import AddDepartment from './HRLayout/Add/AddDepartment'
 import AddFaculty from './HRLayout/Add/AddFaculty'
 import AddCourse from './HRLayout/Add/AddCourse'
@@ -22,6 +23,7 @@ import UpdateLocation from './HRLayout/Update/UpdateLocation'
 import UpdateSalary from './HRLayout/Update/UpdateSalary'
 // Delete Routes ---------------
 import DeleteStaff from './HRLayout/Delete/DeleteStaff'
+import Removemem from './CILayout/Delete/Removemem'
 import DeleteDepartment from './HRLayout/Delete/DeleteDepartment'
 import DeleteFaculty from './HRLayout/Delete/DeleteFaculty'
 import DeleteCourse from './HRLayout/Delete/DeleteCourse'
@@ -59,7 +61,7 @@ function App() {
   token = sessionStorage.getItem("token");
   if(token==null) {
     return <Login />
-  }
+  }*/
     return (
       <div className="wrapper">
       <Router>
@@ -92,6 +94,8 @@ function App() {
           <Route exact path ="/updatelocation" component = {UpdateLocation}>
           </Route>
           <Route exact path ="/updatesalary" component = {UpdateSalary}>
+          </Route>
+          <Route exact path ="/removememCI" component = {Removemem}>
           </Route>
           <Route exact path ="/deletestaff" component = {DeleteStaff}>
           </Route>
@@ -146,7 +150,7 @@ function App() {
           </Route>
           
         </Switch>
-
+        
       </Router>
       </div>
     );
