@@ -36,7 +36,7 @@ export class ViewMissingDaysHours extends Component {
             return (
                 <div>
                     <LecNavbar/>
-                    <Resetpassword/>
+                    <Viewmissingdayshours/>
                 </div>
             )
         }

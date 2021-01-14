@@ -87,4 +87,4 @@ export class ViewSchedule extends Component{
     }
 
 }
-export default ViewSchedule
+export default ViewSchedule 

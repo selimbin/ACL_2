@@ -738,12 +738,12 @@ app.use(async(req, res, next)=>{
         req.user= verified
         const user = await staff_model.findById(req.user._id)
         if(user.token!=token){
-            res.send("login again")
+            return res.status(40).status('Please login Again')
         }
         next()
     }
     catch(err){
-        res.status(400).send('Invalid Request')
+        return res.status(400).send('Invalid Request')
     }
 })
 
