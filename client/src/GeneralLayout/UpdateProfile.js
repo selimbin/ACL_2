@@ -4,6 +4,7 @@ import TANavbar from "../components/Navbar/CCNavbar";
 import Navbar from "../components/Navbar/Navbar";
 import LecNavbar from "../components/Navbar/LecNavbar";
 import Updateprofile from "../components/Services/UpdateProfile";
+import Resetpassword from "./ResetPassword";
 
 export class UpdateProfile extends Component {
     render() {

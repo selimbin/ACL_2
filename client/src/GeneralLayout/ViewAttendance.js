@@ -4,6 +4,7 @@ import TANavbar from "../components/Navbar/CCNavbar";
 import Navbar from "../components/Navbar/Navbar";
 import LecNavbar from "../components/Navbar/LecNavbar";
 import Viewattendance from "../components/Services/ViewAttendance";
+import Resetpassword from "./ResetPassword";
 
 export class ViewAttendance extends Component {
     render() {

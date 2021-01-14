@@ -4,6 +4,7 @@ import HODNavbar from "../components/Navbar/HODNavbar";
 import TANavbar from "../components/Navbar/CCNavbar";
 import LecNavbar from "../components/Navbar/LecNavbar";
 import Viewprofile from "../components/Services/ViewProfile";
+import Resetpassword from "./ResetPassword";
 
 export class ViewProfile extends Component {
     render() {
