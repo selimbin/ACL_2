@@ -1,15 +1,14 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './UpdatePage.css'
+import './AddPage.css'
 
-export class Updatealot extends Component {
+export class Addslot extends Component {
     state = {
         course_code: '',
         location: '',
-        newlocation: '',
-        newtype: '',
+        type: '',
         slot_no: 0,
         day:'',
         compensation: false
@@ -20,15 +19,14 @@ export class Updatealot extends Component {
 
         const slot = {
             course_code: this.state.course_code,
-            location: this.state.location,
-            newlocation: this.state.newlocation,
-            newtype: this.state.newtype,
+            location: this.state.locations,
+            type: this.state.types,
             slot_no:this.state.slot_no,
             day:this.state.day,
             compensation:this.state.compensation
         };
 
-        axios.put("http://localhost:5000/staff/updateslot", slot,{
+        axios.post("http://localhost:5000/staff/Addslot", slot,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -36,7 +34,7 @@ export class Updatealot extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then((res) => toast.success("slot Updated successfully",{position: toast.POSITION.TOP_CENTER}))
+        .then((res) => toast.success("slot added successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }    
 
@@ -47,11 +45,11 @@ export class Updatealot extends Component {
     }
     render() {
         return (
-            <div class="UpdatePage">
-            <div class="container">
-                <form onSubmit={this.mySubmitHandler}>
-                <ToastContainer />
-                <div class="row">
+            <div class="AddPage">
+                <div class="container">
+                    <form onSubmit={this.mySubmitHandler}>
+                    <ToastContainer />
+                    <div class="row">
                         <div class="col-25">
                             <label htmlfor="course_code">Course Code</label>
                         </div>
@@ -69,18 +67,10 @@ export class Updatealot extends Component {
                     </div>
                     <div class="row">
                         <div class="col-25">
-                            <label htmlfor="newlocation">newlocation Code (optional)</label>
+                            <label htmlfor="type">type </label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="newlocation" name="newlocation" placeholder="Enter the location code (optional).." onChange={this.myChangeHandler}></input>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-25">
-                            <label htmlfor="newtype">newtype (optional)</label>
-                        </div>
-                        <div class="col-75">
-                            <input type="text" id="newtype" name="newtype" placeholder="Enter the type(tut or lab)(optional).." onChange={this.myChangeHandler}></input>
+                            <input type="text" id="type" name="type" placeholder="Enter the type(tut or lab).." onChange={this.myChangeHandler}></input>
                         </div>
                     </div>
                     <div class="row">
@@ -102,17 +92,17 @@ export class Updatealot extends Component {
                     <div class="row">
                         <div class="col-25">
                             <input type="checkbox" id="compensation" name="compensation" value="true" onChange={this.myChangeHandler}></input>
-                            <label htmlfor="compensation">compensation (optional)</label>
+                            <label htmlfor="compensation">compensation</label>
                         </div>
                     </div> 
-                <div class="row">
-                    <input type="submit" value="Update"></input>
+                    <div class="row">
+                        <input type="submit" value="Add"></input>
+                    </div>
+                    </form>
                 </div>
-                </form>
             </div>
-        </div>
         )
     }
 }
 
-export default Updateslot
+export default Addslot

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Navbar from "../../components/Navbar/HODNavbar";
 import LecNavbar from "../../components/Navbar/LecNavbar";
-import ViewSlotAssign from "../../components/ManageDepartment/DeleteStaffCourse";
+import ViewSlotAssign from "../../components/ManageCourses/Viewslotassignment";
 
 export class ViewCourseSlotAssignment extends Component {
     render() {
