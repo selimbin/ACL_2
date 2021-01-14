@@ -48,7 +48,7 @@ export const MenuItems = [
             },
             {
                 title: 'View All Staff in Department',
-                url: 'viewDepStaff',
+                url: 'viewLecDepStaff',
                 cName: 'nav-links',
             },
             {

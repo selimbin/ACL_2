@@ -8,7 +8,6 @@ import './App.css';
 // Images ----------------------
 // Add Routes ------------------
 import AddStaff from './HRLayout/Add/AddStaff'
-import Addslot from './CCLayout/Add/Addslot'
 import AddDepartment from './HRLayout/Add/AddDepartment'
 import AddFaculty from './HRLayout/Add/AddFaculty'
 import AddCourse from './HRLayout/Add/AddCourse'
@@ -23,7 +22,6 @@ import UpdateLocation from './HRLayout/Update/UpdateLocation'
 import UpdateSalary from './HRLayout/Update/UpdateSalary'
 // Delete Routes ---------------
 import DeleteStaff from './HRLayout/Delete/DeleteStaff'
-import Removemem from './CILayout/Delete/Removemem'
 import DeleteDepartment from './HRLayout/Delete/DeleteDepartment'
 import DeleteFaculty from './HRLayout/Delete/DeleteFaculty'
 import DeleteCourse from './HRLayout/Delete/DeleteCourse'
@@ -38,7 +36,6 @@ import ViewMissingDaysHours from './GeneralLayout/ViewMissingDaysHours'
 import ResetPassword from './GeneralLayout/ResetPassword'
 import UpdateProfile from './GeneralLayout/UpdateProfile'
 import Login from './Login';
-import useToken from './components/useToken';
 // Home Routes ------------------
 import HrHome from './HrHome'
 import HodHome from './HODHome'
@@ -55,13 +52,31 @@ import ViewDepTeachAssign from './HODLayout/ManageDepartment/ViewDepTeachAssign'
 import AcceptRequests from './HODLayout/ManageRequests/AcceptRequests'
 import RejectRequests from './HODLayout/ManageRequests/RejectRequests'
 import ViewDayOffRequests from './HODLayout/ManageRequests/ViewDayOffRequests'
+//Lec ManageCourses Routes
+import AssignMemberAsCC from './LecturerLayout/ManageCourses/AssignMemberAsCC'
+import AssignMemberToCourse from './LecturerLayout/ManageCourses/AssignMemberToCourse'
+import DeleteCourseAssignment from './LecturerLayout/ManageCourses/DeleteCourseAssignment'
+import RemoveMemberFromCourse from './LecturerLayout/ManageCourses/RemoveMemberFromCourse'
+import UpdateCourseAssignment from './LecturerLayout/ManageCourses/UpdateCourseAssignment'
+import ViewAllDepStaff from './LecturerLayout/ManageCourses/ViewAllDepStaff'
+import ViewCourseCoverageLec from './LecturerLayout/ManageCourses/ViewCourseCoverageLec'
+import ViewCourseSlotAssignment from './LecturerLayout/ManageCourses/ViewCourseSlotAssignment'
+//Course Coordinator Routes
+import AcceptSlotLinking from './CourseCoordinatorLayout/AcceptSlotLinking'
+import AddCourseSlot from './CourseCoordinatorLayout/AddCourseSlot'
+import DeleteCourseSlot from './CourseCoordinatorLayout/DeleteCourseSlot'
+import RejectSlotLinking from './CourseCoordinatorLayout/RejectSlotLinking'
+import UpdateCourseSlot from './CourseCoordinatorLayout/UpdateCourseSlot'
+import ViewSlotLinkingRequests from './CourseCoordinatorLayout/ViewSlotLinkingRequests'
+
+
 
 function App() {
   var token = null
   token = sessionStorage.getItem("token");
   if(token==null) {
     return <Login />
-  }*/
+  }
     return (
       <div className="wrapper">
       <Router>
@@ -94,8 +109,6 @@ function App() {
           <Route exact path ="/updatelocation" component = {UpdateLocation}>
           </Route>
           <Route exact path ="/updatesalary" component = {UpdateSalary}>
-          </Route>
-          <Route exact path ="/removememCI" component = {Removemem}>
           </Route>
           <Route exact path ="/deletestaff" component = {DeleteStaff}>
           </Route>
@@ -149,12 +162,45 @@ function App() {
           <Route exact path ="/viewDayOffReqHOD" component = {ViewDayOffRequests}>
           </Route>
           
+
+          <Route exact path ="/assignMemberCourseCoordinator" component = {AssignMemberAsCC}>
+          </Route>
+          <Route exact path ="/assignAcadCourse" component = {AssignMemberToCourse}>
+          </Route>
+          <Route exact path ="/deleteCourseAssignment" component = {DeleteCourseAssignment}>
+          </Route>
+          <Route exact path ="/removeMemberCourse" component = {RemoveMemberFromCourse}>
+          </Route>
+          <Route exact path ="/updateCourseAssignment" component = {UpdateCourseAssignment}>
+          </Route>
+          <Route exact path ="/viewTeachingAssignments" component = {ViewAllDepStaff}>
+          </Route>
+          <Route exact path ="/viewMyCoverage" component = {ViewCourseCoverageLec}>
+          </Route>
+          <Route exact path ="/viewCourseSlotAssignment" component = {ViewCourseSlotAssignment}>
+          </Route>
+
+
+
+          <Route exact path ="/acceptSlotLinkingRequest" component = {AcceptSlotLinking}>
+          </Route>
+          <Route exact path ="/addCourseSlot" component = {AddCourseSlot}>
+          </Route>
+          <Route exact path ="/deleteCourseSlot" component = {DeleteCourseSlot}>
+          </Route>
+          <Route exact path ="/rejectSlotLinkingRequest" component = {RejectSlotLinking}>
+          </Route>
+          <Route exact path ="/updateCourseSlot" component = {UpdateCourseSlot}>
+          </Route>
+          <Route exact path ="/viewSlotLinkingRequestsCC" component = {ViewSlotLinkingRequests}>
+          </Route>
+
+
         </Switch>
         
       </Router>
       </div>
     );
-  // }
 }
 
 export default App;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Navbar from "../../components/Navbar/HODNavbar";
 import LecNavbar from "../../components/Navbar/LecNavbar";
-import DeleteAssign from "../../components/ManageDepartment/DeleteStaffCourse";
+import DeleteAssign from "../../components/ManageCourses/Deleteslotassign";
 
 export class DeleteCourseAssignment extends Component {
     render() {
