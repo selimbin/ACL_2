@@ -2424,7 +2424,7 @@ router.route('/viewMissingHours')
 })
 
 //--------------------------------------------------------------------
-// view Schedule -----------------------------------------------------
+// Tony Start -----------------------------------------------------
 
 router.route('/viewschedule')
 .get(async(req,res)=>{
@@ -2434,6 +2434,16 @@ router.route('/viewschedule')
     res.send(Schedule)
 }else
 res.send('HR cants view schedules of any kind')
+})
+
+router.route('/viewReplacementReq')
+.get(async(req,res)=>{
+    const user = await staff_model.findById(req.user._id)
+    if(user.role!='HR'){
+        const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
+        res.send(myrequests)
+    }else
+        res.send('HR cants have requests or view of any kind')
 })
 
 router.route('/sendReplacmentReq')
@@ -2462,15 +2472,6 @@ router.route('/sendReplacmentReq')
 res.send('HR cants have requests of any kind')
 })
 
-router.route('/viewReplacementReq')
-.get(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-        const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
-        res.send(myrequests)
-    }else
-        res.send('HR cants have requests or view of any kind')
-})
 router.route('/slotlinkingrequest')
 .post(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
@@ -2494,17 +2495,24 @@ router.route('/changeDayOffReq')
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
     const department = await department_model.findOne({name:user.department})
+    const newdayoff=req.body.newDay;
     if(department!=null){
-        const newreqest = await new request_model({type:'changeDayOffReq',reason:req.body.reason,requester:user.id,receiver:department.head,newDay:req.body.newDay})
+        if((newdayoff=='Sat'||newdayoff=='Sun'||newdayoff=='Mon'||newdayoff=='Tue'||newdayoff=='Wed'||newdayoff=='Thr')&&newdayoff!='Fri'){
+        const newreqest = await new request_model({type:'changeDayOffReq',reason:req.body.reason,requester:user.id,receiver:department.head,newDay:newdayoff})
         await newreqest.save()
         res.send(newreqest)
     }else{
+        //res.send('Please enter correct abreviation of a work day ')
+        return res.status(400).json({msg:"Please enter correct abreviation of a work day "});
+    }
+    }else{
+        return res.status(400).json({msg:"no head of department was found"});
         res.send('no head of department was found')
     }
 }else
-res.send('HR cants have requests of any kind')
+    return res.status(400).json({msg:"HR cants have requests of any kind"});
+    //res.send('HR cants have requests of any kind')
 })
-
 
 router.route('/AnnualLeaveReq')
 .post(async(req,res)=>{
@@ -2534,10 +2542,10 @@ router.route('/AnnualLeaveReq')
                 
         }else
         res.send('HR cants have requests of any kind')
-    })
+})
 
-    router.route('/CompensationLeaveReq')
-    .post(async(req,res)=>{
+router.route('/CompensationLeaveReq')
+.post(async(req,res)=>{
         if(req.body.date==null||req.body.date.length!=10){
             res.send("Enter date request will take effect of format MM/DD/YYYY")
         }
@@ -2562,9 +2570,7 @@ router.route('/AnnualLeaveReq')
 }      
    else
    res.send('HR cants have requests of any kind')
-                })
-
-
+})
 
 router.route('/MaternityLeaveReq')
 .post(async(req,res)=>{
@@ -2588,13 +2594,6 @@ router.route('/MaternityLeaveReq')
     }else
        res.send('HR cants have requests of any kind')
 })
-
-
-
-
-
-
-
 
 router.route('/accidentalLeaveReq')
 .post(async(req,res)=>{
@@ -2623,6 +2622,7 @@ router.route('/accidentalLeaveReq')
    }else
    res.send('HR cants have requests of any kind') 
 })
+
 router.route('/sickleaveReq')
 .post(async(req,res)=>{
     if(req.body.date==null||req.body.date.length!=10){
@@ -2647,9 +2647,8 @@ router.route('/sickleaveReq')
         res.send('HR cants have requests of any kind')
 })
 
-
- router.route('/Notification')
- .get(async(req,res)=>{
+router.route('/Notification')
+.get(async(req,res)=>{
     const user = await staff_model.findById(req.user._id)
     if(user.role!='HR'){
      const reqests = await request_model.findOne({requester:user.id})
@@ -2658,7 +2657,7 @@ router.route('/sickleaveReq')
      }
     }else
     res.send('HR cant be notified of anything')
- })
+})
 
 router.route('/viewAcceptedRequests')
 .get(async(req,res)=>{
@@ -2720,7 +2719,12 @@ router.route('/cancelRequests')
         if(requests.requester==user.id){
             const date = new Date(requests.date)
             if(requests.Status=="Pending"||date>=today){
-                const cancelRequests = request_model.findByIdAndDelete(requests._id)
+                try {
+                    const cancelRequests = request_model.findByIdAndDelete(requests._id) 
+                } catch (error) {
+                    res.send("has already been canceled before or does not exist to be canceled")
+                }
+
                 res.send("Request Canceled")
             }
             else{
@@ -2733,6 +2737,9 @@ router.route('/cancelRequests')
     }else
     res.send('HR cants have requests of any kind')
 })
+
+//Tony ends here
+
 //--------------------------------------------------------------------
 // HOD assign instructor ---------------------------------------------
 

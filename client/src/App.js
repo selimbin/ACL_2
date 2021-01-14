@@ -7,6 +7,7 @@ import {BrowserRouter as Router,Link,Route,Switch} from 'react-router-dom'
 import './App.css';
 // Images ----------------------
 // Add Routes ------------------
+import Tony1 from'./components/TAAddPages/AddchangeDayOffReq'
 import AddStaff from './HRLayout/Add/AddStaff'
 import AddDepartment from './HRLayout/Add/AddDepartment'
 import AddFaculty from './HRLayout/Add/AddFaculty'
