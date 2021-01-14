@@ -58,7 +58,7 @@ export class Viewslotlinkingreq extends Component {
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th>id</th>
+                        <th>_id</th>
                         <th>status</th>
                         <th>requester</th>
                         <th>slot</th>
@@ -67,7 +67,7 @@ export class Viewslotlinkingreq extends Component {
                     {this.state.requests.map((item) => {
                             return (
                                 <tr>
-                                    <td>{item.id}</td>
+                                    <td>{item._id}</td>
                                     <td>{item.status}</td>
                                     <td>{item.requester}</td>
                                     <td>{item.slot}</td>
