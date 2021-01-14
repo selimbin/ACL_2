@@ -4188,9 +4188,9 @@ router.route('/acceptslotlinkingreq')
         }
         const course = await course_model.findOne({code : req.body.course_code })
         if(cord.id==course.courseCoordinator){
-            const slotreq = await request_model.findOne({id : req.body.slotlinking_id });
+            const slotreq = await request_model.findByID(req.body.slotlinking_id);
             if(!slotreq)
-                return res.status(400).json({msg:"please enter a valid slotlinking_id"});
+                return res.status(400).json({msg:"please enter a valid slotlinking _id"});
 
             const day = slotreq.newDay;
             const slot_no = slotreq.slot;
@@ -4368,9 +4368,9 @@ router.route('/Rejectslotlinkingreq')
         }
         const course = await course_model.findOne({code : req.body.course_code })
         if(cord.id==course.courseCoordinator){   
-            const slotreq = await request_model.findOne({id : req.body.slotlinking_id });
+            const slotreq = await request_model.findByID(req.body.slotlinking_id);
             if(!slotreq)
-                return res.status(400).json({msg:"please enter a valid slotlinking_id"});
+                return res.status(400).json({msg:"please enter a valid slotlinking _id"});
 
             slotreq.status="Rejected";
             await slotreq.save();
