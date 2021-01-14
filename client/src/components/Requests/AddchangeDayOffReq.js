@@ -25,7 +25,7 @@ export class AddchangeDayOffReq extends Component {
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxYTk2ODQyOTY3MTA2ZjRlNmQ0ZTgiLCJyb2xlIjoiVEEiLCJpYXQiOjE2MTA0NTc0NTR9.rIBD0gkNKz0kr2qj6FgaYlVlgczx5avb48KAAU-emok",
+                "token":sessionStorage.getItem('token')
             }
         })
         .then((res) => toast.success("Request added successfully",{position: toast.POSITION.TOP_CENTER}))
