@@ -6,7 +6,7 @@ import Navbar from "./components/Navbar/CCNavbar";
 import viewprofile from './components/Images/View_Profile.png';
 import signin from './components/Images/SignIn.jpg';
 import signout from './components/Images/SignOut.jpg';
-import './HrHome.css'
+import './CCHome.css'
 
 export class HrHome extends Component {
     render() {

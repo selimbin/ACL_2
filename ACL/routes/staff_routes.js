@@ -1772,45 +1772,49 @@ router.route('/AddsignIn')
             if(today.toTimeString().substring(0,2)<"07"){
                 return res.status(400).json({msg:"You cannot add a sign in before 7AM"});
             }
+
             const user= await staff_model.findOne({id:id})
-            var attendance= await attendance_model.findOne({"id":id,"date":today.toLocaleString().substring(0,10)})
+            var attendance= await attendance_model.findOne({"id":id,"date":today.toISOString().substring(0,10)})
             var schedule_attendance = null
-            if(today.toDateString().substring(8,10)<"11"){
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+            var tester = null
+            if(today.getDate()<11){
+                if(today.getMonth()==0){
+                    tester = "12" 
+                }else{
+                    if(today.getMonth()<10){
+                        tester = "0"+(parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                    }
+                    else{
+                        tester = (parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                    }
+                }
             }
             else{
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+                tester = today.toISOString().substring(5,7)
             }
-            if(schedule_attendance==null){
-                if(today.toDateString().substring(8,10)<"11"){
-                    schedule_attendance = new scheduleAttendance_model({
-                        id:user.id,
-                        month:(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()
-                    })
-                    await schedule_attendance.save()
-                }
-                else{
-                    schedule_attendance = new scheduleAttendance_model({
-                        id:user.id,
-                        month:today.toLocaleString().substring(0,2)
-                    })
-                    await schedule_attendance.save()
-                }
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":id,"month":tester})
+
+            if(!schedule_attendance){
+                schedule_attendance = new scheduleAttendance_model({
+                    id:user.id,
+                    month:tester
+                })
+                await schedule_attendance.save()
             }
         
-            if(attendance==null){
+            if(!attendance){
                 attendance = new attendance_model({
                     id:user.id,
-                    date:today.toLocaleString().substring(0,10),
+                    date:today.toISOString().substring(0,10),
                     day:today.toUTCString().substring(0,3),
-                    month:today.toLocaleString().substring(0,2)
+                    month:today.toISOString().substring(5,7)
                 })
                 if(user.dayOff != today.toUTCString().substring(0,3)){
                     var x = schedule_attendance.missedHours+8
                     schedule_attendance.missedHours=x
                 }
                 for(var i in schedule_attendance.days){
-                    if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                    if(schedule_attendance.days[i].date==today.toISOString().substring(0,10)){
                         schedule_attendance.days.splice(i,1)
                     }
                 }
@@ -1826,22 +1830,17 @@ router.route('/AddsignIn')
                 else{
                     attendance.signIn.push(today)
                 }
-                await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+                await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toISOString().substring(0,10)},attendance)
         
                 for(var i in schedule_attendance.days){
-                    if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                    if(schedule_attendance.days[i].date==today.toISOString().substring(0,10)){
                         schedule_attendance.days.splice(i,1)
                     }
                 }
                 schedule_attendance.days.push(attendance)
             }
-        
-            if(today.toDateString().substring(8,10)<"11"){
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
-            }
-            else{
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
-            }
+            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
+
             res.send();
         } else {
             return res.status(401).json({msg:"unauthorized"});
@@ -1904,15 +1903,27 @@ router.route('/AddsignOut')
                 return res.status(400).json({msg:"You cannot add a sign out before 7AM"});
             }
             const user= await staff_model.findOne({id:id})
-            const attendance= await attendance_model.findOne({"id":user.id,
-                "date":today.toLocaleString().substring(0,10)})
+            const attendance= await attendance_model.findOne({"id":user.id,"date":today.toISOString().substring(0,10)})
             var schedule_attendance = null
-            if(today.toDateString().substring(8,10)<"11"){
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+            var tester = null
+            if(today.getDate()<11){
+                if(today.getMonth()==0){
+                    tester = "12" 
+                }else{
+                    if(today.getMonth()<10){
+                        tester = "0"+(parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                    }
+                    else{
+                        tester = (parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                    }
+                }
             }
             else{
-                schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+                tester = today.toISOString().substring(5,7)
             }
+
+            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":tester})
+
             if(!attendance||!schedule_attendance){
                 return res.status(400).json({msg:"You did not sign in today"});
             }else{
@@ -1925,19 +1936,16 @@ router.route('/AddsignOut')
                 var diff =(attendance.signOut[attendance.signOut.length-1]-attendance.signIn[attendance.signIn.length-1])/(1000*60*60)
                 diff=schedule_attendance.missedHours-diff
                 schedule_attendance.missedHours=diff
-                await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+                await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toISOString().substring(0,10)},attendance)
                 for(var i in schedule_attendance.days){
-                    if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                    if(schedule_attendance.days[i].date==today.toISOString().substring(0,10)){
                         schedule_attendance.days.splice(i,1)
                     }
                 }
                 schedule_attendance.days.push(attendance)
-                if(today.toDateString().substring(8,10)<"11"){
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
-                }
-                else{
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
-                }
+
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
+
                 res.send();
             }
         } else {
@@ -2132,51 +2140,54 @@ router.route('/signIn')
     try{
         var today =  new Date()
         if(today.toTimeString().substring(0,2)>"19"){
-            res.send("You cannot sign in after 7PM")
+            return res.status(400).json({msg:"You cannot sign in after 7PM"});
         }
         if(today.toTimeString().substring(0,2)<"07"){
             today.setHours(7)
             today.setMinutes(0)
         }
         const user= await staff_model.findById(req.user._id)
-        var attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
+        var attendance= await attendance_model.findOne({"id":user.id,"date":today.toISOString().substring(0,10)})
         var schedule_attendance = null
-        if(today.toDateString().substring(8,10)<"11"){
-            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+        var tester = null
+        if(today.getDate()<11){
+            if(today.getMonth()==0){
+                tester = "12" 
+            }else{
+                if(today.getMonth()<10){
+                    tester = "0"+(parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+                else{
+                    tester = (parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+            }
         }
         else{
-            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+            tester = today.toISOString().substring(5,7)
         }
-        if(schedule_attendance==null){
-            if(today.toDateString().substring(8,10)<"11"){
-                schedule_attendance = new scheduleAttendance_model({
-                    id:user.id,
-                    month:(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()
-                })
-                await schedule_attendance.save()
-            }
-            else{
-                schedule_attendance = new scheduleAttendance_model({
-                    id:user.id,
-                    month:today.toLocaleString().substring(0,2)
-                })
-                await schedule_attendance.save()
-            }
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":tester})
+        
+        if(!schedule_attendance){
+            schedule_attendance = new scheduleAttendance_model({
+                id:user.id,
+                month:tester
+            })
+            await schedule_attendance.save()
         }
 
-        if(attendance==null){
+        if(!attendance){
             attendance = new attendance_model({
                 id:user.id,
-                date:today.toLocaleString().substring(0,10),
+                date:today.toISOString().substring(0,10),
                 day:today.toUTCString().substring(0,3),
-                month:today.toLocaleString().substring(0,2)
+                month:today.toISOString().substring(5,7)
             })
             if(user.dayOff != today.toUTCString().substring(0,3)){
                 var x = schedule_attendance.missedHours+8
                 schedule_attendance.missedHours=x
             }
             for(var i in schedule_attendance.days){
-                if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                if(schedule_attendance.days[i].date==today.toISOString().substring(0,10)){
                     schedule_attendance.days.splice(i,1)
                 }
             }
@@ -2192,22 +2203,18 @@ router.route('/signIn')
             else{
                 attendance.signIn.push(today)
             }
-            await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+            await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toISOString().substring(0,10)},attendance)
 
             for(var i in schedule_attendance.days){
-                if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                if(schedule_attendance.days[i].date==today.toISOString().substring(0,10)){
                     schedule_attendance.days.splice(i,1)
                 }
             }
             schedule_attendance.days.push(attendance)
         }
 
-        if(today.toDateString().substring(8,10)<"11"){
-            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
-        }
-        else{
-            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
-        }
+        await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
+        
         res.send()
     }
     catch(error){
@@ -2230,19 +2237,32 @@ router.route('/signOut')
             today.setMinutes(0)
         }
         const user= await staff_model.findById(req.user._id)
-        const attendance= await attendance_model.findOne({"id":user.id,"date":today.toLocaleString().substring(0,10)})
+        const attendance= await attendance_model.findOne({"id":user.id,"date":today.toISOString().substring(0,10)})
         var schedule_attendance = null
-        if(today.toDateString().substring(8,10)<"11"){
-            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+        var tester = null
+        if(today.getDate()<11){
+            if(today.getMonth()==0){
+                tester = "12" 
+            }else{
+                if(today.getMonth()<10){
+                    tester = "0"+(parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+                else{
+                    tester = (parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+            }
         }
         else{
-            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+            tester = today.toISOString().substring(5,7)
         }
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":tester})
+
+
         if(!attendance||!schedule_attendance){
-            res.send("You did not sign in today")
+            return res.status(400).json({msg:"You did not sign in today"});
         }else{
             if(attendance.signIn.length!=(attendance.signOut.length+1)){
-                res.send("You did not sign in")
+                return res.status(400).json({msg:"You did not sign in"});
             }
             else{
                 attendance.signOut.push(today)
@@ -2250,19 +2270,16 @@ router.route('/signOut')
             var diff =(attendance.signOut[attendance.signOut.length-1]-attendance.signIn[attendance.signIn.length-1])/(1000*60*60)
             diff=schedule_attendance.missedHours-diff
             schedule_attendance.missedHours=diff
-            await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toLocaleString().substring(0,10)},attendance)
+            await attendance_model.findOneAndUpdate({"id":user.id,"date":today.toISOString().substring(0,10)},attendance)
             for(var i in schedule_attendance.days){
-                if(schedule_attendance.days[i].date==today.toLocaleString().substring(0,10)){
+                if(schedule_attendance.days[i].date==today.toISOString().substring(0,10)){
                     schedule_attendance.days.splice(i,1)
                 }
             }
             schedule_attendance.days.push(attendance)
-            if(today.toDateString().substring(8,10)<"11"){
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
-            }
-            else{
-                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
-            }
+
+            await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
+
             res.send()
         }
     }
@@ -2336,12 +2353,26 @@ router.route('/viewMissingDays')
         var today =  new Date()
         const user= await staff_model.findById(req.user._id)
         var schedule_attendance = null
-        if(today.toDateString().substring(8,10)<"11"){
-            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+        var tester = null
+        if(today.getDate()<11){
+            if(today.getMonth()==0){
+                tester = "12" 
+            }else{
+                if(today.getMonth()<10){
+                    tester = "0"+(parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+                else{
+                    tester = (parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+            }
         }
         else{
-            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+            tester = today.toISOString().substring(5,7)
         }
+
+
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":tester})
+
         if(schedule_attendance==null){
             return res.status(400).json({msg:"Your missing days have not yet been calculated this month"});
         }
@@ -2362,12 +2393,24 @@ router.route('/viewMissingHours')
         var today =  new Date()
         const user= await staff_model.findById(req.user._id)
         var schedule_attendance = null
-        if(today.toDateString().substring(8,10)<"11"){
-            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()})
+        var tester = null
+        if(today.getDate()<11){
+            if(today.getMonth()==0){
+                tester = "12" 
+            }else{
+                if(today.getMonth()<10){
+                    tester = "0"+(parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+                else{
+                    tester = (parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                }
+            }
         }
         else{
-            schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":today.toLocaleString().substring(0,2)})
+            tester = today.toISOString().substring(5,7)
         }
+        schedule_attendance = await scheduleAttendance_model.findOne({"id":user.id,"month":tester})
+
         if(schedule_attendance==null){
             return res.status(400).json({msg:"Your missing hours have not yet been calculated this month"});
         }
@@ -2381,315 +2424,450 @@ router.route('/viewMissingHours')
 })
 
 //--------------------------------------------------------------------
-// view Schedule -----------------------------------------------------
+// Tony Start -----------------------------------------------------
 
 router.route('/viewschedule')
 .get(async(req,res)=>{
-    const user= await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-    const Schedule= await schedule_model.findOne({id:user.id})
-    res.send(Schedule)
-}else
-res.send('HR cants view schedules of any kind')
-})
-
-router.route('/sendReplacmentReq')
-.post(async(req,res)=>{
-
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-        if(req.body.date==null||req.body.date.length!=10){
-            res.send("Enter date request will take effect of format MM/DD/YYYY")
-        }
-        const course=await course_model.findOne({course:req.body.course})
-        for(var i =0;i<user.courses.length();i++){
-            if(user.courses[i]==course.id){
-                const receiver=await staff_model.findById(req.body.id)
-                for(var x =0;i<course.TA.length();x++){
-                    if(course.TA[i]==receiver.id){
-                        const newreqest = await new request_model({type:'ReplacmentReq',date:req.body.date,requester:user.id,receiver:receiver.id,reason:req.body.reason})
-                        await newreqest.save()
-                        res.send(newreqest)
-                    }
-                }
-            }
-        }
-        res.send('invalid course or recepiant entered')
-}else
-res.send('HR cants have requests of any kind')
+    try{
+        const user= await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const Schedule= await schedule_model.findOne({id:user.id})
+            res.send(Schedule)
+        }else
+        return res.status(400).json({msg:"Unauthorized Request"});
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
 })
 
 router.route('/viewReplacementReq')
 .get(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-        const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
-        res.send(myrequests)
-    }else
-        res.send('HR cants have requests or view of any kind')
+    try{
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const myrequests= await request_model.find({type:'ReplacmentReq',requester:user.id})
+            res.send(myrequests)
+        }else
+            return res.status(400).json({msg:"Unauthorized Request"});
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
 })
+
+router.route('/sendReplacmentReq')
+.post(async(req,res)=>{
+    try{
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            if(req.body.date==null||req.body.date.length!=10){
+                return res.status(400).json({msg:"Enter date of format YYYY-MM-DD"});
+            }
+            if(date.substring(4,5) != ("-") && date.substring(7,8) != ("-")){
+                return res.status(400).json({msg:"Please enter a valid date format Ex: YYYY-MM-DD"});
+            }
+            const course=await course_model.findOne({course:req.body.course})
+            for(var i =0;i<user.courses.length();i++){
+                if(user.courses[i]==course.id){
+                    const receiver=await staff_model.findById(req.body.id)
+                    for(var x =0;i<course.TA.length();x++){
+                        if(course.TA[i]==receiver.id){
+                            const newreqest = await new request_model({type:'ReplacmentReq',date:req.body.date,requester:user.id,receiver:receiver.id,reason:req.body.reason})
+                            await newreqest.save()
+                            res.send()
+                        }
+                    }
+                }
+            }
+            return res.status(400).json({msg:"Invalid Course or Recipient"});
+        }
+        else
+            return res.status(400).json({msg:"Unauthorized Request"});
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})
+
 router.route('/slotlinkingrequest')
 .post(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    if(req.body.date==null||req.body.date.length!=10){
-        res.send("Enter date request will take effect of format MM/DD/YYYY")
-    }
-    if(user.role!='HR'){
-        const course=await course_model.findOne({course:req.body.course})
-        for(var i =0;i<user.courses.length();i++){
-            if(user.courses[i]==course.id){
-                const newreqest = await new request_model({type:'slotlinkingrequest',requester:user.id,receiver:course.courseCoordinator.id,date:req.body.date,reason:req.body.reason,slot:req.body.slot,location:req.body.location})
-                await newreqest.save()
-                res.send(newreqest)
+    try{
+        const user = await staff_model.findById(req.user._id)
+        if(req.body.date==null||req.body.date.length!=10){
+            return res.status(400).json({msg:"Enter date of format YYYY-MM-DD"});
         }
-    }res.send('no course fits')
-    }else
-    res.send('HR cants have requests of any kind')
+        if(date.substring(4,5) != ("-") && date.substring(7,8) != ("-")){
+            return res.status(400).json({msg:"Please enter a valid date format Ex: YYYY-MM-DD"});
+        }
+        if(user.role!='HR'){
+            const course=await course_model.findOne({course:req.body.course})
+            for(var i =0;i<user.courses.length();i++){
+                if(user.courses[i]==course.id){
+                    const newreqest = await new request_model({type:'slotlinkingrequest',requester:user.id,receiver:course.courseCoordinator.id,date:req.body.date,reason:req.body.reason,slot:req.body.slot,location:req.body.location})
+                    await newreqest.save()
+                    res.send()
+                }
+            }
+                return res.status(400).json({msg:"Enter Correct Course Code"});
+        }else
+            return res.status(400).json({msg:"Unauthorized Request"});
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
 })
 router.route('/changeDayOffReq')
 .post(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-    const department = await department_model.findOne({name:user.department})
-    if(department!=null){
-        const newreqest = await new request_model({type:'changeDayOffReq',reason:req.body.reason,requester:user.id,receiver:department.head,newDay:req.body.newDay})
-        await newreqest.save()
-        res.send(newreqest)
-    }else{
-        res.send('no head of department was found')
+    try{
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const department = await department_model.findOne({name:user.department})
+            const newdayoff=req.body.newDay;
+            if(department!=null){
+                if((newdayoff=='Sat'||newdayoff=='Sun'||newdayoff=='Mon'||newdayoff=='Tue'||newdayoff=='Wed'||newdayoff=='Thr')&&newdayoff!='Fri'){
+                    const newreqest = await new request_model({type:'changeDayOffReq',reason:req.body.reason,requester:user.id,receiver:department.head,newDay:newdayoff})
+                    await newreqest.save()
+                    res.send()
+                }else{
+                    return res.status(400).json({msg:"Please enter correct abreviation of a work day ex: Sun, Mon ..."});
+            }
+            }else{
+                return res.status(400).json({msg:"no head of department was found"});
+            }
+        }else
+            return res.status(400).json({msg:"HR cants have requests of any kind"});
     }
-}else
-res.send('HR cants have requests of any kind')
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
 })
-
 
 router.route('/AnnualLeaveReq')
 .post(async(req,res)=>{
-    if(req.body.date==null||req.body.date.length!=10){
-        res.send("Enter date request will take effect of format MM/DD/YYYY")
-    }
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-    const department = await department_model.findOne({name:user.department})
-    if(department.head!=null){
-        if(req.body.type=='AnnualLeave'&&req.body.date>=Date.now()&&department.head!=null){
-            const replacementREQ= await request_model.findOne({type:'ReplacmentReq',requester:user.id})
-            if(replacementREQ!=null&&replacementREQ.status=='accepted'){
-                const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:replacementREQ.receiver.id,date:req.body.date,amount:req.body.amount})
-                await newreqest.save()
-                res.send(newreqest)
-            }else{
-                const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null',date:req.body.date})
-                await newreqest.save()
-                res.send(newreqest)   
-                    }
-                }else{
-                    res.send('incorrect details entered')
-                }
-            }else
-                 res.send('no head of department was found')
-                
-        }else
-        res.send('HR cants have requests of any kind')
-    })
-
-    router.route('/CompensationLeaveReq')
-    .post(async(req,res)=>{
+    try{
         if(req.body.date==null||req.body.date.length!=10){
-            res.send("Enter date request will take effect of format MM/DD/YYYY")
+            return res.status(400).json({msg:"Enter date of format YYYY-MM-DD"});
+        }
+        if(date.substring(4,5) != ("-") && date.substring(7,8) != ("-")){
+            return res.status(400).json({msg:"Please enter a valid date format Ex: YYYY-MM-DD"});
         }
         const user = await staff_model.findById(req.user._id)
         if(user.role!='HR'){
-        const department = await department_model.findOne({name:user.department})
-        if(department.head!=null){
-     if(req.body.type=='CompensationLeave'&&req.body.reason!=null&&department.head!=null){
-            const newreqest = await new request_model({type:'CompensationLeave',reason:req.body.reason,date:req.body.date,requester:user.id,receiver:department.head,amount:req.body.amount})
-            await newreqest.save()
-            res.send(newreqest)
-        }else{
-            if(req.body.type=='CompensationLeave'&&req.body.reason==null){
-                res.send('CompensationLeave need a reason pls state yours')
-        }else{
-            res.send('not right kind of leave dumdum')
-        }
+            const department = await department_model.findOne({name:user.department})
+            if(department.head!=null){
+                var date = new Date()
+                date.setFullYear(req.body.date.substring(0,4))
+                date.setMonth(req.body.date.substring(5,7)-1)
+                date.setDate(req.body.date.substring(8))
+                if(req.body.type=='AnnualLeave'&&date>=Date.now()&&department.head!=null){
+                    const replacementREQ= await request_model.findOne({type:'ReplacmentReq',requester:user.id})
+                    if(replacementREQ!=null&&replacementREQ.status=='accepted'){
+                        const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:replacementREQ.receiver.id,date:req.body.date,amount:req.body.amount})
+                        await newreqest.save()
+                        res.send()
+                    }
+                    else{
+                        const newreqest = await new request_model({type:'AnnualLeave',reason:req.body.reason,requester:user.id,receiver:department.head,replacement:'null',date:req.body.date})
+                        await newreqest.save()
+                        res.send()   
+                    }
+                }else{
+                    return res.status(400).json({msg:"Type must be AnnualLeave, and leave cannot be in the past"});
+                }
+            }else
+                return res.status(400).json({msg:"No Head of Department Found"});
+                
+        }else
+        return res.status(400).json({msg:"HR cants have requests of any kind"});
     }
-}
-    else
-            res.send('no head of department was found')
-}      
-   else
-   res.send('HR cants have requests of any kind')
-                })
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})
 
-
+router.route('/CompensationLeaveReq')
+.post(async(req,res)=>{
+    try{
+        if(req.body.date==null||req.body.date.length!=10){
+            return res.status(400).json({msg:"Enter date of format YYYY-MM-DD"});
+        }
+        if(date.substring(4,5) != ("-") && date.substring(7,8) != ("-")){
+            return res.status(400).json({msg:"Please enter a valid date format Ex: YYYY-MM-DD"});
+        }
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const department = await department_model.findOne({name:user.department})
+            if(department.head!=null){
+                if(req.body.type=='CompensationLeave'&&req.body.reason!=null&&department.head!=null){
+                    const newreqest = await new request_model({type:'CompensationLeave',reason:req.body.reason,date:req.body.date,requester:user.id,receiver:department.head,amount:req.body.amount})
+                    await newreqest.save()
+                    res.send()
+                }else{
+                    if(req.body.type=='CompensationLeave'&&req.body.reason==null){
+                        return res.status(400).json({msg:"You have to leave a reason for the compensation leave"});
+                    }else{
+                        if(req.body.reason.length()==0){
+                            return res.status(400).json({msg:"You have to leave a reason for the compensation leave"});
+                        }
+                        return res.status(400).json({msg:"Incorrect Type of Leave"});
+                    }
+                }
+            }
+            else
+                return res.status(400).json({msg:"No Head of Department Found"});
+        }      
+        else
+            return res.status(400).json({msg:"HR cants have requests of any kind"});
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})
 
 router.route('/MaternityLeaveReq')
 .post(async(req,res)=>{
-    if(req.body.date==null||req.body.date.length!=10){
-        res.send("Enter date request will take effect of format MM/DD/YYYY")
-    }
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-        const department = await department_model.findOne({name:user.department})
-        if(department.head!=null){
-            if(req.body.type=='MaternityLeave'&&user.gender=="F"){
-                const newreqest = await new request_model({type:'MaternityLeave',reason:req.body.reason,date:req.body.date,requester:user.id,receiver:department.head,amount:req.body.amount})
-                await newreqest.save()
-                res.send(newreqest)
-             }else{
-                res.send('not right kind of leave or wrong gender')
+    try{
+        if(req.body.date==null||req.body.date.length!=10){
+            return res.status(400).json({msg:"Enter date of format YYYY-MM-DD"});
+        }
+        if(date.substring(4,5) != ("-") && date.substring(7,8) != ("-")){
+            return res.status(400).json({msg:"Please enter a valid date format Ex: YYYY-MM-DD"});
+        }
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const department = await department_model.findOne({name:user.department})
+            if(department.head!=null){
+                if(req.body.type=='MaternityLeave'&&user.gender=="F"){
+                    const newreqest = await new request_model({type:'MaternityLeave',reason:req.body.reason,date:req.body.date,requester:user.id,receiver:department.head,amount:req.body.amount})
+                    await newreqest.save()
+                    res.send()
+                }
+                else{
+                    return res.status(400).json({msg:"Incorrect leave type or gender"});
+                }
             }
-            }else
-                res.send('no head of department was found')
-               
-    }else
-       res.send('HR cants have requests of any kind')
+            else
+                return res.status(400).json({msg:"No Head of Department Found"});
+                
+        }
+        else
+            return res.status(400).json({msg:"HR cants have requests of any kind"});
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
 })
-
-
-
-
-
-
-
 
 router.route('/accidentalLeaveReq')
 .post(async(req,res)=>{
-    if(req.body.date==null||req.body.date.length!=10){
-        res.send("Enter date request will take effect of format MM/DD/YYYY")
+    try{
+        if(req.body.date==null||req.body.date.length!=10){
+            return res.status(400).json({msg:"Enter date of format YYYY-MM-DD"});
+        }
+        if(date.substring(4,5) != ("-") && date.substring(7,8) != ("-")){
+            return res.status(400).json({msg:"Please enter a valid date format Ex: YYYY-MM-DD"});
+        }
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const department = await department_model.findOne({name:user.department})
+            if(department.head!=null){
+                if(req.body.type=='accidentalLeave'&&req.body.amount>=6){
+                    return res.status(400).json({msg:"Max Number of Accidental Leave Days allowed is 6"});
+                }
+                else{
+                    if(req.body.type=='accidentalLeave'&&req.body.amount<=6){
+                        const newreqest = await new request_model({type:'accidentalLeave',reason:req.body.reason,requester:user.id,date:req.body.date,receiver:department.head,amount:req.body.amount})
+                        await newreqest.save()
+                        res.send()
+                    }else{
+                        return res.status(400).json({msg:"Incorrect leave type"});
+                    }
+                }
+            }
+            else
+                return res.status(400).json({msg:"No Head of Department Found"});
+            
+        }
+        else
+            return res.status(400).json({msg:"HR cants have requests of any kind"});
     }
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-    const department = await department_model.findOne({name:user.department})
-    if(department.head!=null){
-        if(req.body.type=='accidentalLeave'&&req.body.amount>=6){
-            res.send('no more than six days can be had as accedentall leave')
-    }else{
-        if(req.body.type=='accidentalLeave'&&req.body.amount<=6){
-            const newreqest = await new request_model({type:'accidentalLeave',reason:req.body.reason,requester:user.id,date:req.body.date,receiver:department.head,amount:req.body.amount})
-            await newreqest.save()
-            res.send(newreqest)
-    
-               }else{
-                res.send('not right kind of leave dumdum')
-            }
-            }
-        }else
-            res.send('no head of department was found')
-           
-   }else
-   res.send('HR cants have requests of any kind') 
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
 })
+
 router.route('/sickleaveReq')
 .post(async(req,res)=>{
-    if(req.body.date==null||req.body.date.length!=10){
-        res.send("Enter date request will take effect of format MM/DD/YYYY")
-    }
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-        const department = await department_model.findOne({name:user.department})
-        if(department.head!=null){
-            if(req.body.type=='sickleave'){
-                 const newreqest = await new request_model({type:'sickleave',reason:req.body.reason,date:req.body.date,requester:user.id,receiver:department.head,amount:req.body.amount})
-                 await newreqest.save()
-                 res.send(newreqest)
-         
-        }else{
-            res.send('not right kind of leave dumdum')
+    try{
+        if(req.body.date==null||req.body.date.length!=10){
+            return res.status(400).json({msg:"Enter date of format YYYY-MM-DD"});
         }
-         }else
-            res.send('no head of department was found')
-   
-    }else
-        res.send('HR cants have requests of any kind')
+        if(date.substring(4,5) != ("-") && date.substring(7,8) != ("-")){
+            return res.status(400).json({msg:"Please enter a valid date format Ex: YYYY-MM-DD"});
+        }
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const department = await department_model.findOne({name:user.department})
+            if(department.head!=null){
+                if(req.body.type=='sickleave'){
+                    const newreqest = await new request_model({type:'sickleave',reason:req.body.reason,date:req.body.date,requester:user.id,receiver:department.head,amount:req.body.amount})
+                    await newreqest.save()
+                    res.send()
+            
+                }else{
+                    return res.status(400).json({msg:"Incorrect leave type"});
+                }
+            }else
+                return res.status(400).json({msg:"No Head of Department Found"});
+    
+        }else
+            return res.status(400).json({msg:"HR cants have requests of any kind"});
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
 })
 
-
- router.route('/Notification')
- .get(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-     const reqests = await request_model.findOne({requester:user.id})
-     if(reqests.Status!="Pending"){
-         res.send("requests that have been approved or denied",reqests)
-     }
-    }else
-    res.send('HR cant be notified of anything')
- })
+router.route('/Notification')
+.get(async(req,res)=>{
+    try{
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const reqests = await request_model.findOne({requester:user.id})
+            if(reqests.Status!="Pending"){
+            res.send("requests that have been approved or denied",reqests)
+            }
+        }
+        else
+            return res.status(400).json({msg:"HR cants have requests of any kind"});
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})
 
 router.route('/viewAcceptedRequests')
 .get(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-    const reqests = await request_model.find({requester:user.id,status:"accepted"})
-    if(reqests==null){
-        res.send("No accepted Requests")
+    try{
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const reqests = await request_model.find({requester:user.id,status:"accepted"})
+            if(reqests==null){
+                return res.status(400).json({msg:"No Accepted Requests"});
+            }
+            else{
+                res.send(reqests)
+            }
+        }else
+            return res.status(400).json({msg:"Unauthorized Request"});
     }
-    else{
-        res.send(reqests)
+    catch(error){
+        res.status(500).json({error:error.message});
     }
-}else
-res.send('HR cant have requests of any kind')
+})
+
+router.route('/viewAllRequests')
+.get(async(req,res)=>{
+    try{
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const reqests = await request_model.find({requester:user.id})
+            if(reqests==null){
+                return res.status(400).json({msg:"No Requests"});
+            }
+            else{
+                res.send(reqests)
+            }
+        }else
+            return res.status(400).json({msg:"Unauthorized Request"});
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
+    }
 })
 
 router.route('/viewPendingRequests')
 .get(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-        const reqests = await request_model.find({requester:user.id,status:"Pending"})
-        if(reqests==null){
-            res.send("No Pending Requests")
+    try{
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const reqests = await request_model.find({requester:user.id,status:"Pending"})
+            if(reqests==null){
+                return res.status(400).json({msg:"No pending Requests"});
+            }
+            else{
+                res.send(reqests)
+            }
+        }else{
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
-        else{
-            res.send(reqests)
-        }
-    }else{
-        res.send('HR cant have requests of any kind')
-
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
     }
 })
 
 router.route('/viewRejectedRequests')
 .get(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    if(user.role!='HR'){
-    const reqests = await request_model.find({requester:user.id,status:"rejected"})
-    if(reqests==null){
-        res.send("No Rejected Requests")
+    try{
+        const user = await staff_model.findById(req.user._id)
+        if(user.role!='HR'){
+            const reqests = await request_model.find({requester:user.id,status:"rejected"})
+            if(reqests==null){
+                return res.status(400).json({msg:"No Rejected Requests"});
+            }
+            else{
+                res.send(reqests)
+            }
+        }else{
+            return res.status(400).json({msg:"Unauthorized Request"});
+        }
     }
-    else{
-        res.send(reqests)
+    catch(error){
+        res.status(500).json({error:error.message});
     }
-}else
-res.send('HR cants have requests of any kind')
 })
 
 router.route('/cancelRequests')
 .post(async(req,res)=>{
-    const user = await staff_model.findById(req.user._id)
-    today=new Date()
-    // res.send(today.toLocaleDateString())
-    if(user.role!='HR'){
-        const requests = await request_model.findById(req.body._id)
-        if(requests==null){
-            res.send("Incorrect request id")
-        }
-        if(requests.requester==user.id){
-            const date = new Date(requests.date)
-            if(requests.Status=="Pending"||date>=today){
-                const cancelRequests = request_model.findByIdAndDelete(requests._id)
-                res.send("Request Canceled")
+    try{
+        const user = await staff_model.findById(req.user._id)
+        today=new Date()
+        if(user.role!='HR'){
+            const requests = await request_model.findById(req.body._id)
+            if(requests==null){
+                return res.status(400).json({msg:"Incorrect request ID"});
+            }
+            if(requests.requester==user.id){
+                var date = new Date(requests.date)
+                if(requests.Status=="Pending"||date>=today){
+                    try {
+                        const cancelRequests = request_model.findByIdAndDelete(requests._id) 
+                    } catch (error) {
+                        return res.status(400).json({msg:"Request does not exist or already cancelled"});
+                    }
+
+                    res.send()
+                }
+                else{
+                    return res.status(400).json({msg:"You cannot cancel this request"});
+                }
             }
             else{
-                res.send("You cannot cancel this requests")
+                return res.status(400).json({msg:"You can't cancel another staff members request"});
             }
+        }else{
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
-        else{
-            res.send("You cannot cancel another staff members request")
-        }
-    }else
-    res.send('HR cants have requests of any kind')
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
+    }
 })
+
+//Tony ends here
+
 //--------------------------------------------------------------------
 // HOD assign instructor ---------------------------------------------
 
@@ -2700,12 +2878,16 @@ router.route('/assignInstructor')
         const department = await department_model.findOne({name:user.department})
         const user1=await staff_model.findOne({id:req.body.id})
         if(user1==null){
-            res.send("There is no corresponding instructor")
+            return res.status(400).json({msg:"Please enter a valid Staff ID"});
         }
         if(department.head==user.id){
             var index= null
             var course = null 
-            const check= await course_model.findOne({code:req.body.course}) 
+            var check = null
+            check= await course_model.findOne({code:req.body.course}) 
+            if(check==null){
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
+            }
             for(var x in department.courses){
                 if(department.courses[x].code==check.code){
                     course=department.courses[x]
@@ -2713,7 +2895,7 @@ router.route('/assignInstructor')
                 }
             }
             if(course==null){
-                res.send("No corresponding course")
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
             }else{
                         course.lecturer.push(user1.id)
                         var coverage = ((course.TA.length+course.lecturer.length)/course.totalSlots)/100
@@ -2734,11 +2916,11 @@ router.route('/assignInstructor')
                         res.send()
             }
         }else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"You Cannot Access This Page"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2751,7 +2933,7 @@ router.route('/removeInstructor')
         const department = await department_model.findOne({name:user.department})
         const user1=await staff_model.findOne({id:req.body.id})
         if(user1==null){
-            res.send("There is no corresponding instructor")
+            return res.status(400).json({msg:"Please enter a valid Staff ID"});
         }
         if(department.head==user.id){
             var course = null
@@ -2763,7 +2945,7 @@ router.route('/removeInstructor')
                 }
             }
             if(course==null){
-                res.send("No corresponding course")
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
             }else{
                         for(var i in course.lecturer){
                             if(course.lecturer[i]==user1.id){
@@ -2784,10 +2966,10 @@ router.route('/removeInstructor')
                             }
                         }
 
-                        res.send("This instructor does not teach this course")
-                }
+                        return res.status(400).json({msg:"This instructor does not teach this course"});
+                    }
         }else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
@@ -2800,17 +2982,23 @@ router.route('/removeInstructor')
 router.route('/updateInstructor')
 .put(async(req,res)=>{
     try{
+        var user1=null
+        var user2=null
         const user= await staff_model.findById(req.user._id)
         const department = await department_model.findOne({name:user.department})
-        const user1=await staff_model.findOne({id:req.body.oldID})
-        const user2=await staff_model.findOne({id:req.body.newID})
+        user1=await staff_model.findOne({id:req.body.oldID})
+        user2=await staff_model.findOne({id:req.body.newID})
         if(user1==null||user2==null){
-            res.send("There is no corresponding instructor")
+            return res.status(400).json({msg:"Please enter a valid Staff ID's"});
         }
         if(department.head==user.id){
             var index= null
             var course = null 
-            const check= await course_model.findOne({code:req.body.course}) 
+            var check = null
+            check= await course_model.findOne({code:req.body.course}) 
+            if(check == null){
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
+            }
             for(var x in department.courses){
                 if(department.courses[x].code==check.code){
                     course=department.courses[x]
@@ -2818,7 +3006,7 @@ router.route('/updateInstructor')
                 }
             }
             if(course==null){
-                res.send("No corresponding course")
+                return res.status(400).json({msg:"Please enter a valid Course Code"});
             }else{
                 for(var i in course.lecturer){
                     if(course.lecturer[i]==user1.id){
@@ -2838,24 +3026,24 @@ router.route('/updateInstructor')
                 }
             }
         }else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
 // HOD view staff ----------------------------------------------------
 
 router.route('/viewStaff')
-.get(async(req,res)=>{
+.post(async(req,res)=>{
     try{
         const user= await staff_model.findById(req.user._id)
         const department = await department_model.findOne({name:user.department})
         if(department.head==user.id){
             if(req.body.view=="department"){
-                info = await staff_model.find({department:user.department})
+                var info = await staff_model.find({department:user.department})
                 res.send(info)
             }
             else{
@@ -2867,10 +3055,10 @@ router.route('/viewStaff')
                         }
                     }
                     if(course==null){
-                        res.send("You cannot access this course")
+                        return res.status(400).json({msg:"You cannot view this course"});
                     }
                     else{
-                        const staff = []
+                        let staff = []
                         var TA1= null
                         for(var i in course.TA){
                             TA1 = await staff_model.findOne({id:course.TA[i]})
@@ -2884,34 +3072,45 @@ router.route('/viewStaff')
                     }
                 }
                 else{
-                    res.send("Please enter view")
+                    return res.status(400).json({msg:"Enter Correct view"});
                 }
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
 // HOD view dayOff ---------------------------------------------------
 
 router.route('/viewDayOff')
-.get(async(req,res)=>{
+.post(async(req,res)=>{
     try{
         const user= await staff_model.findById(req.user._id)
         const department = await department_model.findOne({name:user.department})
         if(department.head==user.id){
             if(req.body.id){
-                const staff= await staff_model.findOne({id:req.body.id})
+                var staff = null
+                staff= await staff_model.findOne({id:req.body.id})
+                if(staff==null){
+                    return res.status(400).json({msg:"Please enter a valid Staff ID's"});
+                }
                 if(staff.department==user.department){
-                    res.send(staff.dayOff)
+                    const result = {
+                        "name":staff.name,
+                        "id":staff.id,
+                        "dayOff":staff.dayOff
+                    }
+                    var x = []
+                    x.push(result)
+                    res.send(x)
                 }
                 else{
-                    res.send("This staff member is not in your department")
+                    return res.status(400).json({msg:"Staff Member Not in department"});
                 }
             }
             else{
@@ -2920,11 +3119,11 @@ router.route('/viewDayOff')
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2937,15 +3136,19 @@ router.route('/viewChangeDayOff')
         const department = await department_model.findOne({name:user.department})
         if(department.head==user.id){
             // const requests = await request_model.find({receiver:user.id,type:"changedayoffRequest"}) 
-            const requests = await request_model.find({receiver:user.id}) 
+            var requests = null
+            requests = await request_model.find({receiver:user.id}) 
+            if(requests == null){
+                return res.status(400).json({msg:"No Requests Present"});
+            }
             res.send(requests)
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -2959,59 +3162,71 @@ router.route('/acceptRequest')
         if(department.head==user.id){
             const request = await request_model.findById(req.body._id)
             if(request==null){
-                res.send("No corresponding request")
+                return res.status(400).json({msg:"No Corresponding Request"});
             }
             else{
                 var today =  new Date()
                 var schedule_attendance=null
-                if(today.toDateString().substring(8,10)<"11"){
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
+                var tester = null
+                if(today.getDate()<11){
+                    if(today.getMonth()==0){
+                        tester = "12" 
+                    }else{
+                        if(today.getMonth()<10){
+                            tester = "0"+(parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                        }
+                        else{
+                            tester = (parseInt(today.toISOString().substring(5,7),10)-1).toString()
+                        }
+                    }
                 }
                 else{
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
+                    tester = today.toISOString().substring(5,7)
                 }
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
+
                 request.status="accepted"
                 await request_model.findByIdAndUpdate(req.body._id,request)
                 const sender = await staff_model.findOne({id:request.requester})
                 var amount = request.amount
                 var schedule = null
+                if(request.type!="accidentalLeave"||request.type!="AnnualLeave"||request.type!="sickleave"||request.type!="MaternityLeave"||request.type!="CompensationLeave"){
+                    return res.status(400).json({msg:"Enter correct request type: (accidentalLeave, AnnualLeave, sickleave, MaternityLeave or CompensationLeave)"});
+                }
                 if(request.type=="accidentalLeave"){
                     var missed = sender.leaveBalance - amount
                     sender.leaveBalance = missed
                     await staff_model.findOneAndUpdate({id:request.requester},sender)
                 }
-                if(request.type=="annualLeave"){
+                if(request.type=="AnnualLeave"){
                     var missed = sender.leaveBalance - amount
                     sender.leaveBalance = missed
                     await staff_model.findOneAndUpdate({id:request.requester},sender)
                 }
-                if(request.type=="sick"){
+                if(request.type=="sickleave"){
                     var missed = schedule_attendance.misseddays-amount
                     schedule_attendance.misseddays = missed
                 }
-                if(request.type=="maternity"){
+                if(request.type=="MaternityLeave"){
                     var missed = schedule_attendance.misseddays-amount
                     schedule_attendance.misseddays = missed
                 }
-                if(request.type=="compensation"){
+                if(request.type=="CompensationLeave"){
                     var missed = schedule_attendance.misseddays-amount
                     schedule_attendance.misseddays = missed
                 }
-                if(today.toDateString().substring(8,10)<"11"){
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":(parseInt(today.toLocaleString().substring(0,2),10)-1).toString()},schedule_attendance)
-                }
-                else{
-                    await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":today.toLocaleString().substring(0,2)},schedule_attendance)
-                }
+
+                await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
+
                 res.send()
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }   
     catch(error){   
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -3025,7 +3240,7 @@ router.route('/rejectRequest')
         if(department.head==user.id){
             const request = await request_model.findById(req.body._id)
             if(request==null){
-                res.send("No corresponding request")
+                return res.status(400).json({msg:"No Corresponding Course"});
             }
             else{
                 request.status="rejected"
@@ -3042,11 +3257,11 @@ router.route('/rejectRequest')
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 //--------------------------------------------------------------------
@@ -3060,25 +3275,25 @@ router.route('/viewCourseCoverage')
         if(department.head==user.id){
             const coverage = await course_model.find({departmentname:user.department},'code coverage')
             if(coverage==null){
-                res.send("No courses in your department")
+                return res.status(400).json({msg:"No courses in your department"});
             }
             else{
                 res.send(coverage)
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 
 //--------------------------------------------------------------------
 // HOD view course Assignments ---------------------------------------
 router.route('/viewAssignments')
-.get(async(req,res)=>{
+.post(async(req,res)=>{
     try{
         const user= await staff_model.findById(req.user._id)
         const department = await department_model.findOne({name:user.department})
@@ -3092,13 +3307,13 @@ router.route('/viewAssignments')
             }
 
             if(course==null){
-                res.send("There is no corresponding course")
+                return res.status(400).json({msg:"There is no Corresponding Course"});
             }
             else{
                 const schedule = await schedule_model.findOne({id:course.code})
                 // const slots = await slot_model.find({course:course.code})
                 if(schedule==null){
-                    res.send("Course does not yet have a schedule")
+                    return res.status(400).json({msg:"Course Does Not Yet Have a Schedule"});
                 }
                 else{
                     res.send(schedule)
@@ -3106,11 +3321,11 @@ router.route('/viewAssignments')
             }
         }
         else{
-            res.send("You are not authorized to access this page")
+            return res.status(400).json({msg:"Unauthorized Request"});
         }
     }
     catch(error){
-        res.status(500).json({error:error.message});
+        return res.status(500).json({error:error.message});
     }
 })
 
@@ -3119,304 +3334,287 @@ router.route('/viewAssignments')
 
 
 
-router.route('/viewcoverage').get(async (req,res)=>{
-    const prof= await staff_model.findById(req.user._id);
-    const {courses}=req.body;
-    if(!courses){
-        return res.status(400).json({msg:"Please enter an array of courses"});
-    }
-   
-    if(prof.role=="lecturer"){
-        const coursess = req.body.courses;
-        const output = [];
-        coursess.forEach(async elem => {
-            if(elem.coverage==null)
-            output.push(0);
-            else
-            output.push(elem.coverage);
-    
-    });
-
-res.send(output);
-    }
-    else{
-        return res.status(401).json({msg:"unauthorized"});
-
-    }
-})
-
-
-
-router.route('/viewslotassignment').get(async (req,res)=>{
-    const prof= await staff_model.findById(req.user._id);
-    const {courses}=req.body;
-    if(!courses ){
-        return res.status(400).json({msg:"Please enter an array of courses"});
-    }
-   
-    if(prof.role=="lecturer"){
-        const coursess = req.body.courses;
-        var output=[];
-        for(var i =0 ; i<courses.length;i++){
-            elem=courses[i];
-        
-        const out =  await schedule_model.findOne({id: elem});
-        if(!out)
-        return res.status(400).json({msg:"Please course doent have any slots"});
-        for (var i = 0; i < 5 ; i++) {
-            var j = i+1;
-            if(out.saturday[i].isEmpty==false){
-            output.push("saturday ["+j+"]  :"+out.saturday[i]);
-            }if(out.sunday[i].isEmpty==false){
-            output.push("sunday ["+j+"]  :"+out.sunday[i]);
-            }if(out.monday[i].isEmpty==false){
-            output.push("monday ["+j+"]  :"+out.monday[i]);
-            }if(out.tuesday[i].isEmpty==false){
-            output.push("tuesday ["+j+"]  :"+out.tuesday[i]);
-            }if(out.wednesday[i].isEmpty==false){
-            output.push("wednesday ["+j+"]  :"+out.wednesday[i]);
-            }if(out.thursday[i].isEmpty==false){
-            output.push("thursday ["+j+"]  :"+out.thursday[i]);
-            }
-            
+router.route('/viewcoverage')
+.post(async (req,res)=>{
+    try{
+        const prof= await staff_model.findById(req.user._id);
+        const {courses}=req.body;
+        if(!courses){
+            return res.status(400).json({msg:"Please enter an array of courses"});
         }
-    };
-  
-
-    res.send(output);
+   
+        if(prof.role=="lecturer"){
+            const coursess = req.body.courses;
+            const output = [];
+            coursess.forEach(async elem => {
+                if(elem.coverage==null)
+                output.push(0);
+                else
+                output.push(elem.coverage);
+            });
+            res.send(output);
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"});
+        }
     }
-    else{
-        return res.status(401).json({msg:"unauthorized"});
-
+    catch(error){
+        return res.status(500).json({error:error.message});
     }
 })
 
 
 
- router.route('/viewdepstaff').get(async (req,res)=>{
-    const prof= await staff_model.findById(req.user._id);
-    if(prof.role=="lecturer"){
-    const dep = prof.department;
-    const output = await staff_model.find({department:dep});
-    res.send(output);
-    }else{
-        return res.status(401).json({msg:"unauthorized"});
-    }
-    })   
-
-
-router.route('/Assigntoslots').put(async (req,res)=>{
-    const prof= await staff_model.findById(req.user._id);
-    const {courses,staff_id,slot_no,day}=req.body;
-    if(!courses || !staff_id || !slot_no || !day ){
-        return res.status(400).json({msg:"Please enter staff_id,slot_no,day and array of courses"});
-    }
-    if(req.body.slot_no>5)
-    return res.status(400).json({msg:"Enter a valid slot_no"});
-    if(prof.role=="lecturer"){
-
-
-    const courses = req.body.courses;
-
-    const stafffff =  await staff_model.findOne({id: req.body.staff_id});
-    if(!stafffff)
-    return res.status(400).json({msg:"Enter a valid staff_id"});
-
-
-    for(var i =0 ; i<courses.length;i++){
-        elem=courses[i];
-    
-
-        
-        const courseee =  await course_model.findOne({code: elem});
-        if(!courseee)
-        return res.status(400).json({msg:"Enter valid course codes"});  
-
-
-        await courseee.TA.push(req.body.staff_id)
-        await courseee.save()
-        await stafffff.course.push(elem)
-        await stafffff.save()
-
-        const course1 =  await course_model.findOne({code: elem});
-       
-        const ta = course1.TA.length
-        const le = course1.lecturer.length
-        const ts = course1.totalSlots
-        courseee.coverage = ((ta+le)/ts)%100;
-        await course1.save() 
-
-    const sta =  await schedule_model.findOne({id: req.body.staff_id});
-    const cor =  await schedule_model.findOne({id: elem});
-
-    if(!cor)
-    return res.status(400).json({msg:"please enter a valid course(schedule)"});
-    if(!sta)
-    return res.status(400).json({msg:"please enter a valid staff(schedule)"});
-
+router.route('/viewslotassignment')
+.post(async (req,res)=>{
+    try{
+        const prof= await staff_model.findById(req.user._id);
+        const {courses}=req.body;
+        if(!courses ){
+            return res.status(400).json({msg:"Please enter an array of courses"});
+        }
    
-    var slot =cor.saturday[slot_no-1];
-    var slotsta =sta.saturday[slot_no-1];
-    switch(day) {
-        case "saturday":
-            if(!sta.saturday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.saturday[slot_no-1];
-             slotsta =sta.saturday[slot_no-1];     
-          break;
-        case "sunday":
-        
-            if(!sta.sunday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.sunday[slot_no-1];
-             slotsta =sta.sunday[slot_no-1];
-          break;
-        case "monday":
-            
-            if(!sta.monday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.monday[slot_no-1];
-             slotsta =sta.monday[slot_no-1];
-          break;
-        case "tuesday":
-           
-            if(!sta.tuesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.tuesday[slot_no-1];
-             slotsta =sta.tuesday[slot_no-1];
-          break;
-        case "wednesday":
-           
-            if(!sta.wednesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.wednesday[slot_no-1];
-             slotsta =sta.wednesday[slot_no-1];
-            break;
-        case "thursday":
-            
-            if(!sta.thursday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.thursday[slot_no-1];
-             slotsta =sta.thursday[slot_no-1];
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      }
-      for (var i = 0; i < slot.staff.length; i++) {
-          const emt ="";
-         // console.log(slot.staff[i]);
-        if(slot.staff[i]==emt){
-        slot.staff.set(i,staff_id);
-        var location = slot.location[i];
-        await slotsta.location.push(slot.location[i]);
-        await slotsta.type.push(slot.type[i]);
-        await slotsta.compensation.push(slot.compensation[i]);
-        break;
-        }  
+        if(prof.role=="lecturer"){
+            const coursess = req.body.courses;
+            var output=[];
+            for(var i =0 ; i<courses.length;i++){
+                elem=courses[i];
+                const out =  await schedule_model.findOne({id: elem});
+                if(!out)
+                    return res.status(400).json({msg:"Please course doent have any slots"});
+                    for (var i = 0; i < 5 ; i++) {
+                        var j = i+1;
+                        if(out.saturday[i].isEmpty==false){
+                        output.push("saturday ["+j+"]  :"+out.saturday[i]);
+                        }if(out.sunday[i].isEmpty==false){
+                        output.push("sunday ["+j+"]  :"+out.sunday[i]);
+                        }if(out.monday[i].isEmpty==false){
+                        output.push("monday ["+j+"]  :"+out.monday[i]);
+                        }if(out.tuesday[i].isEmpty==false){
+                        output.push("tuesday ["+j+"]  :"+out.tuesday[i]);
+                        }if(out.wednesday[i].isEmpty==false){
+                        output.push("wednesday ["+j+"]  :"+out.wednesday[i]);
+                        }if(out.thursday[i].isEmpty==false){
+                        output.push("thursday ["+j+"]  :"+out.thursday[i]);
+                        }
+                    }
+                };
+            res.send(output);
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"});
+        }
     }
-    slotsta.isEmpty=false;
-    await slotsta.save();
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})
+
+router.route('/viewdepstaff')
+.get(async (req,res)=>{
+    try{
+        const prof= await staff_model.findById(req.user._id);
+        if(prof.role=="lecturer"){
+            const dep = prof.department;
+            const output = await staff_model.find({department:dep});
+            res.send(output);
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})   
+
+router.route('/Assigntoslots')
+.put(async (req,res)=>{
+    try{
+        const prof= await staff_model.findById(req.user._id);
+        const {courses,staff_id,slot_no,day}=req.body;
+        if(!courses || !staff_id || !slot_no || !day ){
+            return res.status(400).json({msg:"Please enter staff_id,slot_no,day and array of courses"});
+        }
+        if(req.body.slot_no>5)
+            return res.status(400).json({msg:"Enter a valid slot_no"});
+        if(prof.role=="lecturer"){
+            const courses = req.body.courses;
+            const stafffff =  await staff_model.findOne({id: req.body.staff_id});
+            if(!stafffff)
+                return res.status(400).json({msg:"Enter a valid staff_id"});
+            for(var i =0 ; i<courses.length;i++){
+                elem=courses[i];
+                const courseee =  await course_model.findOne({code: elem});
+                if(!courseee)
+                    return res.status(400).json({msg:"Enter valid course codes"});  
+                await courseee.TA.push(req.body.staff_id)
+                await courseee.save()
+                await stafffff.course.push(elem)
+                await stafffff.save()
+
+                const course1 =  await course_model.findOne({code: elem});
+                const ta = course1.TA.length
+                const le = course1.lecturer.length
+                const ts = course1.totalSlots
+                courseee.coverage = ((ta+le)/ts)%100;
+                await course1.save() 
+
+                const sta =  await schedule_model.findOne({id: req.body.staff_id});
+                const cor =  await schedule_model.findOne({id: elem});
+
+                if(!cor)
+                    return res.status(400).json({msg:"please enter a valid course(schedule)"});
+                if(!sta)
+                    return res.status(400).json({msg:"please enter a valid staff(schedule)"});
+
+                var slot =cor.saturday[slot_no-1];
+                var slotsta =sta.saturday[slot_no-1];
+                switch(day) {
+                    case "saturday":
+                        if(!sta.saturday[slot_no-1].isEmpty)
+                            return res.status(400).json({msg:"this staff member is busy in this slot"});
+                        slot =cor.saturday[slot_no-1];
+                        slotsta =sta.saturday[slot_no-1];     
+                    break;
+                    case "sunday":
+                        if(!sta.sunday[slot_no-1].isEmpty)
+                            return res.status(400).json({msg:"this staff member is busy in this slot"});
+                        slot =cor.sunday[slot_no-1];
+                        slotsta =sta.sunday[slot_no-1];
+                    break;
+                    case "monday":
+                        if(!sta.monday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this staff member is busy in this slot"});
+                        slot =cor.monday[slot_no-1];
+                        slotsta =sta.monday[slot_no-1];
+                    break;
+                    case "tuesday":
+                        if(!sta.tuesday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this staff member is busy in this slot"});
+                        slot =cor.tuesday[slot_no-1];
+                        slotsta =sta.tuesday[slot_no-1];
+                    break;
+                    case "wednesday":
+                        if(!sta.wednesday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this staff member is busy in this slot"});
+                        slot =cor.wednesday[slot_no-1];
+                        slotsta =sta.wednesday[slot_no-1];
+                        break;
+                    case "thursday":
+                        
+                        if(!sta.thursday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this staff member is busy in this slot"});
+                        slot =cor.thursday[slot_no-1];
+                        slotsta =sta.thursday[slot_no-1];
+                            break;        
+                    default:
+                        return res.status(400).json({msg:"Enter a valid day/no upper case"});
+                }
+                for (var i = 0; i < slot.staff.length; i++) {
+                    const emt ="";
+                    if(slot.staff[i]==emt){
+                        slot.staff.set(i,staff_id);
+                        var location = slot.location[i];
+                        await slotsta.location.push(slot.location[i]);
+                        await slotsta.type.push(slot.type[i]);
+                        await slotsta.compensation.push(slot.compensation[i]);
+                        break;
+                    }  
+                }
+                slotsta.isEmpty=false;
+                await slotsta.save();
    
-    const loc =  await schedule_model.findOne({id: location});
+                const loc =  await schedule_model.findOne({id: location});
 
-var slotloc =loc.saturday[slot_no-1];
-    switch(day) {
-        case "saturday":
-           
-             slotloc =loc.saturday[slot_no-1];
-          break;
-        case "sunday":
-            
-             slotloc =loc.sunday[slot_no-1];
-          break;
-        case "monday":
-             
-             slotloc =loc.monday[slot_no-1];
-          break;
-        case "tuesday":
-             
-             slotloc =loc.tuesday[slot_no-1];
-          break;
-        case "wednesday":
-             
-             slotloc =loc.wednesday[slot_no-1];
-            break;
-        case "thursday":
-            
-             slotloc =loc.thursday[slot_no-1];
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      };
+                var slotloc =loc.saturday[slot_no-1];
+                switch(day) {
+                    case "saturday":
+                    
+                        slotloc =loc.saturday[slot_no-1];
+                    break;
+                    case "sunday":
+                        
+                        slotloc =loc.sunday[slot_no-1];
+                    break;
+                    case "monday":
+                        
+                        slotloc =loc.monday[slot_no-1];
+                    break;
+                    case "tuesday":
+                        
+                        slotloc =loc.tuesday[slot_no-1];
+                    break;
+                    case "wednesday":
+                        
+                        slotloc =loc.wednesday[slot_no-1];
+                        break;
+                    case "thursday":
+                        
+                        slotloc =loc.thursday[slot_no-1];
+                            break;        
+                    default:
+                        return res.status(400).json({msg:"Enter a valid day/no upper case"});
+                };
 
-  for (var i = 0; i < slotloc.staff.length; i++) {
-        if(slotloc.staff[i]==""){
-        slotloc.staff.set(i, staff_id);
-        break;
+                for (var i = 0; i < slotloc.staff.length; i++) {
+                    if(slotloc.staff[i]==""){
+                    slotloc.staff.set(i, staff_id);
+                    break;
+                    }
+                }
 
-        }}
-
-
-
-
-        switch(day) {
-            case "saturday":
-               cor.saturday.splice(slot_no-1,1,slot)
-               loc.saturday.splice(slot_no-1,1,slotloc)
-               sta.saturday.splice(slot_no-1,1,slotsta)
-              break;
-            case "sunday":
-                cor.sunday.splice(slot_no-1,1,slot)
-                loc.sunday.splice(slot_no-1,1,slotloc)
-               sta.sunday.splice(slot_no-1,1,slotsta)
-              break;
-            case "monday":
-                cor.monday.splice(slot_no-1,1,slot)
-                loc.monday.splice(slot_no-1,1,slotloc)
-                sta.monday.splice(slot_no-1,1,slotsta)
-              break;
-            case "tuesday":
-                cor.tuesday.splice(slot_no-1,1,slot)
-                loc.tuesday.splice(slot_no-1,1,slotloc)
-               sta.tuesday.splice(slot_no-1,1,slotsta)
-              break;
-            case "wednesday":
-                cor.wednesday.splice(slot_no-1,1,slot)
-                loc.wednesday.splice(slot_no-1,1,slotloc)
-                sta.wednesday.splice(slot_no-1,1,slotsta)
-                break;
-            case "thursday":
-                cor.thursday.splice(slot_no-1,1,slot)
-                loc.thursday.splice(slot_no-1,1,slotloc)
-                sta.thursday.splice(slot_no-1,1,slotsta)
-                 
+                switch(day) {
+                    case "saturday":
+                        cor.saturday.splice(slot_no-1,1,slot)
+                        loc.saturday.splice(slot_no-1,1,slotloc)
+                        sta.saturday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "sunday":
+                        cor.sunday.splice(slot_no-1,1,slot)
+                        loc.sunday.splice(slot_no-1,1,slotloc)
+                        sta.sunday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "monday":
+                        cor.monday.splice(slot_no-1,1,slot)
+                        loc.monday.splice(slot_no-1,1,slotloc)
+                        sta.monday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "tuesday":
+                        cor.tuesday.splice(slot_no-1,1,slot)
+                        loc.tuesday.splice(slot_no-1,1,slotloc)
+                        sta.tuesday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "wednesday":
+                        cor.wednesday.splice(slot_no-1,1,slot)
+                        loc.wednesday.splice(slot_no-1,1,slotloc)
+                        sta.wednesday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "thursday":
+                        cor.thursday.splice(slot_no-1,1,slot)
+                        loc.thursday.splice(slot_no-1,1,slotloc)
+                        sta.thursday.splice(slot_no-1,1,slotsta)
                     break;        
-               }
-    
-
-         
-           var cor3 =  await schedule_model.findOneAndUpdate({id: elem},cor);
-           var loc3 = await schedule_model.findOneAndUpdate({id: location},loc);
-           var sta3 = await schedule_model.findOneAndUpdate({id:  req.body.staff_id},sta);
-   
-           
-
-   
-}; 
-
-    
-   
-    res.send("done");
-  
-    }else{
-        return res.status(401).json({msg:"unauthorized"});
+                }
+                var cor3 =  await schedule_model.findOneAndUpdate({id: elem},cor);
+                var loc3 = await schedule_model.findOneAndUpdate({id: location},loc);
+                var sta3 = await schedule_model.findOneAndUpdate({id:  req.body.staff_id},sta);
+            }; 
+            res.send();
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"});
+        }
     }
-    })   
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})   
 
 
-
-
-router.route('/UpdateAssignslots').put(async (req,res)=>{
+router.route('/UpdateAssignslots')
+.put(async (req,res)=>{
+    try{
     const {courses,staff_id,slot_no,day,newstaff_id}=req.body;
     if(!courses || !staff_id || !slot_no || !day || newstaff_id){
         return res.status(400).json({msg:"Please enter staff_id,newstaff_id,slot_no,day and array of courses"});
@@ -3645,1078 +3843,998 @@ router.route('/UpdateAssignslots').put(async (req,res)=>{
 
        
                
-}; 
+        }; 
     
        
-        res.send("done");
+        res.send();
       
         }else{
             return res.status(401).json({msg:"unauthorized"});
         }
-        })   
-
-
-
-    
-
-router.route('/DeleteAssignslots').put(async (req,res)=>{
-    const prof= await staff_model.findById(req.user._id);
-    const {courses,staff_id,slot_no,day}=req.body;
-    if(!courses || !staff_id || !slot_no || !day ){
-        return res.status(400).json({msg:"Please enter staff_id,slot_no,day and array of courses"});
     }
-    if(req.body.slot_no>5)
-    return res.status(400).json({msg:"Enter a valid slot_no"});
-    if(prof.role=="lecturer"){
-    const courses = req.body.courses;
-
-    const stafffff =  await staff_model.findOne({id: req.body.staff_id});
-    if(!stafffff)
-    return res.status(400).json({msg:"Enter a valid staff_id"});
-
-    for(var i =0 ; i<courses.length;i++){
-        elem=courses[i];
-    
-
-        const courseee =  await course_model.findOne({code: elem});
-        if(!courseee)
-        return res.status(400).json({msg:"Enter valid course codes"}); 
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})   
 
 
-        for (var i = 0; i < courseee.TA.length; i++) {
-            if(courseee.TA[i]== req.body.staff_id){
-           await courseee.TA.splice(i,1)
-           
-            }
+router.route('/DeleteAssignslots')
+.put(async (req,res)=>{
+    try{
+        const prof= await staff_model.findById(req.user._id);
+        const {courses,staff_id,slot_no,day}=req.body;
+        if(!courses || !staff_id || !slot_no || !day ){
+            return res.status(400).json({msg:"Please enter staff_id,slot_no,day and array of courses"});
         }
-        
-        for (var i = 0; i < stafffff.course.length; i++) {
-            if(stafffff.course[i]== req.body.elem){
-           await stafffff.course.splice(i,1)
-           
-            }
-        }
+        if(req.body.slot_no>5)
+            return res.status(400).json({msg:"Enter a valid slot_no"});
+        if(prof.role=="lecturer"){
+            const courses = req.body.courses;
+            const stafffff =  await staff_model.findOne({id: req.body.staff_id});
+            if(!stafffff)
+                return res.status(400).json({msg:"Enter a valid staff_id"});
+            for(var i =0 ; i<courses.length;i++){
+                elem=courses[i];
+                const courseee =  await course_model.findOne({code: elem});
+                if(!courseee)
+                    return res.status(400).json({msg:"Enter valid course codes"}); 
+                for (var i = 0; i < courseee.TA.length; i++) {
+                    if(courseee.TA[i]== req.body.staff_id){
+                        await courseee.TA.splice(i,1)
+                    }
+                }
+                for (var i = 0; i < stafffff.course.length; i++) {
+                    if(stafffff.course[i]== req.body.elem){
+                        await stafffff.course.splice(i,1)
+                    }
+                }
+                await courseee.save()
+                await stafffff.save()
+                const course1 =  await course_model.findOne({code: elem});
+                const ta = course1.TA.length
+                const le = course1.lecturer.length
+                const ts = course1.totalSlots
+                courseee.coverage = ((ta+le)/ts)%100;
+                await course1.save() 
 
-        await courseee.save()
-        await stafffff.save()
-
-
-        const course1 =  await course_model.findOne({code: elem});
-        const ta = course1.TA.length
-        const le = course1.lecturer.length
-        const ts = course1.totalSlots
-        courseee.coverage = ((ta+le)/ts)%100;
-        await course1.save() 
-
-
-        const sta =  await schedule_model.findOne({id: req.body.staff_id});
-        const cor =  await schedule_model.findOne({id: elem});
-    
-        if(!cor)
-        return res.status(400).json({msg:"please enter a valid course(schedule)"});
-        if(!sta)
-        return res.status(400).json({msg:"please enter a valid staff(schedule)"});
-    
-       
-        var slot =cor.saturday[slot_no-1];
-        var slotsta =sta.saturday[slot_no-1];
-        switch(day) {
-            case "saturday":
-                
-                 slot =cor.saturday[slot_no-1];
-                 slotsta =sta.saturday[slot_no-1];     
-              break;
-            case "sunday":
+                const sta =  await schedule_model.findOne({id: req.body.staff_id});
+                const cor =  await schedule_model.findOne({id: elem});
             
-                
-                 slot =cor.sunday[slot_no-1];
-                 slotsta =sta.sunday[slot_no-1];
-              break;
-            case "monday":
-                
-               
-                 slot =cor.monday[slot_no-1];
-                 slotsta =sta.monday[slot_no-1];
-              break;
-            case "tuesday":
-               
-                 slot =cor.tuesday[slot_no-1];
-                 slotsta =sta.tuesday[slot_no-1];
-              break;
-            case "wednesday":
-               
-                 slot =cor.wednesday[slot_no-1];
-                 slotsta =sta.wednesday[slot_no-1];
-                break;
-            case "thursday":
-                
-                 slot =cor.thursday[slot_no-1];
-                 slotsta =sta.thursday[slot_no-1];
+                if(!cor)
+                    return res.status(400).json({msg:"please enter a valid course(schedule)"});
+                if(!sta)
+                    return res.status(400).json({msg:"please enter a valid staff(schedule)"});
+
+                var slot =cor.saturday[slot_no-1];
+                var slotsta =sta.saturday[slot_no-1];
+                switch(day) {
+                    case "saturday": 
+                        slot =cor.saturday[slot_no-1];
+                        slotsta =sta.saturday[slot_no-1];     
+                    break;
+                    case "sunday":
+                        slot =cor.sunday[slot_no-1];
+                        slotsta =sta.sunday[slot_no-1];
+                    break;
+                    case "monday":
+                        slot =cor.monday[slot_no-1];
+                        slotsta =sta.monday[slot_no-1];
+                    break;
+                    case "tuesday":
+                        slot =cor.tuesday[slot_no-1];
+                        slotsta =sta.tuesday[slot_no-1];
+                    break;
+                    case "wednesday":
+                        slot =cor.wednesday[slot_no-1];
+                        slotsta =sta.wednesday[slot_no-1];
+                    break;
+                    case "thursday":
+                        slot =cor.thursday[slot_no-1];
+                        slotsta =sta.thursday[slot_no-1];
                     break;        
-            default:
-                return res.status(400).json({msg:"Enter a valid day/no upper case"});
-          }
-          var f = false;
-        for (var i = 0; i < slot.staff.length; i++) {
-            if(slot.staff[i]==staff_id){
-                f=true;
-            var location = slot.location[i];  
-             const emt ="";   
-            slot.staff.set(i, emt);
-        break;
-    }  
-        }
-    if(!f)
-    return res.status(400).json({msg:"This staff mem isnt assigned to this this course"});
-       // console.log(location)
-        for (var i = 0; i < slotsta.staff.length; i++) {
-         await slotsta.location.splice(i,1)
-       // await slotsta.staff.splice(i,1)
-        await slotsta.type.splice(i,1)
-        await slotsta.compensation.splice(i,1) 
-             
-        }
-        slotsta.isEmpty=true;
-    
+                    default:
+                        return res.status(400).json({msg:"Enter a valid day/no upper case"});
+                }
+                var f = false;
+                for (var i = 0; i < slot.staff.length; i++) {
+                    if(slot.staff[i]==staff_id){
+                        f=true;
+                        var location = slot.location[i];  
+                        const emt ="";   
+                        slot.staff.set(i, emt);
+                        break;
+                    }  
+                }
+                if(!f)
+                    return res.status(400).json({msg:"This staff mem isnt assigned to this this course"});
+            // console.log(location)
+                for (var i = 0; i < slotsta.staff.length; i++) {
+                    await slotsta.location.splice(i,1)
+                // await slotsta.staff.splice(i,1)
+                    await slotsta.type.splice(i,1)
+                    await slotsta.compensation.splice(i,1) 
+                }
+                slotsta.isEmpty=true;
+                const loc =  await schedule_model.findOne({id: location});
+                if(!loc)
+                    return res.status(400).json({msg:"please enter a valid loc(schedule)"});
+                var slotloc =loc.saturday[slot_no-1];
+                switch(day) {
+                    case "saturday":
+                        slotloc =loc.saturday[slot_no-1];
+                    break;
+                    case "sunday":
+                        slotloc =loc.sunday[slot_no-1];
+                    break;
+                    case "monday":
+                        slotloc =loc.monday[slot_no-1];
+                    break;
+                    case "tuesday":
+                        slotloc =loc.tuesday[slot_no-1];
+                    break;
+                    case "wednesday":
+                        slotloc =loc.wednesday[slot_no-1];
+                    break;
+                    case "thursday":
+                        slotloc =loc.thursday[slot_no-1];
+                    break;        
+                    default:
+                        return res.status(400).json({msg:"Enter a valid day/no upper case"});
+                };
 
-        const loc =  await schedule_model.findOne({id: location});
-        if(!loc)
-        return res.status(400).json({msg:"please enter a valid loc(schedule)"});
-
-      var slotloc =loc.saturday[slot_no-1];
-    switch(day) {
-        case "saturday":
-           
-             slotloc =loc.saturday[slot_no-1];
-          break;
-        case "sunday":
+                for (var i = 0; i < slotloc.staff.length; i++) {
+                    if(slotloc.staff[i]==staff_id){
+                        const emt = "";
+                        slotloc.staff.set(i, emt);
+                        break;
+                    }
+                }
             
-             slotloc =loc.sunday[slot_no-1];
-          break;
-        case "monday":
-             
-             slotloc =loc.monday[slot_no-1];
-          break;
-        case "tuesday":
-             
-             slotloc =loc.tuesday[slot_no-1];
-          break;
-        case "wednesday":
-             
-             slotloc =loc.wednesday[slot_no-1];
-            break;
-        case "thursday":
-            
-             slotloc =loc.thursday[slot_no-1];
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      };
-
-      for (var i = 0; i < slotloc.staff.length; i++) {
-        if(slotloc.staff[i]==staff_id){
-            const emt = "";
-        slotloc.staff.set(i, emt);
-        break;
-        }}
-       
-switch(day) {
-    case "saturday":
-       cor.saturday.splice(slot_no-1,1,slot)
-       loc.saturday.splice(slot_no-1,1,slotloc)
-       sta.saturday.splice(slot_no-1,1,slotsta)
-      break;
-    case "sunday":
-        cor.sunday.splice(slot_no-1,1,slot)
-        loc.sunday.splice(slot_no-1,1,slotloc)
-       sta.sunday.splice(slot_no-1,1,slotsta)
-      break;
-    case "monday":
-        cor.monday.splice(slot_no-1,1,slot)
-        loc.monday.splice(slot_no-1,1,slotloc)
-        sta.monday.splice(slot_no-1,1,slotsta)
-      break;
-    case "tuesday":
-        cor.tuesday.splice(slot_no-1,1,slot)
-        loc.tuesday.splice(slot_no-1,1,slotloc)
-       sta.tuesday.splice(slot_no-1,1,slotsta)
-      break;
-    case "wednesday":
-        cor.wednesday.splice(slot_no-1,1,slot)
-        loc.wednesday.splice(slot_no-1,1,slotloc)
-        sta.wednesday.splice(slot_no-1,1,slotsta)
-        break;
-    case "thursday":
-        cor.thursday.splice(slot_no-1,1,slot)
-        loc.thursday.splice(slot_no-1,1,slotloc)
-        sta.thursday.splice(slot_no-1,1,slotsta)
-         
-            break;        
-       }
-
-    
-             
-               var cor3 =  await schedule_model.findOneAndUpdate({id: elem},cor);      
-               var loc3 = await schedule_model.findOneAndUpdate({id: location},loc);
-               var sta3 = await schedule_model.findOneAndUpdate({id:  req.body.staff_id},sta);
-       
-               
-}; 
-
-    
-    res.send("done");
-  
-    }else{
-        return res.status(401).json({msg:"unauthorized"});
-    }
-    })   
-
-
-
-
-
-
-
-
-
- router.route('/removecoursemem').delete  (async (req,res)=>{
-    const prof= await staff_model.findById(req.user._id);
-    const {courses,staff_id}=req.body;
-    if(!courses || !staff_id ){
-        return res.status(400).json({msg:"Please enter staff_id and array of courses"});
-    }
-    if(prof.role=="lecturer"){
-    const courses = req.body.courses;
-    for(var i =0 ; i<courses.length;i++){
-        elem=courses[i];
-
+                switch(day) {
+                    case "saturday":
+                        cor.saturday.splice(slot_no-1,1,slot)
+                        loc.saturday.splice(slot_no-1,1,slotloc)
+                        sta.saturday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "sunday":
+                        cor.sunday.splice(slot_no-1,1,slot)
+                        loc.sunday.splice(slot_no-1,1,slotloc)
+                        sta.sunday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "monday":
+                        cor.monday.splice(slot_no-1,1,slot)
+                        loc.monday.splice(slot_no-1,1,slotloc)
+                        sta.monday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "tuesday":
+                        cor.tuesday.splice(slot_no-1,1,slot)
+                        loc.tuesday.splice(slot_no-1,1,slotloc)
+                        sta.tuesday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "wednesday":
+                        cor.wednesday.splice(slot_no-1,1,slot)
+                        loc.wednesday.splice(slot_no-1,1,slotloc)
+                        sta.wednesday.splice(slot_no-1,1,slotsta)
+                    break;
+                    case "thursday":
+                        cor.thursday.splice(slot_no-1,1,slot)
+                        loc.thursday.splice(slot_no-1,1,slotloc)
+                        sta.thursday.splice(slot_no-1,1,slotsta)    
+                    break;        
+                }
+                var cor3 =  await schedule_model.findOneAndUpdate({id: elem},cor);      
+                var loc3 = await schedule_model.findOneAndUpdate({id: location},loc);
+                var sta3 = await schedule_model.findOneAndUpdate({id:  req.body.staff_id},sta);
         
-     const c = await course_model.findOne({code : elem})
-     const staffmem = await  staff_model.findOne({id : staff_id})
-     const dep = await department_model.findOne({name:c.departmentname});
+            }; 
+            res.send();
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})   
 
-    if(!c)
-    return res.status(400).json({msg:"please enter a valid course codes"});
-    if(!staffmem)
-    return res.status(400).json({msg:"please enter a valid staff id"});
 
-   // console.log(staffmem.role,staffmem.id,c.code)
-     if(staffmem.role == "TA")
-     {
-        for (var i = 0; i < c.TA.length; i++) {
-            if(c.TA[i]== req.body.staff_id){
-           await c.TA.splice(i,1)
-           
+router.route('/removecoursemem')
+.delete  (async (req,res)=>{
+    try{
+        const prof= await staff_model.findById(req.user._id);
+        const {courses,staff_id}=req.body;
+        if(!courses || !staff_id ){
+            return res.status(400).json({msg:"Please enter staff_id and array of courses"});
+        }
+        if(prof.role=="lecturer"){
+            const courses = req.body.courses;
+            for(var i =0 ; i<courses.length;i++){
+                elem=courses[i];  
+                const c = await course_model.findOne({code : elem})
+                const staffmem = await  staff_model.findOne({id : staff_id})
+                const dep = await department_model.findOne({name:c.departmentname});
+
+                if(!c)
+                    return res.status(400).json({msg:"please enter a valid course codes"});
+                if(!staffmem)
+                    return res.status(400).json({msg:"please enter a valid staff id"});
+
+                if(staffmem.role == "TA"){
+                    for (var i = 0; i < c.TA.length; i++) {
+                        if(c.TA[i]== req.body.staff_id){
+                            await c.TA.splice(i,1)
+                        }
+                    }
+                    for (var i = 0; i < staffmem.course.length; i++) {
+                        if(staffmem.course[i]== elem){
+                            await staffmem.course.splice(i,1)
+                        }
+                    }
+                }
+                else{
+                    if(staffmem.role == "lecturer"){
+                        return res.status(401).json({msg:"unauthorized"});
+                    }
+                    else{
+                        return res.status(400).json({msg:"please enter a valid staff member"});
+                    }
+                }
+                await staffmem.save();
+                await c.save();
+
+                for (var i = 0; i < dep.courses.length; i++) {
+                    if(dep.courses[i].code== elem){
+                        await dep.courses.splice(i,1,c)
+                    }
+                }
+
+                var dep1 = await department_model.findOneAndUpdate({name:c.departmentname},dep);
+
+            };
+            res.send();
+    
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})   
+
+
+
+
+router.route('/Assigncoordinator')
+.put(async (req,res)=>{
+    try{
+        const prof= await staff_model.findById(req.user._id);
+        const {course_code,staff_id}=req.body;
+        if(!course_code || !staff_id )
+            return res.status(400).json({msg:"Please enter staff_id and a course_code"});
+        
+        if(prof.role=="lecturer"){
+            const staff = await staff_model.findOne({id: req.body.staff_id});
+            //const rem = await staff.findAndRemove({course : {$ne : req.body.course}});// not sure if he can have more than one course 
+            const course = await course_model.findOne({code:  req.body.course_code});
+
+            const dep = await department_model.findOne({name:course.departmentname});
+
+            if(!course)
+                return res.status(400).json({msg:"please enter a valid course code"});
+            if(!staff)
+                return res.status(400).json({msg:"please enter a valid staff id"});
+
+            course.courseCoordinator=staff.name;
+            await course.save();
+
+            for (var i = 0; i < dep.courses.length; i++) {
+                if(dep.courses[i].code== elem){
+                    await dep.courses.splice(i,1,course)
+                }
             }
+
+            var dep1 = await department_model.findOneAndUpdate({name:course.departmentname},dep);
+            res.send();
         }
-        for (var i = 0; i < staffmem.course.length; i++) {
-            if(staffmem.course[i]== elem){
-           await staffmem.course.splice(i,1)
-          
+        else{
+            return res.status(400).json({msg:"unauthorized"});
+        }
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})   
+
+router.route('/viewslotlinkingreq')
+.post(async (req,res)=>{
+    try{
+        const cord= await staff_model.findById(req.user._id);
+        const {course_code}=req.body;
+        if(!course_code){
+            return res.status(400).json({msg:"Please enter a course_code"});
+        }
+        const course = await course_model.findOne({code : req.body.course_code })
+        if(!course)
+            return res.status(400).json({msg:"Please enter a valid course"});   
+        if(cord.id==course.courseCoordinator){
+            console.log(cord.id,t);
+            const output = await request_model.findOne({type:t, receiver: cord.id  });
+            if(!output)
+                return res.status(400).json({msg:"No slot linking requests"});
+            res.send(output);
+        }
+        else{
+            return res.status(400).json({msg:"unauthorized"});
+        }
+    }
+    catch(error){
+        return res.status(500).json({error:error.message()});
+    }
+})
+
+router.route('/acceptslotlinkingreq')
+.put(async (req,res)=>{
+    try{
+        const cord= await staff_model.findById(req.user._id);
+        const {slotlinking_id,course_code}=req.body;
+        if(!course_code){
+            return res.status(400).json({msg:"Please enter a course_code"});
+        }
+        if(!slotlinking_id){
+            return res.status(400).json({msg:"Please enter a slotlinking_id"});
+        }
+        const course = await course_model.findOne({code : req.body.course_code })
+        if(cord.id==course.courseCoordinator){
+            const slotreq = await request_model.findByID(req.body.slotlinking_id);
+            if(!slotreq)
+                return res.status(400).json({msg:"please enter a valid slotlinking _id"});
+
+            const day = slotreq.newDay;
+            const slot_no = slotreq.slot;
+            const staff= slotreq.requester;
+            const sta =  await schedule_model.findOne({id: staff});
+            const cor =  await schedule_model.findOne({id: course_code});
+
+            if(!cor)
+                return res.status(400).json({msg:"please enter a valid course(schedule)"});
+            if(!sta)
+                return res.status(400).json({msg:"please enter a valid staff(schedule)"});
+
+            var slot =cor.saturday[slot_no-1];
+            var slotsta =sta.saturday[slot_no-1];
+            switch(day) {
+                case "saturday":
+                    if(!sta.saturday[slot_no-1].isEmpty)
+                    return res.status(400).json({msg:"this staff member is busy in this slot"});
+                    slot =cor.saturday[slot_no-1];
+                    slotsta =sta.saturday[slot_no-1];     
+                break;
+                case "sunday":
+                
+                    if(!sta.sunday[slot_no-1].isEmpty)
+                    return res.status(400).json({msg:"this staff member is busy in this slot"});
+                    slot =cor.sunday[slot_no-1];
+                    slotsta =sta.sunday[slot_no-1];
+                break;
+                case "monday":
+                    
+                    if(!sta.monday[slot_no-1].isEmpty)
+                    return res.status(400).json({msg:"this staff member is busy in this slot"});
+                    slot =cor.monday[slot_no-1];
+                    slotsta =sta.monday[slot_no-1];
+                break;
+                case "tuesday":
+                
+                    if(!sta.tuesday[slot_no-1].isEmpty)
+                    return res.status(400).json({msg:"this staff member is busy in this slot"});
+                    slot =cor.tuesday[slot_no-1];
+                    slotsta =sta.tuesday[slot_no-1];
+                break;
+                case "wednesday":
+                
+                    if(!sta.wednesday[slot_no-1].isEmpty)
+                    return res.status(400).json({msg:"this staff member is busy in this slot"});
+                    slot =cor.wednesday[slot_no-1];
+                    slotsta =sta.wednesday[slot_no-1];
+                    break;
+                case "thursday":
+                    
+                    if(!sta.thursday[slot_no-1].isEmpty)
+                    return res.status(400).json({msg:"this staff member is busy in this slot"});
+                    slot =cor.thursday[slot_no-1];
+                    slotsta =sta.thursday[slot_no-1];
+                        break;        
+                default:
+                    return res.status(400).json({msg:"Enter a valid day/no upper case"});
             }
-        }
-    }
-     else{if(staffmem.role == "lecturer"){
-        return res.status(401).json({msg:"unauthorized"});
-     }else{
-        return res.status(400).json({msg:"please enter a valid staff member"});
-
-     }
-     
-    }
-
-    await staffmem.save();
-    await c.save();
-
-    
-
-    for (var i = 0; i < dep.courses.length; i++) {
-        if(dep.courses[i].code== elem){
-       await dep.courses.splice(i,1,c)
-      
-        }
-    }
-
-    var dep1 = await department_model.findOneAndUpdate({name:c.departmentname},dep);
-
-    };
-    
-     res.send("done");
-  
-    }else{
-        return res.status(401).json({msg:"unauthorized"});
-    }
-
-
-
-    })   
-
-
-
-
-router.route('/Assigncoordinator').put(async (req,res)=>{
-    const prof= await staff_model.findById(req.user._id);
-    const {course_code,staff_id}=req.body;
-    if(!course_code || !staff_id )
-        return res.status(400).json({msg:"Please enter staff_id and a course_code"});
-    
-    if(prof.role=="lecturer"){
-     const staff = await staff_model.findOne({id: req.body.staff_id});
-    //const rem = await staff.findAndRemove({course : {$ne : req.body.course}});// not sure if he can have more than one course 
-    const course = await course_model.findOne({code:  req.body.course_code});
-
-    const dep = await department_model.findOne({name:course.departmentname});
-
-    if(!course)
-    return res.status(400).json({msg:"please enter a valid course code"});
-    if(!staff)
-    return res.status(400).json({msg:"please enter a valid staff id"});
-
-    course.courseCoordinator=staff.name;
-    await course.save();
-    res.send("done");
-
-    for (var i = 0; i < dep.courses.length; i++) {
-        if(dep.courses[i].code== elem){
-       await dep.courses.splice(i,1,course)
-      
-        }
-    }
-
-    var dep1 = await department_model.findOneAndUpdate({name:course.departmentname},dep);
- 
-  
-    }else{
-        return res.status(401).json({msg:"unauthorized"});
-    }
-    })   
-
-
-
-
- router.route('/viewslotlinkingreq').get(async (req,res)=>{
-    const cord= await staff_model.findById(req.user._id);
-    const {course_code}=req.body;
-    if(!course_code){
-        return res.status(400).json({msg:"Please enter a course_code"});
-    }
-    const course = await course_model.findOne({code : req.body.course_code })
-    if(!course)
-    return res.status(400).json({msg:"Please enter a valid course"}); 
-
-  
-    if(cord.id==course.courseCoordinator){
-       
-        console.log(cord.id,t);
-    const output = await request_model.findOne({type:t, receiver: cord.id  });
-    if(!output)
-    return res.status(400).json({msg:"No slot linking requests"});
-    res.send(output);
-    }
-    else{
-        return res.status(401).json({msg:"unauthorized"});
-
-    }
-    })
-
-
-    
-
-router.route('/acceptslotlinkingreq').put(async (req,res)=>{
-    const cord= await staff_model.findById(req.user._id);
-    const {slotlinking_id,course_code}=req.body;
-    if(!course_code){
-        return res.status(400).json({msg:"Please enter a course_code"});
-    }
-    if(!slotlinking_id){
-        return res.status(400).json({msg:"Please enter a slotlinking_id"});
-    }
-    const course = await course_model.findOne({code : req.body.course_code })
-    if(cord.id==course.courseCoordinator){
-    const slotreq = await request_model.findOne({id : req.body.slotlinking_id });
-    if(!slotreq)
-    return res.status(400).json({msg:"please enter a valid slotlinking_id"});
-
-    const day = slotreq.newDay;
-    const slot_no = slotreq.slot;
-    const staff= slotreq.requester;
-
-
-    const sta =  await schedule_model.findOne({id: staff});
-    const cor =  await schedule_model.findOne({id: course_code});
-
-    if(!cor)
-    return res.status(400).json({msg:"please enter a valid course(schedule)"});
-    if(!sta)
-    return res.status(400).json({msg:"please enter a valid staff(schedule)"});
-    
-
-   
-    var slot =cor.saturday[slot_no-1];
-    var slotsta =sta.saturday[slot_no-1];
-    switch(day) {
-        case "saturday":
-            if(!sta.saturday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.saturday[slot_no-1];
-             slotsta =sta.saturday[slot_no-1];     
-          break;
-        case "sunday":
+            for (var i = 0; i < slot.staff.length; i++) {
+                if(slot.staff[i]==""){
+                    slot.staff.set(i, staff_id);
+                    var location = slot.location[i];
+                    await slotsta.location.push(slot.location[i]);
+                    await slotsta.type.push(slot.type[i]);
+                    await slotsta.staff.push(staff_id);
+                    await slotsta.compensation.push(slot.compensation[i]);
+                    break;
+                }  
+            }
         
-            if(!sta.sunday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.sunday[slot_no-1];
-             slotsta =sta.sunday[slot_no-1];
-          break;
-        case "monday":
-            
-            if(!sta.monday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.monday[slot_no-1];
-             slotsta =sta.monday[slot_no-1];
-          break;
-        case "tuesday":
-           
-            if(!sta.tuesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.tuesday[slot_no-1];
-             slotsta =sta.tuesday[slot_no-1];
-          break;
-        case "wednesday":
-           
-            if(!sta.wednesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.wednesday[slot_no-1];
-             slotsta =sta.wednesday[slot_no-1];
-            break;
-        case "thrusday":
-            
-            if(!sta.thrusday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this staff member is busy in this slot"});
-             slot =cor.thrusday[slot_no-1];
-             slotsta =sta.thrusday[slot_no-1];
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      }
-    for (var i = 0; i < slot.staff.length; i++) {
-        if(slot.staff[i]==""){
-        slot.staff.set(i, staff_id);
-        var location = slot.location[i];
-        await slotsta.location.push(slot.location[i]);
-        await slotsta.type.push(slot.type[i]);
-        await slotsta.staff.push(staff_id);
-        await slotsta.compensation.push(slot.compensation[i]);
-        break;
-        }  
-    }
-    
-    slotsta.isEmpty=false;
-    await slotsta.save();
+            slotsta.isEmpty=false;
+            await slotsta.save();
 
-    slotreq.status="Accepted";
-    await slotreq.save();
+            slotreq.status="Accepted";
+            await slotreq.save();
 
-    const loc =  await schedule_model.findOne({id:  location});
+            const loc =  await schedule_model.findOne({id:  location});
 
-    var slotloc =loc.saturday[slot_no-1];
-    switch(day) {
-        case "saturday":
-           
-             slotloc =loc.saturday[slot_no-1];
-          break;
-        case "sunday":
-            
-             slotloc =loc.sunday[slot_no-1];
-          break;
-        case "monday":
-             
-             slotloc =loc.monday[slot_no-1];
-          break;
-        case "tuesday":
-             
-             slotloc =loc.tuesday[slot_no-1];
-          break;
-        case "wednesday":
-             
-             slotloc =loc.wednesday[slot_no-1];
-            break;
-        case "thursday":
-            
-             slotloc =loc.thursday[slot_no-1];
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      };
+            var slotloc =loc.saturday[slot_no-1];
+            switch(day) {
+                case "saturday":
+                
+                    slotloc =loc.saturday[slot_no-1];
+                break;
+                case "sunday":
+                    
+                    slotloc =loc.sunday[slot_no-1];
+                break;
+                case "monday":
+                    
+                    slotloc =loc.monday[slot_no-1];
+                break;
+                case "tuesday":
+                    
+                    slotloc =loc.tuesday[slot_no-1];
+                break;
+                case "wednesday":
+                    
+                    slotloc =loc.wednesday[slot_no-1];
+                    break;
+                case "thursday":
+                    
+                    slotloc =loc.thursday[slot_no-1];
+                        break;        
+                default:
+                    return res.status(400).json({msg:"Enter a valid day/no upper case"});
+            };
 
-      
-  for (var i = 0; i < slotloc.staff.length; i++) {
-    if(slotloc.staff[i]==""){
-    slotloc.staff.set(i, staff_id);
-    break;
-
-    }}
-
-   
-switch(day) {
-    case "saturday":
-       cor.saturday.splice(slot_no-1,1,slot)
-       loc.saturday.splice(slot_no-1,1,slotloc)
-       sta.saturday.splice(slot_no-1,1,slotsta)
-      break;
-    case "sunday":
-        cor.sunday.splice(slot_no-1,1,slot)
-        loc.sunday.splice(slot_no-1,1,slotloc)
-       sta.sunday.splice(slot_no-1,1,slotsta)
-      break;
-    case "monday":
-        cor.monday.splice(slot_no-1,1,slot)
-        loc.monday.splice(slot_no-1,1,slotloc)
-        sta.monday.splice(slot_no-1,1,slotsta)
-      break;
-    case "tuesday":
-        cor.tuesday.splice(slot_no-1,1,slot)
-        loc.tuesday.splice(slot_no-1,1,slotloc)
-       sta.tuesday.splice(slot_no-1,1,slotsta)
-      break;
-    case "wednesday":
-        cor.wednesday.splice(slot_no-1,1,slot)
-        loc.wednesday.splice(slot_no-1,1,slotloc)
-        sta.wednesday.splice(slot_no-1,1,slotsta)
-        break;
-    case "thursday":
-        cor.thursday.splice(slot_no-1,1,slot)
-        loc.thursday.splice(slot_no-1,1,slotloc)
-        sta.thursday.splice(slot_no-1,1,slotsta)
-         
-            break;        
-       }
-
-         
-           var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
-          
-           var sta3 = await schedule_model.findOneAndUpdate({id: staff},sta);
-   
-           
-
-         
-           var loc3 = await schedule_model.findOneAndUpdate({id: location},loc);
-
-
-    res.send("done");
-    }
-    else{
-        return res.status(401).json({msg:"unauthorized"});
-
-    }
-    })    
-
-
-
-
-router.route('/Rejectslotlinkingreq').put(async (req,res)=>{
-    const cord= await staff_model.findById(req.user._id);
-    const {slotlinking_id,course_code}=req.body;
-    if(!course_code){
-        return res.status(400).json({msg:"Please enter a course_code"});
-    }
-    const course = await course_model.findOne({code : req.body.course_code })
-    if(cord.id==course.courseCoordinator){   
-    const slotreq = await request_model.findOne({id : req.body.slotlinking_id });
-    if(!slotreq)
-    return res.status(400).json({msg:"please enter a valid slotlinking_id"});
-
-    slotreq.status="Rejected";
-    await slotreq.save();
-    res.send("done");
-   
-    }
-    else{
-        return res.status(401).json({msg:"unauthorized"});
-
-    }
-    })    
-
-
-      
-
-
-
-
-router.route('/Addslot').post(async (req,res)=>{
-    const cord= await staff_model.findById(req.user._id);
-    const {course_code,slot_no,day,location,type,compensation}=req.body;
-    if(!course_code || !slot_no || !day || !location ||!type || !compensation){
-        return res.status(400).json({msg:"Please enter location,type,compensation(true,false),slot_no,day and course_code"});
-    }
-
-    if(req.body.slot_no>5)
-    return res.status(400).json({msg:"Enter a valid slot_no"});
-    if(type != "tut" && type !="lab")
-    return res.status(400).json({msg:"The type is eaither tut or lab"});
-
-    const course =  await course_model.findOne({code: req.body.course_code});
-    if(!course)
-    return res.status(400).json({msg:"Please enter a valid course"}); 
-    
-    if(cord.id == course.courseCoordinator){
- 
-        const cor =  await schedule_model.findOne({id:  req.body.course_code});
-        const loc =  await schedule_model.findOne({id:  req.body.location});
-
-        if(!cor)
-        return res.status(400).json({msg:"Please enter a valid course(schedule)"}); 
-
-        if(!loc)
-    return res.status(400).json({msg:"Please enter a valid location(schedule)"}); 
-      
-    
-        var slot =cor.saturday[slot_no-1];
-        var slotloc =loc.saturday[slot_no-1];
-    switch(day) {
-        case "saturday":
-            if(!loc.saturday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-             slot =cor.saturday[slot_no-1];
-             slotloc =loc.saturday[slot_no-1];
-          break;
-        case "sunday":
-            if(!loc.sunday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-             slot =cor.sunday[slot_no-1];
-             slotloc =loc.sunday[slot_no-1];
-          break;
-        case "monday":
-            if(!loc.monday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-             slot =cor.monday[slot_no-1];
-             slotloc =loc.monday[slot_no-1];
-          break;
-        case "tuesday":
-            if(!loc.tuesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-             slot =cor.tuesday[slot_no-1];
-             slotloc =loc.tuesday[slot_no-1];
-          break;
-        case "wednesday":
-            if(!loc.wednesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-             slot =cor.wednesday[slot_no-1];
-             slotloc =loc.wednesday[slot_no-1];
-            break;
-        case "thursday":
-            if(!loc.thursday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-             slot =cor.thursday[slot_no-1];
-             slotloc =loc.thursday[slot_no-1];
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      }
-
-      const em = "";
-      await slot.location.push(location);
-      await slot.type.push(type);
-      await slot.staff.push(em);
-      await slot.compensation.push(compensation);
-
-      
-      await slotloc.type.push(type);
-      await slotloc.staff.push(em);
-      await slotloc.compensation.push(compensation);
-
-
-    slot.isEmpty=false;
-    slotloc.isEmpty=false;
-
-    await slot.save();
-    await slotloc.save();
-    
-    
-    switch(day) {
-        case "saturday":
-           cor.saturday.splice(slot_no-1,1,slot)
-           
-           loc.saturday.splice(slot_no-1,1,slotloc)
-          break;
-        case "sunday":
-            cor.sunday.splice(slot_no-1,1,slot)
-           
-           loc.sunday.splice(slot_no-1,1,slotloc)
-          break;
-        case "monday":
-            cor.monday.splice(slot_no-1,1,slot)
-            
-            loc.monday.splice(slot_no-1,1,slotloc)
-          break;
-        case "tuesday":
-            cor.tuesday.splice(slot_no-1,1,slot)
-          
-           loc.tuesday.splice(slot_no-1,1,slotloc)
-          break;
-        case "wednesday":
-            cor.wednesday.splice(slot_no-1,1,slot)
         
-            loc.wednesday.splice(slot_no-1,1,slotloc)
-            break;
-        case "thursday":
-            cor.thursday.splice(slot_no-1,1,slot)
-           
-            loc.thursday.splice(slot_no-1,1,slotloc)
-             
-                break;        
-           }
+            for (var i = 0; i < slotloc.staff.length; i++) {
+                if(slotloc.staff[i]==""){
+                    slotloc.staff.set(i, staff_id);
+                    break;
+                }
+            }
 
-           console.log(slotloc.isEmpty)
-          
-           var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
-          
-           var loc3 = await schedule_model.findOneAndUpdate({id: req.body.location},loc);
-   
-           
-    res.send("done");
+            switch(day) {
+                case "saturday":
+                    cor.saturday.splice(slot_no-1,1,slot)
+                    loc.saturday.splice(slot_no-1,1,slotloc)
+                    sta.saturday.splice(slot_no-1,1,slotsta)
+                break;
+                case "sunday":
+                    cor.sunday.splice(slot_no-1,1,slot)
+                    loc.sunday.splice(slot_no-1,1,slotloc)
+                    sta.sunday.splice(slot_no-1,1,slotsta)
+                break;
+                case "monday":
+                    cor.monday.splice(slot_no-1,1,slot)
+                    loc.monday.splice(slot_no-1,1,slotloc)
+                    sta.monday.splice(slot_no-1,1,slotsta)
+                break;
+                case "tuesday":
+                    cor.tuesday.splice(slot_no-1,1,slot)
+                    loc.tuesday.splice(slot_no-1,1,slotloc)
+                    sta.tuesday.splice(slot_no-1,1,slotsta)
+                break;
+                case "wednesday":
+                    cor.wednesday.splice(slot_no-1,1,slot)
+                    loc.wednesday.splice(slot_no-1,1,slotloc)
+                    sta.wednesday.splice(slot_no-1,1,slotsta)
+                    break;
+                case "thursday":
+                    cor.thursday.splice(slot_no-1,1,slot)
+                    loc.thursday.splice(slot_no-1,1,slotloc)
+                    sta.thursday.splice(slot_no-1,1,slotsta)
+                    break;        
+            }
+
+            var cor3 = await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
+            var sta3 = await schedule_model.findOneAndUpdate({id: staff},sta);        
+            var loc3 = await schedule_model.findOneAndUpdate({id: location},loc);
+            res.send();
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})    
+
+
+
+
+router.route('/Rejectslotlinkingreq')
+.put(async (req,res)=>{
+    try{
+        const cord= await staff_model.findById(req.user._id);
+        const {slotlinking_id,course_code}=req.body;
+        if(!course_code){
+            return res.status(400).json({msg:"Please enter a course_code"});
+        }
+        const course = await course_model.findOne({code : req.body.course_code })
+        if(cord.id==course.courseCoordinator){   
+            const slotreq = await request_model.findByID(req.body.slotlinking_id);
+            if(!slotreq)
+                return res.status(400).json({msg:"please enter a valid slotlinking _id"});
+
+            slotreq.status="Rejected";
+            await slotreq.save();
+            res.send();
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"});
+        }
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})    
+
+router.route('/Addslot')
+.post(async (req,res)=>{
+    try{
+        const cord= await staff_model.findById(req.user._id);
+        const {course_code,slot_no,day,location,type,compensation}=req.body;
+        if(!course_code || !slot_no || !day || !location ||!type || !compensation){
+            return res.status(400).json({msg:"Please enter location,type,compensation(true,false),slot_no,day and course_code"});
+        }
+
+        if(req.body.slot_no>5)
+            return res.status(400).json({msg:"Enter a valid slot_no"});
+        if(type != "tut" && type !="lab")
+            return res.status(400).json({msg:"The type is eaither tut or lab"});
+
+        const course =  await course_model.findOne({code: req.body.course_code});
+        if(!course)
+            return res.status(400).json({msg:"Please enter a valid course"}); 
+        
+        if(cord.id == course.courseCoordinator){
     
-    }
-    else{
-        return res.status(401).json({msg:"unauthorized"}); 
+            const cor =  await schedule_model.findOne({id:  req.body.course_code});
+            const loc =  await schedule_model.findOne({id:  req.body.location});
+            if(!cor)
+                return res.status(400).json({msg:"Please enter a valid course(schedule)"}); 
 
-    }
-    })  ;
-
-
-
-router.route('/updateslot').put(async (req,res)=>{
-    const cord= await staff_model.findById(req.user._id);
-    const {course_code,slot_no,day,location,newlocation,newtype,compensation}=req.body;
-    if(!course_code || !slot_no || !day || !location ||  !(newlocation||newtype||compensation)){
-        return res.status(400).json({msg:"Please enter location,slot_no,day,course_code and the new location,compensation or/and type"});
-    }
-
-    if(req.body.slot_no>5)
-    return res.status(400).json({msg:"Enter a valid slot_no"});
-
-    if(location==newlocation)
-    return res.status(400).json({msg:"The old and new locations have the same code"});
-
-    if(newtype){
-    if(req.body.newtype != "tut" && req.body.newtype != "lab" )
-    return res.status(400).json({msg:"the type is either lab or tut"});}
-
-    if(newlocation){
-    const nlo = await Location_model.findOne({code:req.body.newlocation});
-    if(!nlo)
-    return res.status(400).json({msg:"Please enter a valid location"}); 
-    }
-    const lo = await Location_model.findOne({code:req.body.location});
-    if(!lo)
-    return res.status(400).json({msg:"Please enter a valid location"}); 
-
-    const course =  await course_model.findOne({code: req.body.course_code});
-    if(!course)
-    return res.status(400).json({msg:"Please enter a valid course"}); 
-    
-    if(cord.id == course.courseCoordinator){
- 
-        const loc = await schedule_model.findOne({id: req.body.newlocation});
-        const cor =  await schedule_model.findOne({id:  req.body.course_code});
-        const loc1 = await schedule_model.findOne({id: req.body.location});
-        if(newlocation){
             if(!loc)
-            return res.status(400).json({msg:"Please enter a valid new location"}); 
-        var slotloc =loc.saturday[slot_no-1];
-        var slotloc1 =loc1.saturday[slot_no-1];
+                return res.status(400).json({msg:"Please enter a valid location(schedule)"}); 
+        
+            var slot =cor.saturday[slot_no-1];
+            var slotloc =loc.saturday[slot_no-1];
+            switch(day) {
+                case "saturday":
+                    if(!loc.saturday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this location is used in this slot"});
+                    slot =cor.saturday[slot_no-1];
+                    slotloc =loc.saturday[slot_no-1];
+                break;
+                case "sunday":
+                    if(!loc.sunday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this location is used in this slot"});
+                    slot =cor.sunday[slot_no-1];
+                    slotloc =loc.sunday[slot_no-1];
+                break;
+                case "monday":
+                    if(!loc.monday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this location is used in this slot"});
+                    slot =cor.monday[slot_no-1];
+                    slotloc =loc.monday[slot_no-1];
+                break;
+                case "tuesday":
+                    if(!loc.tuesday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this location is used in this slot"});
+                    slot =cor.tuesday[slot_no-1];
+                    slotloc =loc.tuesday[slot_no-1];
+                break;
+                case "wednesday":
+                    if(!loc.wednesday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this location is used in this slot"});
+                    slot =cor.wednesday[slot_no-1];
+                    slotloc =loc.wednesday[slot_no-1];
+                break;
+                case "thursday":
+                    if(!loc.thursday[slot_no-1].isEmpty)
+                        return res.status(400).json({msg:"this location is used in this slot"});
+                    slot =cor.thursday[slot_no-1];
+                    slotloc =loc.thursday[slot_no-1];
+                break;        
+                default:
+                    return res.status(400).json({msg:"Enter a valid day/no upper case"});
+            }
+
+            const em = "";
+            await slot.location.push(location);
+            await slot.type.push(type);
+            await slot.staff.push(em);
+            await slot.compensation.push(compensation);
+
+            await slotloc.type.push(type);
+            await slotloc.staff.push(em);
+            await slotloc.compensation.push(compensation);
+
+            slot.isEmpty=false;
+            slotloc.isEmpty=false;
+
+            await slot.save();
+            await slotloc.save();
+        
+            switch(day) {
+                case "saturday":
+                    cor.saturday.splice(slot_no-1,1,slot)
+                    loc.saturday.splice(slot_no-1,1,slotloc)
+                break;
+                case "sunday":
+                    cor.sunday.splice(slot_no-1,1,slot)
+                    loc.sunday.splice(slot_no-1,1,slotloc)
+                break;
+                case "monday":
+                    cor.monday.splice(slot_no-1,1,slot)
+                    loc.monday.splice(slot_no-1,1,slotloc)
+                break;
+                case "tuesday":
+                    cor.tuesday.splice(slot_no-1,1,slot)
+                    loc.tuesday.splice(slot_no-1,1,slotloc)
+                break;
+                case "wednesday":
+                    cor.wednesday.splice(slot_no-1,1,slot)
+                    loc.wednesday.splice(slot_no-1,1,slotloc)
+                break;
+                case "thursday":
+                    cor.thursday.splice(slot_no-1,1,slot)
+                    loc.thursday.splice(slot_no-1,1,slotloc)
+                break;        
+            }
+
+            console.log(slotloc.isEmpty)
+            var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);    
+            var loc3 = await schedule_model.findOneAndUpdate({id: req.body.location},loc);   
+            res.send();
         }
-        var slot =cor.saturday[slot_no-1];
-       
-    switch(day) {
-        case "saturday":
-            if(newlocation){
-            if(!loc.saturday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-            slotloc =loc.saturday[slot_no-1];
-            slotloc1 =loc1.saturday[slot_no-1];
-            }
-             slot =cor.saturday[slot_no-1];
-            
-          break;
-        case "sunday":
-            if(newlocation){
-            if(!loc.sunday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-            slotloc =loc.sunday[slot_no-1];
-            slotloc1 =loc1.sunday[slot_no-1];
-        
-        }
-             slot =cor.sunday[slot_no-1];
-             
-          break;
-        case "monday":
-            if(newlocation){
-            if(!loc.monday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-            slotloc =loc.monday[slot_no-1];
-            slotloc1 =loc1.monday[slot_no-1];}
-             slot =cor.monday[slot_no-1];
-            
-          break;
-        case "tuesday":
-            if(newlocation){
-            if(!loc.tuesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-            slotloc =loc.tuesday[slot_no-1];
-            slotloc1 =loc1.tuesday[slot_no-1];}
-             slot =cor.tuesday[slot_no-1];
-             
-          break;
-        case "wednesday":
-            if(newlocation){
-            if(!loc.wednesday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-            slotloc =loc.wednesday[slot_no-1];
-            slotloc1 =loc1.wednesday[slot_no-1];}
-             slot =cor.wednesday[slot_no-1];
-            
-            break;
-        case "thursday":
-            if(newlocation){
-            if(!loc.thursday[slot_no-1].isEmpty)
-            return res.status(400).json({msg:"this location is used in this slot"});
-            slotloc =loc.thursday[slot_no-1];
-            slotloc1 =loc1.thursday[slot_no-1];
-            }
-             slot =cor.thursday[slot_no-1];
-             
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      }
-    for (var i = 0; i < slot.location.length; i++) {
-        if(slot.location[i]==req.body.location){
-        if(newlocation)
-        slot.location.set(i, req.body.newlocation);
-        if(newtype)
-        slot.type.set(i, req.body.newtype);
-        if(compensation)
-        slot.compensation.set(i, req.body.compensation);
-        break; }
-    }
-
-    if(newlocation)
-    { for (var i = 0; i < slotloc.location.length; i++) { 
-        //slotloc.location.set(i, req.body.newlocation);
-        const em = "";
-
-        await slotloc.staff.push(em);
-      
-        if(compensation)
-        await slotloc.compensation.push(compensation);
-        if(newtype)
-        await slotloc.type.push(type);
-        break; }
-    }
-    if(newlocation)
-    { for (var i = 0; i < slotloc1.location.length; i++) {
-        
-       // await slotloc1.location.splice(i,1)
-        await slotloc1.staff.splice(i,1)
-        await slotloc1.type.splice(i,1)
-        await slotloc1.compensation.splice(i,1) 
-    }}
-
-    if(newlocation)
-    {
-    slotloc.isEmpty=false;
-    slotloc1.isEmpty=true;
-    }
-
-
-
-
-    switch(day) {
-        case "saturday":
-           cor.saturday.splice(slot_no-1,1,slot)
-           if(newlocation){
-           loc.saturday.splice(slot_no-1,1,slotloc)
-           loc1.saturday.splice(slot_no-1,1,slotloc1)
-           }break;
-        case "sunday":
-            cor.sunday.splice(slot_no-1,1,slot)
-           if(newlocation){
-           loc.sunday.splice(slot_no-1,1,slotloc)
-           loc1.sunday.splice(slot_no-1,1,slotloc1)
-           }break;
-        case "monday":
-            cor.monday.splice(slot_no-1,1,slot)
-            if(newlocation){
-            loc.monday.splice(slot_no-1,1,slotloc)
-            loc1.monday.splice(slot_no-1,1,slotloc1)
-            }break;
-        case "tuesday":
-            cor.tuesday.splice(slot_no-1,1,slot)
-           if(newlocation){
-           loc.tuesday.splice(slot_no-1,1,slotloc)
-           loc1.tuesday.splice(slot_no-1,1,slotloc1)
-           }break;
-        case "wednesday":
-            cor.wednesday.splice(slot_no-1,1,slot)
-            if(newlocation){
-            loc.wednesday.splice(slot_no-1,1,slotloc)
-            loc1.wednesday.splice(slot_no-1,1,slotloc1)
-            }break;
-        case "thursday":
-            cor.thursday.splice(slot_no-1,1,slot)
-            if(newlocation){
-            loc.thursday.splice(slot_no-1,1,slotloc)
-            loc1.thursday.splice(slot_no-1,1,slotloc1)
-            }
-                break;        
-           }
-
-          // mongoose.set('useFindAndModify', false);
-           var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
-           if(newlocation){
-           var loc3 = await schedule_model.findOneAndUpdate({id: req.body.newlocation},loc);
-           var loc13 = await schedule_model.findOneAndUpdate({id: req.body.location},loc1);
-           }
-           
-   
-    res.send("done");
-    
-    }
-    else{
-        return res.status(401).json({msg:"unauthorized"}); 
-
-    }
-    })   
-
-
-
-
-
-
-
-
-
-router.route('/deleteslot').delete(async (req,res)=>{
-    const cord= await staff_model.findById(req.user._id);
-    const {course_code,slot_no,day,location}=req.body;
-    if(!course_code || !slot_no || !day || !location ){
-        return res.status(400).json({msg:"Please enter location,slot_no,day and course_code"});
-    }
-
-    if(req.body.slot_no>5)
-    return res.status(400).json({msg:"Enter a valid slot_no"});
-
-    const course =  await course_model.findOne({code: req.body.course_code});
-    if(!course)
-    return res.status(400).json({msg:"Please enter a valid course"}); 
-    
-    if(cord.id == course.courseCoordinator){
- 
-        const cor =  await schedule_model.findOne({id:  req.body.course_code});
-        const loc =  await schedule_model.findOne({id:  req.body.location});
-
-        if(!loc)
-    return res.status(400).json({msg:"Please enter a valid location"}); 
-       
-        var slot =cor.saturday[slot_no-1];
-        var slotloc =loc.saturday[slot_no-1];
-    switch(day) {
-        case "saturday":
-             slot =cor.saturday[slot_no-1];
-             slotloc =loc.saturday[slot_no-1];
-          break;
-        case "sunday":
-             slot =cor.sunday[slot_no-1];
-             slotloc =loc.sunday[slot_no-1];
-          break;
-        case "monday":
-             slot =cor.monday[slot_no-1];
-             slotloc =loc.monday[slot_no-1];
-          break;
-        case "tuesday":
-             slot =cor.tuesday[slot_no-1];
-             slotloc =loc.tuesday[slot_no-1];
-          break;
-        case "wednesday":
-             slot =cor.wednesday[slot_no-1];
-             slotloc =loc.wednesday[slot_no-1];
-            break;
-        case "thursday":
-             slot =cor.thursday[slot_no-1];
-             slotloc =loc.thursday[slot_no-1];
-                break;        
-        default:
-            return res.status(400).json({msg:"Enter a valid day/no upper case"});
-      }
-    for (var i = 0; i < slot.location.length; i++) {
-        if(slot.location[i]==location){
-        await slot.location.splice(i,1)
-        await slot.staff.splice(i,1)
-        await slot.type.splice(i,1)
-        await slot.compensation.splice(i,1)
-        
+        else{
+            return res.status(401).json({msg:"unauthorized"}); 
         }
     }
-    for (var i = 0; i < slotloc.location.length; i++) {
-        //await slotloc.location.splice(i,1)
-        await slotloc.staff.splice(i,1)
-        await slotloc.type.splice(i,1)
-        await slotloc.compensation.splice(i,1)
-         
+    catch(error){
+        return res.status(500).json({error:error.message});
     }
+});
 
-   
-    slotloc.isEmpty=true;
-    
-    
-    switch(day) {
-        case "saturday":
-           cor.saturday.splice(slot_no-1,1,slot)
-           
-           loc.saturday.splice(slot_no-1,1,slotloc)
-          break;
-        case "sunday":
-            cor.sunday.splice(slot_no-1,1,slot)
-           
-           loc.sunday.splice(slot_no-1,1,slotloc)
-          break;
-        case "monday":
-            cor.monday.splice(slot_no-1,1,slot)
-            
-            loc.monday.splice(slot_no-1,1,slotloc)
-          break;
-        case "tuesday":
-            cor.tuesday.splice(slot_no-1,1,slot)
-          
-           loc.tuesday.splice(slot_no-1,1,slotloc)
-          break;
-        case "wednesday":
-            cor.wednesday.splice(slot_no-1,1,slot)
+
+
+router.route('/updateslot')
+.put(async (req,res)=>{
+    try{
+        const cord= await staff_model.findById(req.user._id);
+        const {course_code,slot_no,day,location,newlocation,newtype,compensation}=req.body;
+        if(!course_code || !slot_no || !day || !location ||  !(newlocation||newtype||compensation)){
+            return res.status(400).json({msg:"Please enter location,slot_no,day,course_code and the new location,compensation or/and type"});
+        }
+
+        if(req.body.slot_no>5)
+            return res.status(400).json({msg:"Enter a valid slot_no"});
+
+        if(location==newlocation)
+            return res.status(400).json({msg:"The old and new locations have the same code"});
+
+        if(newtype){
+            if(req.body.newtype != "tut" && req.body.newtype != "lab" )
+                return res.status(400).json({msg:"the type is either lab or tut"});
+        }
+
+        if(newlocation){
+            const nlo = await Location_model.findOne({code:req.body.newlocation});
+            if(!nlo)
+                return res.status(400).json({msg:"Please enter a valid location"}); 
+        }
+
+        const lo = await Location_model.findOne({code:req.body.location});
+        if(!lo)
+            return res.status(400).json({msg:"Please enter a valid location"}); 
+
+        const course =  await course_model.findOne({code: req.body.course_code});
+        if(!course)
+            return res.status(400).json({msg:"Please enter a valid course"}); 
         
-            loc.wednesday.splice(slot_no-1,1,slotloc)
-            break;
-        case "thursday":
-            cor.thursday.splice(slot_no-1,1,slot)
-           
-            loc.thursday.splice(slot_no-1,1,slotloc)
-             
-                break;        
-           }
-
-          // mongoose.set('useFindAndModify', false);
-           var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
-          
-           var loc3 = await schedule_model.findOneAndUpdate({id: req.body.location},loc);
-   
-           
-    res.send("done");
+        if(cord.id == course.courseCoordinator){
     
-    }
-    else{
-        return res.status(401).json({msg:"unauthorized"}); 
+            const loc = await schedule_model.findOne({id: req.body.newlocation});
+            const cor =  await schedule_model.findOne({id:  req.body.course_code});
+            const loc1 = await schedule_model.findOne({id: req.body.location});
+            if(newlocation){
+                if(!loc)
+                    return res.status(400).json({msg:"Please enter a valid new location"}); 
+                var slotloc =loc.saturday[slot_no-1];
+                var slotloc1 =loc1.saturday[slot_no-1];
+            }
+            var slot =cor.saturday[slot_no-1];
+        
+            switch(day) {
+                case "saturday":
+                    if(newlocation){
+                        if(!loc.saturday[slot_no-1].isEmpty)
+                            return res.status(400).json({msg:"this location is used in this slot"});
+                        slotloc =loc.saturday[slot_no-1];
+                        slotloc1 =loc1.saturday[slot_no-1];
+                    }
+                    slot =cor.saturday[slot_no-1];
+                break;
+                case "sunday":
+                    if(newlocation){
+                        if(!loc.sunday[slot_no-1].isEmpty)
+                            return res.status(400).json({msg:"this location is used in this slot"});
+                        slotloc =loc.sunday[slot_no-1];
+                        slotloc1 =loc1.sunday[slot_no-1];
+                    }
+                    slot =cor.sunday[slot_no-1];
+                break;
+                case "monday":
+                    if(newlocation){
+                        if(!loc.monday[slot_no-1].isEmpty)
+                            return res.status(400).json({msg:"this location is used in this slot"});
+                        slotloc =loc.monday[slot_no-1];
+                        slotloc1 =loc1.monday[slot_no-1];
+                    }
+                    slot =cor.monday[slot_no-1];   
+                break;
+                case "tuesday":
+                    if(newlocation){
+                        if(!loc.tuesday[slot_no-1].isEmpty)
+                            return res.status(400).json({msg:"this location is used in this slot"});
+                        slotloc =loc.tuesday[slot_no-1];
+                        slotloc1 =loc1.tuesday[slot_no-1];
+                    }
+                    slot =cor.tuesday[slot_no-1];
+                break;
+                case "wednesday":
+                    if(newlocation){
+                        if(!loc.wednesday[slot_no-1].isEmpty)
+                            return res.status(400).json({msg:"this location is used in this slot"});
+                        slotloc =loc.wednesday[slot_no-1];
+                        slotloc1 =loc1.wednesday[slot_no-1];
+                    }
+                    slot =cor.wednesday[slot_no-1];
+                break;
+                case "thursday":
+                    if(newlocation){
+                        if(!loc.thursday[slot_no-1].isEmpty)
+                            return res.status(400).json({msg:"this location is used in this slot"});
+                        slotloc =loc.thursday[slot_no-1];
+                        slotloc1 =loc1.thursday[slot_no-1];
+                    }
+                    slot =cor.thursday[slot_no-1];
+                break;        
+                default:
+                    return res.status(400).json({msg:"Enter a valid day/no upper case"});
+            }
+            for (var i = 0; i < slot.location.length; i++) {
+                if(slot.location[i]==req.body.location){
+                    if(newlocation)
+                        slot.location.set(i, req.body.newlocation);
+                    if(newtype)
+                        slot.type.set(i, req.body.newtype);
+                    if(compensation)
+                        slot.compensation.set(i, req.body.compensation);
+                    break; 
+                }
+            }
 
+            if(newlocation){
+                for (var i = 0; i < slotloc.location.length; i++) { 
+                    //slotloc.location.set(i, req.body.newlocation);
+                    const em = "";
+
+                    await slotloc.staff.push(em);
+                
+                    if(compensation)
+                        await slotloc.compensation.push(compensation);
+                    if(newtype)
+                        await slotloc.type.push(type);
+                    break; 
+                }
+            }
+            if(newlocation){
+                for (var i = 0; i < slotloc1.location.length; i++) {
+                    // await slotloc1.location.splice(i,1)
+                    await slotloc1.staff.splice(i,1)
+                    await slotloc1.type.splice(i,1)
+                    await slotloc1.compensation.splice(i,1) 
+                }
+            }
+            if(newlocation){
+                slotloc.isEmpty=false;
+                slotloc1.isEmpty=true;
+            }
+
+            switch(day) {
+                case "saturday":
+                    cor.saturday.splice(slot_no-1,1,slot)
+                    if(newlocation){
+                        loc.saturday.splice(slot_no-1,1,slotloc)
+                        loc1.saturday.splice(slot_no-1,1,slotloc1)
+                    }
+                break;
+                case "sunday":
+                    cor.sunday.splice(slot_no-1,1,slot)
+                    if(newlocation){
+                        loc.sunday.splice(slot_no-1,1,slotloc)
+                        loc1.sunday.splice(slot_no-1,1,slotloc1)
+                    }
+                break;
+                case "monday":
+                    cor.monday.splice(slot_no-1,1,slot)
+                    if(newlocation){
+                        loc.monday.splice(slot_no-1,1,slotloc)
+                        loc1.monday.splice(slot_no-1,1,slotloc1)
+                    }
+                break;
+                case "tuesday":
+                    cor.tuesday.splice(slot_no-1,1,slot)
+                    if(newlocation){
+                        loc.tuesday.splice(slot_no-1,1,slotloc)
+                        loc1.tuesday.splice(slot_no-1,1,slotloc1)
+                    }
+                break;
+                case "wednesday":
+                    cor.wednesday.splice(slot_no-1,1,slot)
+                    if(newlocation){
+                        loc.wednesday.splice(slot_no-1,1,slotloc)
+                        loc1.wednesday.splice(slot_no-1,1,slotloc1)
+                    }
+                break;
+                case "thursday":
+                    cor.thursday.splice(slot_no-1,1,slot)
+                    if(newlocation){
+                        loc.thursday.splice(slot_no-1,1,slotloc)
+                        loc1.thursday.splice(slot_no-1,1,slotloc1)
+                    }
+                break;        
+            }
+
+            // mongoose.set('useFindAndModify', false);
+            var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
+            if(newlocation){
+                var loc3 = await schedule_model.findOneAndUpdate({id: req.body.newlocation},loc);
+                var loc13 = await schedule_model.findOneAndUpdate({id: req.body.location},loc1);
+            }
+            res.send();
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"}); 
+
+        }
     }
-    })    
+    catch(error){
+        return res.status(500).json({error:error.message});   
+    }
+})   
+
+
+router.route('/deleteslot')
+.delete(async (req,res)=>{
+    try{
+        const cord= await staff_model.findById(req.user._id);
+        const {course_code,slot_no,day,location}=req.body;
+        if(!course_code || !slot_no || !day || !location ){
+            return res.status(400).json({msg:"Please enter location,slot_no,day and course_code"});
+        }
+
+        if(req.body.slot_no>5)
+            return res.status(400).json({msg:"Enter a valid slot_no"});
+
+        const course =  await course_model.findOne({code: req.body.course_code});
+        if(!course)
+            return res.status(400).json({msg:"Please enter a valid course"}); 
+        
+        if(cord.id == course.courseCoordinator){
+            const cor =  await schedule_model.findOne({id:  req.body.course_code});
+            const loc =  await schedule_model.findOne({id:  req.body.location});
+
+            if(!loc)
+                return res.status(400).json({msg:"Please enter a valid location"}); 
+        
+            var slot =cor.saturday[slot_no-1];
+            var slotloc =loc.saturday[slot_no-1];
+            switch(day) {
+                case "saturday":
+                    slot =cor.saturday[slot_no-1];
+                    slotloc =loc.saturday[slot_no-1];
+                break;
+                case "sunday":
+                    slot =cor.sunday[slot_no-1];
+                    slotloc =loc.sunday[slot_no-1];
+                break;
+                case "monday":
+                    slot =cor.monday[slot_no-1];
+                    slotloc =loc.monday[slot_no-1];
+                break;
+                case "tuesday":
+                    slot =cor.tuesday[slot_no-1];
+                    slotloc =loc.tuesday[slot_no-1];
+                break;
+                case "wednesday":
+                    slot =cor.wednesday[slot_no-1];
+                    slotloc =loc.wednesday[slot_no-1];
+                break;
+                case "thursday":
+                    slot =cor.thursday[slot_no-1];
+                    slotloc =loc.thursday[slot_no-1];
+                break;        
+                default:
+                    return res.status(400).json({msg:"Enter a valid day/no upper case"});
+            }
+            for (var i = 0; i < slot.location.length; i++) {
+                if(slot.location[i]==location){
+                    await slot.location.splice(i,1)
+                    await slot.staff.splice(i,1)
+                    await slot.type.splice(i,1)
+                    await slot.compensation.splice(i,1)
+                }
+            }
+            for (var i = 0; i < slotloc.location.length; i++) {
+                //await slotloc.location.splice(i,1)
+                await slotloc.staff.splice(i,1)
+                await slotloc.type.splice(i,1)
+                await slotloc.compensation.splice(i,1)   
+            }
+    
+            slotloc.isEmpty=true;
+        
+        
+            switch(day) {
+                case "saturday":
+                    cor.saturday.splice(slot_no-1,1,slot)
+                    loc.saturday.splice(slot_no-1,1,slotloc)
+                break;
+                case "sunday":
+                    cor.sunday.splice(slot_no-1,1,slot)
+                    loc.sunday.splice(slot_no-1,1,slotloc)
+                break;
+                case "monday":
+                    cor.monday.splice(slot_no-1,1,slot)
+                    loc.monday.splice(slot_no-1,1,slotloc)
+                break;
+                case "tuesday":
+                    cor.tuesday.splice(slot_no-1,1,slot)
+                    loc.tuesday.splice(slot_no-1,1,slotloc)
+                break;
+                case "wednesday":
+                    cor.wednesday.splice(slot_no-1,1,slot)
+                    loc.wednesday.splice(slot_no-1,1,slotloc)
+                break;
+                case "thursday":
+                    cor.thursday.splice(slot_no-1,1,slot)
+                    loc.thursday.splice(slot_no-1,1,slotloc)
+                break;        
+            }
+
+            // mongoose.set('useFindAndModify', false);
+            var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);
+            var loc3 = await schedule_model.findOneAndUpdate({id: req.body.location},loc);
+            
+            res.send();
+        }
+        else{
+            return res.status(401).json({msg:"unauthorized"}); 
+
+        }
+    }
+    catch(error){
+        return res.status(500).json({error:error.message});
+    }
+})    
           
 module.exports = router

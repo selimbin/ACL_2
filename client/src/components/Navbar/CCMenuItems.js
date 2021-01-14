@@ -32,131 +32,87 @@ export const MenuItems = [
         ]
     },
     {
-        title: 'View',
+        title: 'Course Coordinator',
         url: '#',
         cName: 'nav-links',
         dropdown: [
             {
-                title: 'Staff attendance record',
-                url: 'viewstaffattendance',
+                title: 'View Slot Linking Requests',
+                url: 'viewSlotLinkingRequestsCC',
                 cName: 'nav-links',
             },
             {
-                title: 'All staff with missing days/hours',
-                url: 'viewmissing',
+                title: 'Accept Slot Linking Request',
+                url: 'acceptSlotLinkingRequest',
                 cName: 'nav-links',
             },
+            {
+                title: 'Reject Slot Linking Requests',
+                url: 'rejectSlotLinkingRequest',
+                cName: 'nav-links',
+            },
+            {
+                title: 'Add Course Slot',
+                url: 'addCourseSlot',
+                cName: 'nav-links',
+            },
+            {
+                title: 'Update Course Slot',
+                url: 'updateCourseSlot',
+                cName: 'nav-links',
+            },
+            {
+                title: 'Delete Course Slot',
+                url: 'deleteCourseSlot',
+                cName: 'nav-links',
+            }
         ]
     },
     {
-        title: 'Add',
+        title: 'Requests',
         url: '#',
         cName: 'nav-links',
         dropdown: [
             {
-                title: 'Staff',
-                url: 'addstaff',
+                title: 'Send Replacement Request',
+                url: 'sendReplacementRequest',
                 cName: 'nav-links',
             },
             {
-                title: 'Department',
-                url: 'adddepartment',
+                title: 'View Replacement Request',
+                url: 'viewReplacementRequest',
                 cName: 'nav-links',
             },
             {
-                title: 'Faculty',
-                url: 'addfaculty',
+                title: 'Send Slot Linking Request',
+                url: 'sendSlotLinkingReq',
                 cName: 'nav-links',
             },
             {
-                title: 'Course',
-                url: 'addcourse',
+                title: 'Change Day Off Request',
+                url: 'changeDayOffReq',
                 cName: 'nav-links',
             },
             {
-                title: 'Location',
-                url: 'addlocation',
+                title: 'Submit Leave Request',
+                url: 'submitLeaveRequest',
                 cName: 'nav-links',
             },
             {
-                title: 'Staff Sign In/Out',
-                url: 'addsigninout',
-                cName: 'nav-links',
-            },
-        ]
-    },
-    {
-        title: 'Update',
-        url: '#',
-        cName: 'nav-links',
-        dropdown: [
-            {
-                title: 'Staff',
-                url: 'updatestaff',
+                title: 'View Status of all Requests',
+                url: 'viewRequestStatus',
                 cName: 'nav-links',
             },
             {
-                title: 'Department',
-                url: 'updatedepartment',
+                title: 'Cancel Request',
+                url: 'cancelRequest',
                 cName: 'nav-links',
-            },
-            {
-                title: 'Faculty',
-                url: 'updatefaculty',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Course',
-                url: 'updatecourse',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Location',
-                url: 'updatelocation',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Salary',
-                url: 'updatesalary',
-                cName: 'nav-links',
-            },
-        ]
-    },
-    {
-        title: 'Delete',
-        url: '#',
-        cName: 'nav-links',
-        dropdown: [
-            {
-                title: 'Staff',
-                url: 'deletestaff',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Department',
-                url: 'deletedepartment',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Faculty',
-                url: 'deletefaculty',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Course',
-                url: 'deletecourse',
-                cName: 'nav-links',
-            },
-            {
-                title: 'Location',
-                url: 'deletelocation',
-                cName: 'nav-links',
-            },
+            }
         ]
     },
     {
         title: 'Home',
-        url: 'HrHome',
+        url: 'CCHome',
         cName: 'nav-links',
         dropdown: []
     },

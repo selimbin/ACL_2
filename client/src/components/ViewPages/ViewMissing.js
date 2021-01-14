@@ -15,7 +15,7 @@ export class ViewMissing extends Component {
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
+                "token":sessionStorage.getItem('token')
             }
         }).then(
           res =>this.setState({staff:res.data}),toast.warning("Loading might take some time",{position: toast.POSITION.TOP_CENTER}))
@@ -28,16 +28,14 @@ export class ViewMissing extends Component {
                     <tr>
                         <th>id</th>
                         <th>name</th>
-                        <th>missed days</th>
-                        <th>missed hours</th>
+                        <th>day off</th>
                     </tr>
                     {this.state.staff.map((item) => {
                             return (
                                 <tr>
                                     <td>{item.id}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.missedDays}</td>
-                                    <td>{item.missedHours}</td>
+                                    <td>{item.dayOff}</td>
                                 </tr>
                             )
                         })}

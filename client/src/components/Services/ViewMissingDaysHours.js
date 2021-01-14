@@ -18,23 +18,23 @@ export class ViewMissingDaysHours extends Component {
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxYTk0NTQyOTY3MTA2ZjRlNmQ0ZTciLCJyb2xlIjoibGVjdHVyZXIiLCJpYXQiOjE2MTAzMDIwOTF9.FLCkX5Zsjk_omdH-M4k_diewI28Vl22uLlEgG_kEjNE",
+                "token":sessionStorage.getItem('token')
             }
-        }).then(
-          res =>this.setState({days:res.data}))
-          .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
+        })
+        .then(res =>this.setState({days:res}))
+        .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
 
-          axios.get("http://localhost:5000/staff/viewMissingHours",{
+        axios.get("http://localhost:5000/staff/viewMissingHours",{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
+                "token":sessionStorage.getItem('token')
             }
-        }).then(
-          res =>this.setState({hours:res.data}))
-          .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
-      }
+        })
+        .then(res =>this.setState({hours:res}))
+        .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
+    }
     render() {
         return (
             <div class="Viewmiss">

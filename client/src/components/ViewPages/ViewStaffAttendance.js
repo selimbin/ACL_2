@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
 
 export class ViewStaffAttendance extends Component {
+    
     state = {
         id:'',
         staff:[axios]
@@ -22,7 +23,7 @@ export class ViewStaffAttendance extends Component {
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
-                "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
+                "token":sessionStorage.getItem('token') 
             }
         })
         .then(res => this.setState({staff:res.data}))

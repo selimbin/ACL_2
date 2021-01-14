@@ -2,9 +2,12 @@ const bcrypt= require('bcrypt')
 const jwt= require('jsonwebtoken')
 
 const express= require('express');
+const mongoose = require('mongoose')
 const router= express.Router()
 const staff_model=require('../models/staff')
-const {staffSchema} = require('../models/staff.js') 
+const {staffSchema} = require('../models/staff.js')
+const {departmentSchema} = require('../models/academics.js')
+const department_model = mongoose.model('Department', departmentSchema) 
 
 
 /*router.route('/register')
@@ -29,7 +32,7 @@ router.route('/login')
 .post(async (req,res)=>{
     const result = await staff_model.findOne({email:req.body.email})
     if(!result){
-        return res.status.json({msg:"You need to sign up first or incorrect email"})
+        return res.status(401).json({msg:"You need to sign up first or incorrect email"})
     }
     const correctPassword= await bcrypt.compare(req.body.password, result.password)
     if(correctPassword){
@@ -38,7 +41,18 @@ router.route('/login')
         // result=token;
         result.token = token
         await staff_model.findOneAndUpdate({"_id":result._id},result)
-        res.header('token',token).send(token)
+        const department = await department_model.findOne({name:result.department})
+        if(result.role=="lecturer"){
+            if(department.head==result.id){
+                res.header('token',token).send({"token":token,"role":result.role,"isHOD":"true"})
+            }
+            else{
+                res.header('token',token).send({"token":token,"role":result.role,"isHOD":"false"})
+            }
+        }
+        else{
+            res.header('token',token).send({"token":token,"role":result.role,"isHOD":"false"})
+        }
     }
     else{
         return res.status(400).json({msg:"Incorrect Password"})

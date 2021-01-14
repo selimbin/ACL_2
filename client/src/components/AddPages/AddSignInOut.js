@@ -25,7 +25,7 @@ export class AddSignInOut extends Component {
                 {
                     "Access-Control-Allow-Origin": "*",
                     "Content-Type":"application/JSON",
-                    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
+                    "token":sessionStorage.getItem('token')
                 }
             })
             .then((res) => toast.success("Sign out record added successfully",{position: toast.POSITION.TOP_CENTER}))
@@ -47,7 +47,7 @@ export class AddSignInOut extends Component {
                 {
                     "Access-Control-Allow-Origin": "*",
                     "Content-Type":"application/JSON",
-                    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmUxMGU2MGU5MmM1OTI2MDg0OWEwZmYiLCJyb2xlIjoiSFIiLCJpYXQiOjE2MDg5MDQzMzl9.z0kUii0CzU6fDnjxPiD9SVoDe8WL1GVme2O0sK1jiJQ",
+                    "token":sessionStorage.getItem('token')
                 }
             })
             .then((res) => toast.success("Sign in record added successfully",{position: toast.POSITION.TOP_CENTER}))
@@ -78,7 +78,7 @@ export class AddSignInOut extends Component {
                             <label htmlfor="date">Date</label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="date" name="date" placeholder="Enter the date Ex: 01/07/2021" onChange={this.myChangeHandler}></input>
+                            <input type="text" id="date" name="date" placeholder="Enter the date Ex: 2021-07-31" onChange={this.myChangeHandler}></input>
                         </div>
                     </div> 
                     <div class="row">
