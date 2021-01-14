@@ -36,7 +36,7 @@ export class ViewProfile extends Component {
             return (
                 <div>
                     <LecNavbar/>
-                    <Resetpassword/>
+                    <Viewprofile/>
                 </div>
             )
         }

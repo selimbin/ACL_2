@@ -37,7 +37,7 @@ export class UpdateProfile extends Component {
             return (
                 <div>
                     <LecNavbar/>
-                    <Resetpassword/>
+                    <Updateprofile/>
                 </div>
             )
         }
