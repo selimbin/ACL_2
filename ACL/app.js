@@ -27,6 +27,9 @@ const AuthenticationRoutes= require('./routes/auth')
 app.use(cors());
 app.use('/seed', seed_routes)
 
+app.use(cors());
+app.use('/seed', seed_routes)
+
 app.use('/Login',async(req, res, next)=>{
     const token= req.headers.token
     var today =  new Date()

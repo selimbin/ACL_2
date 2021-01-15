@@ -22,7 +22,7 @@ export class ViewSchedule extends Component{
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then(res => this.setState({slot1:res.data[0],slot2:res.data[1],slot3:res.data[2],slot4:res.data[3],slot5:res.data[4]}))
+        .then(res => this.setState({slot1:res.data[0],slot2:res.data[1],slot3:res.data[2],slot4:res.data[3],slot5:res.data[4]}),toast.success("Loaded Successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
     render() {
