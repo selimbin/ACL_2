@@ -14,7 +14,7 @@ export class ViewRequests extends Component {
     mySubmitHandler = async event => {
         event.preventDefault();
 
-        if(this.state.value=="All"){
+        if(this.state.value==="All"){
             await axios.get("http://localhost:5000/staff/viewAllRequests",{
                 headers:
                 {
@@ -26,7 +26,7 @@ export class ViewRequests extends Component {
             .then(res => this.setState({staff:res.data}))
             .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
         }
-        if(this.state.value=="Rejected"){
+        if(this.state.value==="Rejected"){
             await axios.get("http://localhost:5000/staff/viewRejectedRequests",{
                 headers:
                 {
@@ -38,7 +38,7 @@ export class ViewRequests extends Component {
             .then(res => this.setState({staff:res.data}))
             .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
         }
-        if(this.state.value=="Accepted"){
+        if(this.state.value==="Accepted"){
             await axios.get("http://localhost:5000/staff/viewAcceptedRequests",{
                 headers:
                 {
@@ -50,7 +50,7 @@ export class ViewRequests extends Component {
             .then(res => this.setState({staff:res.data}))
             .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
         }
-        if(this.state.value=="Pending"){
+        if(this.state.value==="Pending"){
             await axios.get("http://localhost:5000/staff/viewPendingRequests",{
                 headers:
                 {
@@ -63,7 +63,7 @@ export class ViewRequests extends Component {
             .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
         }
 
-        if(this.state.value==""){
+        if(this.state.value===""){
             toast.error("Choose Request Status",{position: toast.POSITION.TOP_CENTER})
         }
     }

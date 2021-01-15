@@ -3,7 +3,6 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
-import useToken from '../useToken.js';
 
 let x = 0;
 let array = [];

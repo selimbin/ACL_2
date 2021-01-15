@@ -5,7 +5,7 @@ import Addstaff from "../../components/AddPages/AddStaff";
 export class AddStaff extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

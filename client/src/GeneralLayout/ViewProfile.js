@@ -8,7 +8,7 @@ import Viewprofile from "../components/Services/ViewProfile";
 export class ViewProfile extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>
@@ -16,7 +16,7 @@ export class ViewProfile extends Component {
                 </div>
             )
         }
-        if(role=="HOD"){
+        if(role==="HOD"){
             return(
             <div>
                 <HODNavbar/>
@@ -24,7 +24,7 @@ export class ViewProfile extends Component {
             </div>
             )
         }
-        if(role=="TA"){
+        if(role==="TA"){
             return(
             <div>
                 <TANavbar/>
@@ -32,7 +32,7 @@ export class ViewProfile extends Component {
             </div>
             )
         }
-        if(role=="Lec"){
+        if(role==="Lec"){
             return (
                 <div>
                     <LecNavbar/>

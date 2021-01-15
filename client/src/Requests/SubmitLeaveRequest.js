@@ -7,7 +7,7 @@ import LeaveReq from "../components/Requests/SubmitLeaveRequest";
 export class SubmitLeaveRequest extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <Navbar/>
@@ -15,7 +15,7 @@ export class SubmitLeaveRequest extends Component {
                 </div>
             )
         }
-        if(role=="Lec"){
+        if(role==="Lec"){
             return (
                 <div>
                     <LecNavbar/>
@@ -23,7 +23,7 @@ export class SubmitLeaveRequest extends Component {
                 </div>
             )
         }
-        if(role=="TA"){
+        if(role==="TA"){
             return (
                 <div>
                     <TANavbar/>

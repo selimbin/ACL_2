@@ -2439,43 +2439,55 @@ router.route('/viewschedule')
                 for(var j = 0;j < schedule.saturday[i].staff.length; j++){
                     let course = schedule.saturday[i].course[j];
                     let location = schedule.saturday[i].location[j];
-                    let final = course + " in " + location + " / ";
-                    saturday.push(final);
+                    if(course){
+                        let final = course + " in " + location + " / ";
+                        saturday.push(final);
+                    }
                 }
                 let sunday =[];
                 for(var j = 0;j < schedule.sunday[i].staff.length; j++){
                     let course = schedule.sunday[i].course[j];
                     let location = schedule.sunday[i].location[j];
-                    let final = course + " in " + location + " / ";
-                    sunday.push(final);
+                    if(course){
+                        let final = course + " in " + location + " / ";
+                        sunday.push(final);
+                    }
                 }
                 let monday =[];
                 for(var j = 0;j < schedule.monday[i].staff.length; j++){
                     let course = schedule.monday[i].course[j];
                     let location = schedule.monday[i].location[j];
-                    let final = course + " in " + location + " / ";
-                    monday.push(final);
+                    if(course){
+                        let final = course + " in " + location + " / ";
+                        monday.push(final);
+                    }
                 }
                 let tuesday =[];
                 for(var j = 0;j < schedule.tuesday[i].staff.length; j++){
                     let course = schedule.tuesday[i].course[j];
                     let location = schedule.tuesday[i].location[j];
-                    let final = course + " in " + location + " / ";
-                    tuesday.push(final);
+                    if(course){
+                        let final = course + " in " + location + " / ";
+                        tuesday.push(final);
+                    }
                 }
                 let wednesday =[];
                 for(var j = 0;j < schedule.wednesday[i].staff.length; j++){
                     let course = schedule.wednesday[i].course[j];
                     let location = schedule.wednesday[i].location[j];
-                    let final = course + " in " + location + " / ";
-                    wednesday.push(final);
+                    if(course){
+                        let final = course + " in " + location + " / ";
+                        wednesday.push(final);
+                    }
                 }
                 let thursday =[];
                 for(var j = 0;j < schedule.thursday[i].staff.length; j++){
                     let course = schedule.thursday[i].course[j];
                     let location = schedule.thursday[i].location[j];
-                    let final = course + " in " + location + " / ";
-                    thursday.push(final);
+                    if(course){
+                        let final = course + " in " + location + " / ";
+                        thursday.push(final);
+                    }
                 }
                 let courseschedule = [];
                 courseschedule.push({saturday:saturday,sunday:sunday,monday:monday,tuesday:tuesday,wednesday:wednesday,thursday:thursday});
@@ -3484,17 +3496,17 @@ router.route('/viewslotassignment')
                     for (var i = 0; i < 5 ; i++) {
                         var j = i+1;
                         if(out.saturday[i].isEmpty==false){
-                        output.push("saturday ["+j+"]  :"+out.saturday[i]);
+                        output.push(out.saturday[i]);
                         }if(out.sunday[i].isEmpty==false){
-                        output.push("sunday ["+j+"]  :"+out.sunday[i]);
+                        output.push(out.sunday[i]);
                         }if(out.monday[i].isEmpty==false){
-                        output.push("monday ["+j+"]  :"+out.monday[i]);
+                        output.push(out.monday[i]);
                         }if(out.tuesday[i].isEmpty==false){
-                        output.push("tuesday ["+j+"]  :"+out.tuesday[i]);
+                        output.push(out.tuesday[i]);
                         }if(out.wednesday[i].isEmpty==false){
-                        output.push("wednesday ["+j+"]  :"+out.wednesday[i]);
+                        output.push(out.wednesday[i]);
                         }if(out.thursday[i].isEmpty==false){
-                        output.push("thursday ["+j+"]  :"+out.thursday[i]);
+                        output.push(out.thursday[i]);
                         }
                     }
                 };
@@ -4225,7 +4237,7 @@ router.route('/Assigncoordinator')
             if(!staff)
                 return res.status(400).json({msg:"please enter a valid staff id"});
 
-            course.courseCoordinator=staff.name;
+            course.courseCoordinator=staff.id;
             await course.save();
 
             for (var i = 0; i < dep.courses.length; i++) {
@@ -4258,7 +4270,7 @@ router.route('/viewslotlinkingreq')
         if(!course)
             return res.status(400).json({msg:"Please enter a valid course"});   
         if(cord.id==course.courseCoordinator){
-            const output = await request_model.findOne({type:t, receiver: cord.id  });
+            const output = await request_model.find({type:"slotlinking", receiver: cord.id  });
             if(!output)
                 return res.status(400).json({msg:"No slot linking requests"});
             res.send(output);
@@ -4285,7 +4297,7 @@ router.route('/acceptslotlinkingreq')
         }
         const course = await course_model.findOne({code : req.body.course_code })
         if(cord.id==course.courseCoordinator){
-            const slotreq = await request_model.findByID(req.body.slotlinking_id);
+            const slotreq = await request_model.findById(req.body.slotlinking_id);
             if(!slotreq)
                 return res.status(400).json({msg:"please enter a valid slotlinking _id"});
 
@@ -4465,7 +4477,7 @@ router.route('/Rejectslotlinkingreq')
         }
         const course = await course_model.findOne({code : req.body.course_code })
         if(cord.id==course.courseCoordinator){   
-            const slotreq = await request_model.findByID(req.body.slotlinking_id);
+            const slotreq = await request_model.findById(req.body.slotlinking_id);
             if(!slotreq)
                 return res.status(400).json({msg:"please enter a valid slotlinking _id"});
 

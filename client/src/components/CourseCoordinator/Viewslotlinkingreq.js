@@ -5,21 +5,19 @@ import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
 
 export class Viewslotlinkingreq extends Component {
-    // const [token, setToken] = useState();
-    
     state = {
         course_code:'',
         requests:[axios]
     }
 
-    mySubmitHandler = async event => {
+    mySubmitHandler = event => {
         event.preventDefault();
 
         const course = {
             course_code:this.state.course_code
         }
 
-        await axios.post("http://localhost:5000/staff/viewslotlinkingreq", course ,{
+        axios.post("http://localhost:5000/staff/viewslotlinkingreq", course ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",

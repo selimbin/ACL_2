@@ -3,14 +3,11 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
-import useToken from '../useToken.js';
 
 let x = 0;
 let array = [];
 
 export class Viewslotassignment extends Component {
-    // const [token, setToken] = useState();
-    
     state = {
         courses : array,
         slots:[axios]
@@ -31,7 +28,7 @@ export class Viewslotassignment extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then(res => this.setState({slots:res.data}))
+        .then(res => this.setState({slots:res.data}),toast.success("Slots loaded successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
 

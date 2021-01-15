@@ -18,7 +18,7 @@ export class SubmitLeaveRequest extends Component {
         event.preventDefault();
 
 
-        if(this.state.value=="Maternity"){
+        if(this.state.value==="Maternity"){
             const staff = {
                 date:this.state.date,
                 type:"MaternityLeave",
@@ -36,7 +36,7 @@ export class SubmitLeaveRequest extends Component {
             .then(res => this.setState({staff:res.data}))
             .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
         }
-        if(this.state.value=="Compensation"){
+        if(this.state.value==="Compensation"){
             const staff = {
                 date:this.state.date,
                 type:"CompensationLeave",
@@ -54,7 +54,7 @@ export class SubmitLeaveRequest extends Component {
             .then(res => this.setState({staff:res.data}))
             .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
         }
-        if(this.state.value=="Sick"){
+        if(this.state.value==="Sick"){
             const staff = {
                 date:this.state.date,
                 type:"sickleave",
@@ -72,7 +72,7 @@ export class SubmitLeaveRequest extends Component {
             .then(res => this.setState({staff:res.data}))
             .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
         }
-        if(this.state.value=="Annual"){
+        if(this.state.value==="Annual"){
             const staff = {
                 date:this.state.date,
                 type:"AnnualLeave",
@@ -90,7 +90,7 @@ export class SubmitLeaveRequest extends Component {
             .then(res => this.setState({staff:res.data}))
             .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
         }
-        if(this.state.value=="Accidental"){
+        if(this.state.value==="Accidental"){
             const staff = {
                 date:this.state.date,
                 type:"accidentalLeave",
@@ -108,7 +108,7 @@ export class SubmitLeaveRequest extends Component {
             .then(res => this.setState({staff:res.data}))
             .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
         }
-        if(this.state.value==""){
+        if(this.state.value===""){
             toast.error("Choose Request Type",{position: toast.POSITION.TOP_CENTER})
         }
     }

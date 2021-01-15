@@ -6,7 +6,7 @@ import DeleteAssign from "../../components/ManageCourses/Deleteslotassign";
 export class DeleteCourseAssignment extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <Navbar/>
@@ -14,7 +14,7 @@ export class DeleteCourseAssignment extends Component {
                 </div>
             )
         }
-        if(role=="Lec"){
+        if(role==="Lec"){
             return (
                 <div>
                     <LecNavbar/>

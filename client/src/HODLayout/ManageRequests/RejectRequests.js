@@ -5,7 +5,7 @@ import RejReq from "../../components/ManageRequestsHOD/RejectRequests";
 export class RejectRequests extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <Navbar/>

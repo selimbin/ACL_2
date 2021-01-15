@@ -5,7 +5,7 @@ import DeleteStaff from "../../components/ManageDepartment/DeleteStaffCourse";
 export class DeleteStaffCourse extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <Navbar/>

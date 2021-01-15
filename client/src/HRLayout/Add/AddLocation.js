@@ -5,7 +5,7 @@ import Addlocation from "../../components/AddPages/AddLocation";
 export class AddLocation extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

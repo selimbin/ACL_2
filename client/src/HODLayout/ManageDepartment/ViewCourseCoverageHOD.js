@@ -5,7 +5,7 @@ import CourseCoverage from "../../components/ManageDepartment/ViewCourseCoverage
 export class ViewCourseCoverageHOD extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <Navbar/>

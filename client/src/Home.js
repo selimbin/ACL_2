@@ -11,7 +11,7 @@ import LecHome from "./LecHome";
 export class ResetPassword extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>
@@ -19,7 +19,7 @@ export class ResetPassword extends Component {
                 </div>
             )
         }
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <HODNavbar/>
@@ -27,7 +27,7 @@ export class ResetPassword extends Component {
                 </div>
             )
         }
-        if(role=="TA"){
+        if(role==="TA"){
             return (
                 <div>
                     <TANavbar/>
@@ -35,7 +35,7 @@ export class ResetPassword extends Component {
                 </div>
             )
         }
-        if(role=="Lec"){
+        if(role==="Lec"){
             return (
                 <div>
                     <LecNavbar/>
