@@ -122,7 +122,7 @@ export default function Login() {
         if(response.data.role=="lecturer"){
           if(response.data.isHOD=="true"){
             sessionStorage.setItem("role", "HOD");
-            window.location.href='/HODHome' 
+            window.location.href='/HodHome' 
           }
           else{
             sessionStorage.setItem("role", "Lec");
