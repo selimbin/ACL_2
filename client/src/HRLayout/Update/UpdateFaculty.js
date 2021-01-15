@@ -4,12 +4,18 @@ import Updatefaculty from "../../components/UpdatePages/UpdateFaculty";
 
 export class UpdateFaculty extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Updatefaculty/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Updatefaculty/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

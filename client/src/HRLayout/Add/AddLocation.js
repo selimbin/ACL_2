@@ -4,12 +4,18 @@ import Addlocation from "../../components/AddPages/AddLocation";
 
 export class AddLocation extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Addlocation/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Addlocation/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

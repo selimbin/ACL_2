@@ -4,12 +4,18 @@ import AcceptReq from "../../components/ManageRequestsHOD/AcceptRequests";
 
 export class AcceptRequests extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <AcceptReq/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HOD"){
+            return (
+                <div>
+                    <Navbar/>
+                    <AcceptReq/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

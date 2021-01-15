@@ -21,7 +21,6 @@
   
   .flex-container1>div {
     color: white;
-    width: 33%;
     margin-top: 20px;
     text-align: center;
     line-height: 75px;
@@ -29,114 +28,64 @@
     color: black;
   }
 
-.viewprofile {
+.viewprofilehod {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 50%;
+    width: 60%;
 }
 
-.text1 {
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
-  color: white;
-  font-weight: bold;
-  font-size: 25px;
-  position: absolute;
-  top: 35.5%;
-  left: 15.4%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  width: 14%;
-  text-align: center;
-}
-
-.viewattendance {
+.viewattendancehod {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 50%;
+  width: 60%;
 }
 
-.text2 {
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
-  color: white;
-  font-weight: bold;
-  font-size: 25px;
-  position: absolute;
-  top: 40%;
-  left: 48.7%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  width: 14%;
-  text-align: center;
-}
-
-.viewmissingdayshours {
+.viewmissingdayshourshod {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 50%;
+  width: 60%;
 }
 
-.text3 {
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
-  color: white;
-  font-weight: bold;
-  font-size: 19px;
-  position: absolute;
-  top: 40%;
-  left: 82.2%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  width: 14%;
-  text-align: center;
-}
-
-.signin {
+.viewschedulehod {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 30%;
+  width: 60%;
 }
 
-.text4 {
-  background-color: rgb(28, 75, 14); /* Fallback color */
-  background-color: rgba(12, 65, 40, 0.4); /* Black w/opacity/see-through */
-  color: white;
-  font-weight: bold;
-  font-size: 19px;
-  position: absolute;
-  top: 74.7%;
-  left: 25%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  width: 15%;
-  text-align: center;
-}
-
-.signout {
+.signinhod {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 30%;
+  width: 10%;
+  height: 10%;
 }
 
-.text5 {
-  background-color: rgb(170, 25, 25); /* Fallback color */
-  background-color: rgba(172, 12, 25, 0.4); /* Black w/opacity/see-through */
-  color: white;
-  font-weight: bold;
-  font-size: 19px;
-  position: absolute;
-  top: 74.7%;
-  left: 75%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  width: 15%;
-  text-align: center;
+.signinhodimg {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+  height: 70%;
+}
+
+.signouthod {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 10%;
+  height: 10%;
+}
+
+.signouthodimg {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+  height: 70%;
 }
 
 .flex-container2 {
@@ -144,10 +93,10 @@
   align-items: stretch;
 }
 
-.flex-container2>div {
+.flex-container2>button {
   color: white;
-  width: 50%;
-  margin-top: 20px;
+  width: 20%;
+  margin-top: 100px;
   text-align: center;
   line-height: 75px;
   font-size: 16px;

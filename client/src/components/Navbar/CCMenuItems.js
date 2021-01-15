@@ -1,7 +1,7 @@
 export const MenuItems = [
     {
         title: 'Services',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
@@ -33,7 +33,7 @@ export const MenuItems = [
     },
     {
         title: 'Course Coordinator',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
@@ -70,7 +70,7 @@ export const MenuItems = [
     },
     {
         title: 'Requests',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
@@ -112,7 +112,7 @@ export const MenuItems = [
     },
     {
         title: 'Home',
-        url: 'CCHome',
+        url: 'Home',
         cName: 'nav-links',
         dropdown: []
     },

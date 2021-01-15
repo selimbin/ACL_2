@@ -4,12 +4,18 @@ import Viewmissing from "../../components/ViewPages/ViewMissing";
 
 export class ViewMissing extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Viewmissing/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Viewmissing/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

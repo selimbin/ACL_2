@@ -4,12 +4,18 @@ import AssignStaff from "../../components/ManageDepartment/AssignStaffCourse";
 
 export class AssignStaffCourse extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <AssignStaff/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HOD"){
+            return (
+                <div>
+                    <Navbar/>
+                    <AssignStaff/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

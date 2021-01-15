@@ -4,12 +4,18 @@ import AddsignInOut from "../../components/AddPages/AddSignInOut";
 
 export class AddSignInOut extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <AddsignInOut/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <AddsignInOut/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

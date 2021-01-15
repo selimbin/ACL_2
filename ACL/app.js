@@ -24,33 +24,6 @@ app.use(express.json())
 require('dotenv').config()
 const AuthenticationRoutes= require('./routes/auth')
 
-// schedule.scheduleJob({date: 11}, async function(){
-//     let allstaff = await staff_model.find();
-//     for(var i = 0; i < allstaff.length; i = i + 1){
-//         let currentstaff = allstaff[i];
-//         let currentstaffattendance = await scheduleAttendance_model.findOne({id:currentstaff.id})
-//         let misseddays = currentstaffattendance.missedDays
-//         let missedhours = currentstaffattendance.missedHours - 3
-//         let staffsalary = currentstaff.salary
-//         while(misseddays != 0){
-//             staffsalary = staffsalary - staffsalary/60;
-//             misseddays = misseddays -1;
-//         }
-//         while(missedhours != 0){
-//             staffsalary = staffsalary - staffsalary/180;
-//             missedhours = missedhours - 1;
-//         }
-//         missedhours = (missedhours*100) * 60;
-//         while(missedhours != 0){
-//             staffsalary = staffsalary - ((staffsalary/180) * 60);
-//             missedhours = missedhours - 1;
-//         }
-//         let newleavebalance = currentstaff.leaveBalance + 2.5
-//         let currentstaff1 = await staff_model.findOne({id:currentstaff.id})
-//         await staff_model.findByIdAndUpdate(currentstaff1._id,{leaveBalance:newleavebalance,lastSalary:staffsalary},{new:true})
-//         await currentstaff1.save();
-//     }
-// });
 // schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
 //     var today = new Date()
 //     var week1 = new Date()
@@ -618,9 +591,10 @@ const AuthenticationRoutes= require('./routes/auth')
 
 //     }
 // });
+
 app.use(cors());
 app.use('/seed', seed_routes)
-app.use(async(req, res, next)=>{
+app.use('/Login',async(req, res, next)=>{
     const token= req.headers.token
     var today =  new Date()
     try{

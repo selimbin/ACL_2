@@ -4,12 +4,18 @@ import Deletelocation from "../../components/DeletePages/DeleteLocation";
 
 export class DeleteLocation extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Deletelocation/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Deletelocation/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

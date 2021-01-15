@@ -8,7 +8,11 @@ import './ViewPage.css'
 export class ViewDepTeachAssign extends Component {
     state = {
         id:'',
-        staff:[axios]
+        slot1:[axios],
+        slot2:[axios],
+        slot3:[axios],
+        slot4:[axios],
+        slot5:[axios]
     }
     mySubmitHandler = async event => {
         event.preventDefault();
@@ -24,7 +28,7 @@ export class ViewDepTeachAssign extends Component {
                 "token":sessionStorage.getItem('token') 
             }
         })
-        .then(res => this.setState({staff:res.data}))
+        .then(res => this.setState({slot1:res.data[0],slot2:res.data[1],slot3:res.data[2],slot4:res.data[3],slot5:res.data[4]}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
 
@@ -56,7 +60,7 @@ export class ViewDepTeachAssign extends Component {
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th></th>
+                        <th>Slot</th>
                         <th>Saturday</th>
                         <th>Sunday</th>
                         <th>Monday</th>
@@ -65,33 +69,70 @@ export class ViewDepTeachAssign extends Component {
                         <th>Thursday</th>
                     </tr>
 
-                    {this.state.staff.map((item) => {
-                        if(item.saturday){
+                        {this.state.slot1.map((item) => {
                             return (
                                 <tr>
-                                    <th>First</th>
-                                    <td>{item.saturday[0]}</td>
-                                    <td>{item.sunday[0]}</td>
-                                    <td>{item.monday[0]}</td>
-                                    <td>{item.tuesday[0]}</td>
-                                    <td>{item.wednesday[0]}</td>
-                                    <td>{item.thursday[0]}</td>
+                                    <td>1</td>
+                                    <td>{item.saturday}</td>
+                                    <td>{item.sunday}</td>
+                                    <td>{item.monday}</td>
+                                    <td>{item.tuesday}</td>
+                                    <td>{item.wednesday}</td>
+                                    <td>{item.thursday}</td>
                                 </tr>
                             )
-                        }
-                        if(item.sunday){
+                        })}
+                        {this.state.slot2.map((item) => {
                             return (
                                 <tr>
-                                    <th>Second</th>
-                                    <td>{item.saturday[1]}</td>
-                                    <td>{item.sunday[1]}</td>
-                                    <td>{item.monday[1]}</td>
-                                    <td>{item.tuesday[1]}</td>
-                                    <td>{item.wednesday[1]}</td>
-                                    <td>{item.thursday[1]}</td>
+                                    <td>2</td>
+                                    <td>{item.saturday}</td>
+                                    <td>{item.sunday}</td>
+                                    <td>{item.monday}</td>
+                                    <td>{item.tuesday}</td>
+                                    <td>{item.wednesday}</td>
+                                    <td>{item.thursday}</td>
                                 </tr>
                             )
-                        }
+                        })}
+                        {this.state.slot3.map((item) => {
+                            return (
+                                <tr>
+                                    <td>3</td>
+                                    <td>{item.saturday}</td>
+                                    <td>{item.sunday}</td>
+                                    <td>{item.monday}</td>
+                                    <td>{item.tuesday}</td>
+                                    <td>{item.wednesday}</td>
+                                    <td>{item.thursday}</td>
+                                </tr>
+                            )
+                        })}
+                        {this.state.slot4.map((item) => {
+                            return (
+                                <tr>
+                                    <td>4</td>
+                                    <td>{item.saturday}</td>
+                                    <td>{item.sunday}</td>
+                                    <td>{item.monday}</td>
+                                    <td>{item.tuesday}</td>
+                                    <td>{item.wednesday}</td>
+                                    <td>{item.thursday}</td>
+                                </tr>
+                            )
+                        })}
+                        {this.state.slot5.map((item) => {
+                            return (
+                                <tr>
+                                    <td>5</td>
+                                    <td>{item.saturday}</td>
+                                    <td>{item.sunday}</td>
+                                    <td>{item.monday}</td>
+                                    <td>{item.tuesday}</td>
+                                    <td>{item.wednesday}</td>
+                                    <td>{item.thursday}</td>
+                                </tr>
+                            )
                         })}
                 </table>
             </div>
