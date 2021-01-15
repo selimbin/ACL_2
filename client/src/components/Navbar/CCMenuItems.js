@@ -112,7 +112,7 @@ export const MenuItems = [
     },
     {
         title: 'Home',
-        url: 'CCHome',
+        url: 'Home',
         cName: 'nav-links',
         dropdown: []
     },

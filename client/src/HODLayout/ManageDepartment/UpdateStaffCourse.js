@@ -4,12 +4,18 @@ import UpdateStaff from "../../components/ManageDepartment/UpdateStaffCourse";
 
 export class UpdateStaffCourse extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <UpdateStaff/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HOD"){
+            return (
+                <div>
+                    <Navbar/>
+                    <UpdateStaff/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login';
+        }
     }
 }
 

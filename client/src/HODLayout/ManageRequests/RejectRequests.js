@@ -4,12 +4,18 @@ import RejReq from "../../components/ManageRequestsHOD/RejectRequests";
 
 export class RejectRequests extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <RejReq/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HOD"){
+            return (
+                <div>
+                    <Navbar/>
+                    <RejReq/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

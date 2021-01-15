@@ -4,12 +4,18 @@ import DepTeachAssign from "../../components/ManageDepartment/ViewDepTeachAssign
 
 export class ViewDepTeachAssign extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <DepTeachAssign/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HOD"){
+            return (
+                <div>
+                    <Navbar/>
+                    <DepTeachAssign/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

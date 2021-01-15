@@ -4,12 +4,18 @@ import AssignCC from "../components/CourseCoordinator/Deleteslot";
 
 export class DeleteCourseSlot extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <AssignCC/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="TA"){
+            return (
+                <div>
+                    <Navbar/>
+                    <AssignCC/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

@@ -4,12 +4,18 @@ import Adddepartment from "../../components/AddPages/AddDepartment";
 
 export class AddDepartment extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Adddepartment/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Adddepartment/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

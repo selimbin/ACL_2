@@ -122,7 +122,7 @@ export const MenuItems = [
     },
     {
         title: 'Home',
-        url: 'LecHome',
+        url: 'Home',
         cName: 'nav-links',
         dropdown: []
     },

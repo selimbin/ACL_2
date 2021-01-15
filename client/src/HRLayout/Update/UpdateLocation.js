@@ -4,12 +4,18 @@ import Updatelocation from "../../components/UpdatePages/UpdateLocation";
 
 export class UpdateLocation extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Updatelocation/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Updatelocation/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

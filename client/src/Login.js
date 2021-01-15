@@ -112,21 +112,21 @@ export default function Login() {
         sessionStorage.setItem("token", response.data.token);
         if(response.data.role=="HR"){
           sessionStorage.setItem("role", "HR");
-          window.location.href='/HrHome' 
+          window.location.href='/Home' 
         }
         if(response.data.role=="TA"){
           sessionStorage.setItem("role", "TA");
-          window.location.href='/CCHome' 
+          window.location.href='/Home' 
 
         }
         if(response.data.role=="lecturer"){
           if(response.data.isHOD=="true"){
             sessionStorage.setItem("role", "HOD");
-            window.location.href='/HodHome' 
+            window.location.href='/Home' 
           }
           else{
             sessionStorage.setItem("role", "Lec");
-            window.location.href='/LecHome' 
+            window.location.href='/Home' 
           }
 
         }

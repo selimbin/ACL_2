@@ -4,12 +4,18 @@ import Addstaff from "../../components/AddPages/AddStaff";
 
 export class AddStaff extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Addstaff/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Addstaff/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

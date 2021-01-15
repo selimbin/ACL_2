@@ -41,7 +41,6 @@ export class LecHome extends Component {
     render() {
         return (
             <div class="home">
-                <Navbar/>
                 <div Class="flex-container1">
                     <div Class="viewprofilelec">
                     <a href="viewprofile">

@@ -186,7 +186,7 @@ export const MenuItems = [
     },
     {
         title: 'Home',
-        url: 'HodHome',
+        url: 'Home',
         cName: 'nav-links',
         dropdown: []
     },
