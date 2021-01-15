@@ -38,6 +38,7 @@ export class ViewStaffAttendance extends Component {
     render() {
         return (
             <div class="ViewPage">
+            <h1>All Times are Displayed in GMT</h1>
                 <div class="container">
                     <form onSubmit={this.mySubmitHandler}>
                     <ToastContainer />
