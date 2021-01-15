@@ -5,14 +5,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import './ViewMissingDaysHours.css'
 
 export class ViewMissingDaysHours extends Component {
-    state = {days:[
-        axios
-    ],
-    hours:[
-        axios
-    ]}
+    state = {
+        days:'',
+        hours:''
+    }
 
     componentDidMount(){
+        toast.warning("Loading...",{position: toast.POSITION.TOP_CENTER})
+        
         axios.get("http://localhost:5000/staff/viewMissingDays",{
             headers:
             {
@@ -21,7 +21,7 @@ export class ViewMissingDaysHours extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then(res =>this.setState({days:res}))
+        .then(res =>this.setState({days:res.data}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
 
         axios.get("http://localhost:5000/staff/viewMissingHours",{
@@ -32,7 +32,7 @@ export class ViewMissingDaysHours extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then(res =>this.setState({hours:res}))
+        .then(res =>this.setState({hours:res.data}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
     render() {
@@ -41,31 +41,15 @@ export class ViewMissingDaysHours extends Component {
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th>id</th>
-                        <th>name</th>
                         <th>missed days</th>
                         <th>missed hours</th>
                     </tr>
-                    {this.state.days.map((item) => {
-                            return (
-                                <tr>
-                                    <td>{item.id}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.missedDays}</td>
-                                    <td>{item.missedHours}</td>
-                                </tr>
+
+                    <tr>
+                        <td>{this.state.days}</td>
+                        <td>{this.state.hours}</td>
+                    </tr>
                             )
-                        })}
-                        {this.state.hours.map((item) => {
-                            return (
-                                <tr>
-                                    <td>{item.id}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.missedDays}</td>
-                                    <td>{item.missedHours}</td>
-                                </tr>
-                            )
-                        })}
                 </table>
             </div>
         )

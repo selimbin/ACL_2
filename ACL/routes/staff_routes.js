@@ -937,14 +937,12 @@ router.route('/DeleteCourse')
             let lecturers = await existingcourse.lecturer
             let TAs = await existingcourse.TA
             while(lecturers.length != 0){
-                console.log(lecturers)
                 let lecturerid = lecturers.shift();
                 const lect = await staff_model.findOne({id:lecturerid})
                 await lect.course.pull(Code)
                 await lect.save();
             }
             while(TAs.length != 0){
-                console.log(TAs)
                 let TAid = TAs.shift();
                 const ta = await staff_model.findOne({id:TAid})
                 await ta.course.pull(Code)
@@ -2145,6 +2143,7 @@ router.route('/signIn')
         }
         if(today.toTimeString().substring(0,2)<"07"){
             today.setHours(7)
+            
             today.setMinutes(0)
         }
         const user= await staff_model.findById(req.user._id)
@@ -2198,8 +2197,7 @@ router.route('/signIn')
             await attendance.save()
         }else{
             if(attendance.signIn.length!=attendance.signOut.length){
-                attendance.signIn.pop()
-                attendance.signIn.push(today)
+                return res.status(400).json({msg:"You already signed in, Please sign out first"});
             }
             else{
                 attendance.signIn.push(today)
@@ -2215,7 +2213,6 @@ router.route('/signIn')
         }
 
         await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
-        console.log(schedule_attendance)
         res.send("Signed in successfully");
     }
     catch(error){
@@ -4049,7 +4046,6 @@ router.route('/DeleteAssignslots')
                 }
                 if(!f)
                     return res.status(400).json({msg:"This staff mem isnt assigned to this this course"});
-            // console.log(location)
                 for (var i = 0; i < slotsta.staff.length; i++) {
                     await slotsta.location.splice(i,1)
                 // await slotsta.staff.splice(i,1)
@@ -4262,7 +4258,6 @@ router.route('/viewslotlinkingreq')
         if(!course)
             return res.status(400).json({msg:"Please enter a valid course"});   
         if(cord.id==course.courseCoordinator){
-            console.log(cord.id,t);
             const output = await request_model.findOne({type:t, receiver: cord.id  });
             if(!output)
                 return res.status(400).json({msg:"No slot linking requests"});
@@ -4601,7 +4596,6 @@ router.route('/Addslot')
                 break;        
             }
 
-            console.log(slotloc.isEmpty)
             var cor3 =  await schedule_model.findOneAndUpdate({id: req.body.course_code},cor);    
             var loc3 = await schedule_model.findOneAndUpdate({id: req.body.location},loc);   
             res.send();
