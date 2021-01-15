@@ -3,16 +3,16 @@ import Navbar from "../components/Navbar/Navbar";
 import HODNavbar from "../components/Navbar/HODNavbar";
 import TANavbar from "../components/Navbar/CCNavbar";
 import LecNavbar from "../components/Navbar/LecNavbar";
-import Viewprofile from "../components/Services/ViewProfile";
+import Viewschedule from "../components/Requests/ViewSchedule";
 
-export class ViewProfile extends Component {
+export class ViewSchedule extends Component {
     render() {
         const role = sessionStorage.getItem('role')
         if(role=="HR"){
             return (
                 <div>
                     <Navbar/>
-                    <Viewprofile/>
+                    <Viewschedule/>
                 </div>
             )
         }
@@ -20,7 +20,7 @@ export class ViewProfile extends Component {
             return(
             <div>
                 <HODNavbar/>
-                <Viewprofile/>
+                <Viewschedule/>
             </div>
             )
         }
@@ -28,7 +28,7 @@ export class ViewProfile extends Component {
             return(
             <div>
                 <TANavbar/>
-                <Viewprofile/>
+                <Viewschedule/>
             </div>
             )
         }
@@ -36,11 +36,11 @@ export class ViewProfile extends Component {
             return (
                 <div>
                     <LecNavbar/>
-                    <Viewprofile/>
+                    <Viewschedule/>
                 </div>
             )
         }
     }
 }
 
-export default ViewProfile
+export default ViewSchedule
