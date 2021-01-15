@@ -4,12 +4,18 @@ import Updatesalary from "../../components/UpdatePages/UpdateSalary";
 
 export class UpdateSalary extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Updatesalary/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Updatesalary/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

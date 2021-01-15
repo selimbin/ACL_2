@@ -4,12 +4,18 @@ import CourseCoverage from "../../components/ManageDepartment/ViewCourseCoverage
 
 export class ViewCourseCoverageHOD extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <CourseCoverage/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HOD"){
+            return (
+                <div>
+                    <Navbar/>
+                    <CourseCoverage/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

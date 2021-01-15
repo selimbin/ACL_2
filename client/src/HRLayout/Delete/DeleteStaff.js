@@ -4,12 +4,18 @@ import Deletestaff from "../../components/DeletePages/DeleteStaff";
 
 export class DeleteStaff extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Deletestaff/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Deletestaff/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

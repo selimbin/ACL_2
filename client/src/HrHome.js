@@ -40,7 +40,6 @@ export class HrHome extends Component {
     render() {
         return (
             <div class="home">
-                <Navbar/>
                 <div Class="flex-container1">
                     <div Class="viewprofilehr">
                     <a href="viewprofile">

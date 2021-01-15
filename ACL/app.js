@@ -594,7 +594,7 @@ schedule.scheduleJob({hour: 0, minute: 0, dayOfWeek: 5}, async function(){
 
 app.use(cors());
 app.use('/seed', seed_routes)
-app.use(async(req, res, next)=>{
+app.use('/Login',async(req, res, next)=>{
     const token= req.headers.token
     var today =  new Date()
     try{

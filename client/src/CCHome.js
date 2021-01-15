@@ -42,7 +42,6 @@ export class CCHome extends Component {
     render() {
         return (
             <div class="home">
-                <Navbar/>
                 <div Class="flex-container1">
                     <div Class="viewprofilecc">
                     <a href="viewprofile">

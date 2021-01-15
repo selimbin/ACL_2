@@ -4,12 +4,18 @@ import Viewstaffattendance from "../../components/ViewPages/ViewStaffAttendance"
 
 export class ViewStaffAttendance extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Viewstaffattendance/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Viewstaffattendance/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

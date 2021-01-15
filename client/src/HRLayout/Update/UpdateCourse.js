@@ -4,12 +4,18 @@ import Updatecourse from "../../components/UpdatePages/UpdateCourse";
 
 export class UpdateCourse extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Updatecourse/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Updatecourse/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

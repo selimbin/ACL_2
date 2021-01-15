@@ -4,12 +4,18 @@ import ViewDepartment from "../../components/ManageDepartment/ViewDepartmentStaf
 
 export class ViewDepartmentStaff extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <ViewDepartment/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HOD"){
+            return (
+                <div>
+                    <Navbar/>
+                    <ViewDepartment/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

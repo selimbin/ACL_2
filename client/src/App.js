@@ -38,10 +38,7 @@ import ResetPassword from './GeneralLayout/ResetPassword'
 import UpdateProfile from './GeneralLayout/UpdateProfile'
 import Login from './Login';
 // Home Routes ------------------
-import HrHome from './HrHome'
-import HodHome from './HODHome'
-import CCHome from './CCHome'
-import LecHome from './LecHome'
+import Home from './Home'
 //HOD Manage Department Routes
 import AssignStaffCourse from './HODLayout/ManageDepartment/AssignStaffCourse'
 import DeleteStaffCourse from './HODLayout/ManageDepartment/DeleteStaffCourse'
@@ -89,8 +86,8 @@ function App() {
       <div className="wrapper">
       <Router>
         <Switch>
-         <Route path ="/HrHome">
-           <HrHome />
+         <Route path ="/Home">
+           <Home />
          </Route>
           <Route exact path ="/addstaff" component = {AddStaff}>
           </Route>
@@ -140,12 +137,6 @@ function App() {
           </Route>
           <Route exact path ="/viewmissingdayshours" component = {ViewMissingDaysHours}>
           </Route>   
-          <Route  exact path="/HodHome" component={HodHome}>
-          </Route>
-          <Route  exact path="/CCHome" component={CCHome}>
-          </Route>
-          <Route  exact path="/LecHome" component={LecHome}>
-          </Route>
           <Route  exact path="/resetpassword" component={ResetPassword}>
           </Route>
           <Route  exact path="/updateprofile" component={UpdateProfile}>

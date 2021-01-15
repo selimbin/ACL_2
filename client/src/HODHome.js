@@ -42,7 +42,6 @@ export class HODHome extends Component {
     render() {
         return (
             <div class="home">
-                <Navbar/>
                 <div Class="flex-container1">
                     <div Class="viewprofilehod">
                     <a href="viewprofile">

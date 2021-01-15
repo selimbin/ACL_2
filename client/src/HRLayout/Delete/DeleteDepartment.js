@@ -4,12 +4,18 @@ import Deletedepartment from "../../components/DeletePages/DeleteDepartment";
 
 export class DeleteDepartment extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Deletedepartment/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Deletedepartment/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

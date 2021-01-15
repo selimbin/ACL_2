@@ -4,12 +4,18 @@ import DeleteStaff from "../../components/ManageDepartment/DeleteStaffCourse";
 
 export class DeleteStaffCourse extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <DeleteStaff/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HOD"){
+            return (
+                <div>
+                    <Navbar/>
+                    <DeleteStaff/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

@@ -4,12 +4,18 @@ import AssignCC from "../components/CourseCoordinator/Addslot";
 
 export class AddCourseSlot extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <AssignCC/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="TA"){
+            return (
+                <div>
+                    <Navbar/>
+                    <AssignCC/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 

@@ -4,12 +4,18 @@ import Addfaculty from "../../components/AddPages/AddFaculty";
 
 export class AddFaculty extends Component {
     render() {
-        return (
-            <div>
-                <Navbar/>
-                <Addfaculty/>
-            </div>
-        )
+        const role = sessionStorage.getItem('role')
+        if(role=="HR"){
+            return (
+                <div>
+                    <Navbar/>
+                    <Addfaculty/>
+                </div>
+            )
+        }
+        else{
+            window.location.href='/Login' ;
+        }
     }
 }
 
