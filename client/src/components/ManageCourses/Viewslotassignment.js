@@ -8,12 +8,12 @@ import useToken from '../useToken.js';
 let x = 0;
 let array = [];
 
-export class Viewcoverage extends Component {
+export class Viewslotassignment extends Component {
     // const [token, setToken] = useState();
     
     state = {
         courses : array,
-        coverage:[axios]
+        slots:[axios]
     }
 
     mySubmitHandler = async event => {
@@ -23,7 +23,7 @@ export class Viewcoverage extends Component {
             courses:array
         }
 
-        await axios.get("http://localhost:5000/staff/viewcoverage", course ,{
+        await axios.post("http://localhost:5000/staff/viewslotassignment", course ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -31,7 +31,7 @@ export class Viewcoverage extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then(res => this.setState({coverage:res.data}))
+        .then(res => this.setState({slots:res.data}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
 
@@ -71,12 +71,20 @@ export class Viewcoverage extends Component {
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th>coverage</th>
+                        <th>course</th>
+                        <th>staff</th>
+                        <th>location</th>
+                        <th>type</th>
+                        <th>compensation</th>
                     </tr>
-                    {this.state.coverage.map((item) => {
+                    {this.state.slots.map((item) => {
                             return (
                                 <tr>
-                                    <td>{item}</td>
+                                    <td>{item.course}</td>
+                                    <td>{item.staff}</td>
+                                    <td>{item.location}</td>
+                                    <td>{item.type}</td>
+                                    <td>{item.compensation}</td>
                                 </tr>
                             )
                         })}
@@ -86,4 +94,4 @@ export class Viewcoverage extends Component {
     }
 }
 
-export default Viewcoverage
+export default Viewslotassignment

@@ -3,27 +3,23 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
-import useToken from '../useToken.js';
 
-let x = 0;
-let array = [];
-
-export class Viewslotassignment extends Component {
+export class Viewslotlinkingreq extends Component {
     // const [token, setToken] = useState();
     
     state = {
-        courses : array,
-        slots:[axios]
+        course_code:'',
+        requests:[axios]
     }
 
     mySubmitHandler = async event => {
         event.preventDefault();
 
         const course = {
-            courses:array
+            course_code:this.state.course_code
         }
 
-        await axios.get("http://localhost:5000/staff/viewslotassignment", course ,{
+        await axios.post("http://localhost:5000/staff/viewslotlinkingreq", course ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -31,7 +27,7 @@ export class Viewslotassignment extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then(res => this.setState({slots:res.data}))
+        .then(res => this.setState({requests:res.data}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
 
@@ -40,14 +36,6 @@ export class Viewslotassignment extends Component {
         let val = event.target.value;
         this.setState({[nam]: val});
     }
-
-    add_element=(event)=>{
-        array[x] = document.getElementById("course").value;
-        alert("Element: " + array[x] + " Added at index " + x);
-        x++;
-        document.getElementById("course").value = "";
-     }
-
     render() {
         return (
             <div class="ViewPage">
@@ -56,11 +44,10 @@ export class Viewslotassignment extends Component {
                     <ToastContainer />
                     <div class="row">
                         <div class="col-25">
-                            <label htmlfor="name">course code</label>
+                            <label htmlfor="course_code">Course Code</label>
                         </div>
-                        <div class="col-25">
-                        <input type="text" id="course" name="course" placeholder="Enter a course  code.." ></input>
-                        <input type="button" id="course1" value="Add" onClick={this.add_element}></input>
+                        <div class="col-75">
+                            <input type="text" id="course_code" name="course_code" placeholder="Enter Course code.." onChange={this.myChangeHandler}></input>
                         </div>
                     </div>
                     <div class="row">
@@ -71,20 +58,20 @@ export class Viewslotassignment extends Component {
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th>course</th>
-                        <th>staff</th>
-                        <th>location</th>
-                        <th>type</th>
-                        <th>compensation</th>
+                        <th>_id</th>
+                        <th>status</th>
+                        <th>requester</th>
+                        <th>slot</th>
+                        <th>day</th>
                     </tr>
-                    {this.state.slots.map((item) => {
+                    {this.state.requests.map((item) => {
                             return (
                                 <tr>
-                                    <td>{item.course}</td>
-                                    <td>{item.staff}</td>
-                                    <td>{item.location}</td>
-                                    <td>{item.type}</td>
-                                    <td>{item.compensation}</td>
+                                    <td>{item._id}</td>
+                                    <td>{item.status}</td>
+                                    <td>{item.requester}</td>
+                                    <td>{item.slot}</td>
+                                    <td>{item.newDay}</td>
                                 </tr>
                             )
                         })}
@@ -94,4 +81,4 @@ export class Viewslotassignment extends Component {
     }
 }
 
-export default Viewslotassignment
+export default Viewslotlinkingreq

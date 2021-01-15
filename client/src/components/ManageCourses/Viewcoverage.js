@@ -5,22 +5,25 @@ import 'react-toastify/dist/ReactToastify.css';
 import './ViewPage.css'
 import useToken from '../useToken.js';
 
-export class Viewslotlinkingreq extends Component {
+let x = 0;
+let array = [];
+
+export class Viewcoverage extends Component {
     // const [token, setToken] = useState();
     
     state = {
-        course_code:'',
-        requests:[axios]
+        courses : array,
+        coverage:[axios]
     }
 
     mySubmitHandler = async event => {
         event.preventDefault();
 
         const course = {
-            course_code:this.state.course_code
+            courses:array
         }
 
-        await axios.get("http://localhost:5000/staff/viewslotlinkingreq", course ,{
+        await axios.post("http://localhost:5000/staff/viewcoverage", course ,{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -28,7 +31,7 @@ export class Viewslotlinkingreq extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then(res => this.setState({requests:res.data}))
+        .then(res => this.setState({coverage:res.data}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
 
@@ -37,6 +40,14 @@ export class Viewslotlinkingreq extends Component {
         let val = event.target.value;
         this.setState({[nam]: val});
     }
+
+    add_element=(event)=>{
+        array[x] = document.getElementById("course").value;
+        alert("Element: " + array[x] + " Added at index " + x);
+        x++;
+        document.getElementById("course").value = "";
+     }
+
     render() {
         return (
             <div class="ViewPage">
@@ -45,10 +56,11 @@ export class Viewslotlinkingreq extends Component {
                     <ToastContainer />
                     <div class="row">
                         <div class="col-25">
-                            <label htmlfor="course_code">Course Code</label>
+                            <label htmlfor="name">course code</label>
                         </div>
-                        <div class="col-75">
-                            <input type="text" id="course_code" name="course_code" placeholder="Enter the Staff id.." onChange={this.myChangeHandler}></input>
+                        <div class="col-25">
+                        <input type="text" id="course" name="course" placeholder="Enter a course  code.." ></input>
+                        <input type="button" id="course1" value="Add" onClick={this.add_element}></input>
                         </div>
                     </div>
                     <div class="row">
@@ -59,20 +71,12 @@ export class Viewslotlinkingreq extends Component {
                 <table id="customers">
                 <ToastContainer />
                     <tr>
-                        <th>id</th>
-                        <th>status</th>
-                        <th>requester</th>
-                        <th>slot</th>
-                        <th>day</th>
+                        <th>coverage</th>
                     </tr>
-                    {this.state.requests.map((item) => {
+                    {this.state.coverage.map((item) => {
                             return (
                                 <tr>
-                                    <td>{item.id}</td>
-                                    <td>{item.status}</td>
-                                    <td>{item.requester}</td>
-                                    <td>{item.slot}</td>
-                                    <td>{item.newDay}</td>
+                                    <td>{item}</td>
                                 </tr>
                             )
                         })}
@@ -82,4 +86,4 @@ export class Viewslotlinkingreq extends Component {
     }
 }
 
-export default Viewslotlinkingreq
+export default Viewcoverage

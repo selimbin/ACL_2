@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Navbar from "../components/Navbar/HODNavbar";
 import LecNavbar from "../components/Navbar/LecNavbar";
 import TANavbar from "../components/Navbar/CCNavbar";
-import CancelRequest from "../components/ManageDepartment/DeleteStaffCourse";
+import CancelReq from "../components/Requests/AddcancelRequests";
 
 export class CancelRequest extends Component {
     render() {
@@ -11,7 +11,7 @@ export class CancelRequest extends Component {
             return (
                 <div>
                     <Navbar/>
-                    <CancelRequest/>
+                    <CancelReq/>
                 </div>
             )
         }
@@ -19,7 +19,7 @@ export class CancelRequest extends Component {
             return (
                 <div>
                     <LecNavbar/>
-                    <CancelRequest/>
+                    <CancelReq/>
                 </div>
             )
         }
@@ -27,7 +27,7 @@ export class CancelRequest extends Component {
             return (
                 <div>
                     <TANavbar/>
-                    <CancelRequest/>
+                    <CancelReq/>
                 </div>
             )
         }

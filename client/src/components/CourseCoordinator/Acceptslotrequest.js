@@ -49,10 +49,10 @@ export class Acceptslotrequest extends Component {
                             <input type="text" id="course_code" name="course_code" placeholder="Enter the course code.." onChange={this.myChangeHandler}></input>
                         </div>
                         <div class="col-25">
-                            <label htmlfor="slotlinking_id">request id</label>
+                            <label htmlfor="slotlinking_id">Request _id</label>
                         </div>
                         <div class="col-75">
-                            <input type="text" id="slotlinking_id" name="slotlinking_id" placeholder="Enter the request id.." onChange={this.myChangeHandler}></input>
+                            <input type="text" id="slotlinking_id" name="slotlinking_id" placeholder="Enter exact request _id.." onChange={this.myChangeHandler}></input>
                         </div>
                 </div>
                 <div class="row">

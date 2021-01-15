@@ -36,7 +36,7 @@ export class ViewAttendance extends Component {
             return (
                 <div>
                     <LecNavbar/>
-                    <Resetpassword/>
+                    <Viewattendance/>
                 </div>
             )
         }
