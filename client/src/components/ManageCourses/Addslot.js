@@ -19,8 +19,8 @@ export class Addslot extends Component {
 
         const slot = {
             course_code: this.state.course_code,
-            location: this.state.locations,
-            type: this.state.types,
+            location: this.state.location,
+            type: this.state.type,
             slot_no:this.state.slot_no,
             day:this.state.day,
             compensation:this.state.compensation
