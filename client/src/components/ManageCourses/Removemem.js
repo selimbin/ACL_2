@@ -24,7 +24,7 @@ export class Removemem extends Component {
                 "token":sessionStorage.getItem('token')
             },
             data: {
-                staff_id: this.state.name ,
+                staff_id: this.state.staff_id ,
                 courses:array
             }
           })
