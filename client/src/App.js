@@ -31,6 +31,7 @@ import ViewMissing from './HRLayout/View/ViewMissing'
 import ViewStaffAttendance from './HRLayout/View/ViewStaffAttendance'
 // Services Routes --------------
 import ViewProfile from './GeneralLayout/ViewProfile'
+import ViewSchedule from './GeneralLayout/ViewSchedule'
 import ViewAttendance from './GeneralLayout/ViewAttendance'
 import ViewMissingDaysHours from './GeneralLayout/ViewMissingDaysHours'
 import ResetPassword from './GeneralLayout/ResetPassword'
@@ -132,6 +133,8 @@ function App() {
           <Route exact path ="/viewstaffattendance" component = {ViewStaffAttendance}>
           </Route>
           <Route exact path ="/viewprofile" component = {ViewProfile}>
+          </Route>
+          <Route exact path ="/viewschedule" component = {ViewSchedule}>
           </Route>
           <Route exact path ="/viewattendance" component = {ViewAttendance}>
           </Route>

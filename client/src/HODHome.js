@@ -3,53 +3,86 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "./components/Navbar/HODNavbar";
-import viewprofile from './components/Images/View_Profile.png';
+import viewprofile from './components/Images/View_Profile.jpeg';
 import signin from './components/Images/SignIn.jpg';
-import signout from './components/Images/SignOut.jpg';
-import './HrHome.css'
+import signout from './components/Images/SignOut.jpeg';
+import viewschedule from './components/Images/ViewSchedule.jpeg';
+import viewattendance from './components/Images/ViewAttendance.jpeg';
+import viewmissing from './components/Images/ViewMissing.jpg';
+import './HODHome.css'
 
-export class HrHome extends Component {
+export class HODHome extends Component {
+
+    onClicksignin = () => {
+
+        axios.post("http://localhost:5000/staff/signIn",{
+            headers:
+            {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type":"application/JSON",
+                "token":sessionStorage.getItem('token')
+            }
+        })
+        .then((res) => toast.success("Signed In successfully",{position: toast.POSITION.TOP_CENTER}))
+        .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
+    } 
+
+    onClicksignout = () =>{
+        axios.post("http://localhost:5000/staff/signOut",{
+            headers:
+            {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type":"application/JSON",
+                "token":sessionStorage.getItem('token')
+            }
+        })
+        .then((res) => toast.success("Signed Out successfully",{position: toast.POSITION.TOP_CENTER}))
+        .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
+    }
+
     render() {
         return (
             <div class="home">
                 <Navbar/>
                 <div Class="flex-container1">
-                    <div Class="viewprofile">
+                    <div Class="viewprofilehod">
                     <a href="viewprofile">
-                        <img Class="viewprofile" src={viewprofile} alt="profile"/>
+                        <img Class="viewprofilehod" src={viewprofile} alt="profile"/>
                     </a>
-                    <a href="viewprofile" Class="text1">View Profile</a>
                     </div>
-                    <div Class="viewattendance">
+                    <div Class="viewattendancehod">
                     <a href="viewattendance">
-                        <img Class="viewattendance" src={viewprofile}/>
+                        <img Class="viewattendancehod" src={viewattendance}/>
                     </a>
-                    <a href="viewattendance" Class="text2">View Attendance</a>
                     </div>
-                    <div Class="viewmissingdayshours">
+                    <div Class="viewmissingdayshourshod">
                     <a href="viewmissingdayshours">
-                        <img Class="viewmissingdayshours" src={viewprofile}/>
+                        <img Class="viewmissingdayshourshod" src={viewmissing}/>
                     </a>
-                    <a href="viewmissingdayshours" Class="text3">View Missing days/hours</a>
                     </div>
+                    <div Class="viewschedulehod">
+                    <a href="viewschedule">
+                        <img Class="viewschedulehod" src={viewschedule}/>
+                    </a>
+                </div>
                 </div>
                 <div Class="flex-container2">
-                <div Class="signin">
+                <button Class="signinhod" onClick={this.onClicksignin}>
+                <ToastContainer />
                     <a>
-                        <img Class="signin" src={signin}/>
+                        <img Class="signinhodimg" src={signin}/>
                     </a>
-                    <a Class="text4">SignIn</a>
-                    </div>
-                    <div Class="signout">
+                </button>
+                <button Class="signouthod" onClick={this.onClicksignout}>
+                <ToastContainer />
                     <a>
-                        <img Class="signout" src={signout}/>
+                        <img Class="signouthodimg" src={signout}/>
                     </a>
-                    <a Class="text5">SignOut</a>
-                    </div>
+                </button>
                 </div>
             </div>
         )
     }
 }
 
-export default HrHome
+export default HODHome

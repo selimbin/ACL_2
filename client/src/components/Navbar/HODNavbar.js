@@ -10,7 +10,7 @@ class Navbar extends Component {
         this.setState({clicked: !this.state.clicked})
     }
 
-    logout = event => {
+    logout = (event) => {
         event.preventDefault();
 
         axios.post("http://localhost:5000/staff/logout", {
@@ -19,7 +19,8 @@ class Navbar extends Component {
                 "Content-Type":"application/JSON",
                 "token":sessionStorage.getItem('token')
             }})
-        .then((res) => window.location.href='/Login')
+        .then((res) => alert("logged out"))
+        .catch((err) => alert("error"))
     }  
 
     render(){
