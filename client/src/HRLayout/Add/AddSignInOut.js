@@ -5,7 +5,7 @@ import AddsignInOut from "../../components/AddPages/AddSignInOut";
 export class AddSignInOut extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

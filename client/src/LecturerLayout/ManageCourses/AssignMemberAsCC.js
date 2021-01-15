@@ -6,7 +6,7 @@ import AssignCC from "../../components/ManageCourses/Assigncoordinator";
 export class AssignMemberAsCC extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <Navbar/>
@@ -14,7 +14,7 @@ export class AssignMemberAsCC extends Component {
                 </div>
             )
         }
-        if(role=="Lec"){
+        if(role==="Lec"){
             return (
                 <div>
                     <LecNavbar/>

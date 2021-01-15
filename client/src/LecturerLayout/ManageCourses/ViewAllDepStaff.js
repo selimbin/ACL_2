@@ -6,7 +6,7 @@ import ViewStaff from "../../components/ManageCourses/Viewdepstaff";
 export class ViewAllDepStaff extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <Navbar/>
@@ -14,7 +14,7 @@ export class ViewAllDepStaff extends Component {
                 </div>
             )
         }
-        if(role=="Lec"){
+        if(role==="Lec"){
             return (
                 <div>
                     <LecNavbar/>

@@ -5,7 +5,7 @@ import Updatecourse from "../../components/UpdatePages/UpdateCourse";
 export class UpdateCourse extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

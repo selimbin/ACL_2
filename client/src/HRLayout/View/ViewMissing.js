@@ -5,7 +5,7 @@ import Viewmissing from "../../components/ViewPages/ViewMissing";
 export class ViewMissing extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

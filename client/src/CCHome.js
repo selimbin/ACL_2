@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Navbar from "./components/Navbar/CCNavbar";
 import viewprofile from './components/Images/View_Profile.jpeg';
 import signin from './components/Images/SignIn.jpg';
 import signout from './components/Images/SignOut.jpeg';
@@ -50,27 +49,27 @@ export class CCHome extends Component {
                     </div>
                     <div Class="viewattendancecc">
                     <a href="viewattendance">
-                        <img Class="viewattendancecc" src={viewattendance}/>
+                        <img Class="viewattendancecc" src={viewattendance} alt=""/>
                     </a>
                     </div>
                     <div Class="viewmissingdayshourscc">
                     <a href="viewmissingdayshours">
-                        <img Class="viewmissingdayshourscc" src={viewmissing}/>
+                        <img Class="viewmissingdayshourscc" src={viewmissing} alt=""/>
                     </a>
                     </div>
                     <div Class="viewschedulecc">
                     <a href="viewschedule">
-                        <img Class="viewschedulecc" src={viewschedule}/>
+                        <img Class="viewschedulecc" src={viewschedule} alt=""/>
                     </a>
                 </div>
                 </div>
                 <div Class="flex-container2">
                 <ToastContainer />
                 <button Class="signincc" onClick={this.onClicksignin}>
-                        <img Class="signinccimg" src={signin}/>
+                        <img Class="signinccimg" src={signin} alt=""/>
                 </button>
                 <button Class="signoutcc" onClick={this.onClicksignout}>
-                        <img Class="signoutccimg" src={signout}/>
+                        <img Class="signoutccimg" src={signout} alt=""/>
                 </button>
                 </div>
             </div>

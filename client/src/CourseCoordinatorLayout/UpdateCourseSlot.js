@@ -5,7 +5,7 @@ import AssignCC from "../components/CourseCoordinator/Updateslot";
 export class UpdateCourseSlot extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="TA"){
+        if(role==="TA"){
             return (
                 <div>
                     <Navbar/>

@@ -5,7 +5,7 @@ import Addfaculty from "../../components/AddPages/AddFaculty";
 export class AddFaculty extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>
