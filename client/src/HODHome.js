@@ -14,21 +14,20 @@ import './HODHome.css'
 export class HODHome extends Component {
 
     onClicksignin = () => {
-
-        axios.post("http://localhost:5000/staff/signIn",{
+        axios.post("http://localhost:5000/staff/signIn", {},{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
                 "token":sessionStorage.getItem('token')
             }
-        })
+        })        
         .then((res) => toast.success("Signed In successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     } 
 
     onClicksignout = () =>{
-        axios.post("http://localhost:5000/staff/signOut",{
+        axios.post("http://localhost:5000/staff/signOut", {},{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -69,15 +68,11 @@ export class HODHome extends Component {
                 <div Class="flex-container2">
                 <button Class="signinhod" onClick={this.onClicksignin}>
                 <ToastContainer />
-                    <a>
                         <img Class="signinhodimg" src={signin}/>
-                    </a>
                 </button>
                 <button Class="signouthod" onClick={this.onClicksignout}>
                 <ToastContainer />
-                    <a>
                         <img Class="signouthodimg" src={signout}/>
-                    </a>
                 </button>
                 </div>
             </div>

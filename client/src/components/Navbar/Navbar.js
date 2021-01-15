@@ -11,7 +11,7 @@ class Navbar extends Component {
     }
 
     logout = () => {
-        axios.post("http://localhost:5000/staff/logout", {
+        axios.post("http://localhost:5000/staff/logout", {}, {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",

@@ -12,25 +12,21 @@ import './LecHome.css'
 
 export class LecHome extends Component {
 
-    onClicksignin = event => {
-        event.preventDefault();
-
-        axios.post("http://localhost:5000/staff/signIn",{
+    onClicksignin = () => {
+        axios.post("http://localhost:5000/staff/signIn", {},{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",
                 "token":sessionStorage.getItem('token')
             }
-        })
+        })        
         .then((res) => toast.success("Signed In successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     } 
 
-    onClicksignout = event => {
-        event.preventDefault();
-
-        axios.post("http://localhost:5000/staff/signOut",{
+    onClicksignout = () =>{
+        axios.post("http://localhost:5000/staff/signOut", {},{
             headers:
             {
                 "Access-Control-Allow-Origin": "*",
@@ -38,7 +34,7 @@ export class LecHome extends Component {
                 "token":sessionStorage.getItem('token')
             }
         })
-        .then((res) => toast.success("Signed out successfully",{position: toast.POSITION.TOP_CENTER}))
+        .then((res) => toast.success("Signed Out successfully",{position: toast.POSITION.TOP_CENTER}))
         .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
     }
 
@@ -71,14 +67,10 @@ export class LecHome extends Component {
                 <div Class="flex-container2">
                 <ToastContainer />
                 <button Class="signinlec" onClick={this.onClicksignin}>
-                    <a>
                         <img Class="signinlecimg" src={signin}/>
-                    </a>
                 </button>
                 <button Class="signoutlec" onClick={this.onClicksignout}>
-                    <a>
                         <img Class="signoutlecimg" src={signout}/>
-                    </a>
                 </button>
                 </div>
             </div>

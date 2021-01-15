@@ -51,6 +51,7 @@ require('dotenv').config()
 
 //------------------------------------------------------------------
 // Add a location --------------------------------------------------
+
 router.route('/AddLocation')
 .post(async (req, res)=>{
     const {Code,Building,Type,Capacity}=req.body;
@@ -2214,7 +2215,7 @@ router.route('/signIn')
         }
 
         await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
-        
+        console.log(schedule_attendance)
         res.send("Signed in successfully");
     }
     catch(error){
