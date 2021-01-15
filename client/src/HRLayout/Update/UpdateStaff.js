@@ -5,7 +5,7 @@ import Updatestaff from "../../components/UpdatePages/UpdateStaff";
 export class UpdateStaff extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

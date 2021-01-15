@@ -5,7 +5,7 @@ import Adddepartment from "../../components/AddPages/AddDepartment";
 export class AddDepartment extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

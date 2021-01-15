@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Navbar from "./components/Navbar/HODNavbar";
 import viewprofile from './components/Images/View_Profile.jpeg';
 import signin from './components/Images/SignIn.jpg';
 import signout from './components/Images/SignOut.jpeg';
@@ -50,28 +49,28 @@ export class HODHome extends Component {
                     </div>
                     <div Class="viewattendancehod">
                     <a href="viewattendance">
-                        <img Class="viewattendancehod" src={viewattendance}/>
+                        <img Class="viewattendancehod" src={viewattendance} alt=""/>
                     </a>
                     </div>
                     <div Class="viewmissingdayshourshod">
                     <a href="viewmissingdayshours">
-                        <img Class="viewmissingdayshourshod" src={viewmissing}/>
+                        <img Class="viewmissingdayshourshod" src={viewmissing} alt=""/>
                     </a>
                     </div>
                     <div Class="viewschedulehod">
                     <a href="viewschedule">
-                        <img Class="viewschedulehod" src={viewschedule}/>
+                        <img Class="viewschedulehod" src={viewschedule} alt=""/>
                     </a>
                 </div>
                 </div>
                 <div Class="flex-container2">
                 <button Class="signinhod" onClick={this.onClicksignin}>
                 <ToastContainer />
-                        <img Class="signinhodimg" src={signin}/>
+                        <img Class="signinhodimg" src={signin} alt=""/>
                 </button>
                 <button Class="signouthod" onClick={this.onClicksignout}>
                 <ToastContainer />
-                        <img Class="signouthodimg" src={signout}/>
+                        <img Class="signouthodimg" src={signout} alt=""/>
                 </button>
                 </div>
             </div>

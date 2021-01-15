@@ -43,7 +43,7 @@ export class AddcancelRequests extends Component {
                     <ToastContainer />
                     <div class="row">
                         <div class="col-25">
-                            <label htmlfor="ReqId">ReqId</label>
+                            <label htmlfor="ReqId">Enter Req:_Id</label>
                         </div>
                         <div class="col-75">
                             <input type="text" id="ReqId" name="ReqId" placeholder="Enter the request ID.." onChange={this.myChangeHandler}></input>

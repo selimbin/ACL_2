@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useHistory } from "react-router-dom";
+import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -71,7 +70,7 @@ export default function Login() {
     // alert(event.target.value)
     let nam = event.target.name;
     let val = event.target.value;
-    if(nam=="email"){
+    if(nam==="email"){
       state={
         email:val,
         password:state.password
@@ -100,27 +99,27 @@ export default function Login() {
     })
     .then(function (response) {
       // console.log(response);
-      if(response.data.code==401){
+      if(response.data.code===401){
         console.log("Username does not exists");
         alert("Username does not exist");
       }
-      else if(response.data.code == 400){
+      else if(response.data.code === 400){
         console.log("Username password do not match");
         alert("username password do not match")
       }
       else{
         sessionStorage.setItem("token", response.data.token);
-        if(response.data.role=="HR"){
+        if(response.data.role==="HR"){
           sessionStorage.setItem("role", "HR");
           window.location.href='/Home' 
         }
-        if(response.data.role=="TA"){
+        if(response.data.role==="TA"){
           sessionStorage.setItem("role", "TA");
           window.location.href='/Home' 
 
         }
-        if(response.data.role=="lecturer"){
-          if(response.data.isHOD=="true"){
+        if(response.data.role==="lecturer"){
+          if(response.data.isHOD==="true"){
             sessionStorage.setItem("role", "HOD");
             window.location.href='/Home' 
           }

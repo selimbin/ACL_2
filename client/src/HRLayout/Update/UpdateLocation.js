@@ -5,7 +5,7 @@ import Updatelocation from "../../components/UpdatePages/UpdateLocation";
 export class UpdateLocation extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

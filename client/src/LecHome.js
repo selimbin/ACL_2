@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
-import Navbar from "./components/Navbar/LecNavbar";
 import viewprofile from './components/Images/View_Profile.jpeg';
 import signin from './components/Images/SignIn.jpg';
 import signout from './components/Images/SignOut.jpeg';
@@ -49,27 +48,27 @@ export class LecHome extends Component {
                     </div>
                     <div Class="viewattendancelec">
                     <a href="viewattendance">
-                        <img Class="viewattendancelec" src={viewattendance}/>
+                        <img Class="viewattendancelec" src={viewattendance} alt=""/>
                     </a>
                     </div>
                     <div Class="viewmissingdayshourslec">
                     <a href="viewmissingdayshours">
-                        <img Class="viewmissingdayshourslec" src={viewmissing}/>
+                        <img Class="viewmissingdayshourslec" src={viewmissing} alt=""/>
                     </a>
                     </div>
                     <div Class="viewschedulelec">
                     <a href="viewschedule">
-                        <img Class="viewschedulelec" src={viewschedule}/>
+                        <img Class="viewschedulelec" src={viewschedule} alt=""/>
                     </a>
                 </div>
                 </div>
                 <div Class="flex-container2">
                 <ToastContainer />
                 <button Class="signinlec" onClick={this.onClicksignin}>
-                        <img Class="signinlecimg" src={signin}/>
+                        <img Class="signinlecimg" src={signin} alt=""/>
                 </button>
                 <button Class="signoutlec" onClick={this.onClicksignout}>
-                        <img Class="signoutlecimg" src={signout}/>
+                        <img Class="signoutlecimg" src={signout} alt=""/>
                 </button>
                 </div>
             </div>

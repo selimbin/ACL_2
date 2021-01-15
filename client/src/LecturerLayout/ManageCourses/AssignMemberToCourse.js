@@ -6,7 +6,7 @@ import AssignToCourse from "../../components/ManageCourses/Assignslot";
 export class AssignMemberToCourse extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <Navbar/>
@@ -14,7 +14,7 @@ export class AssignMemberToCourse extends Component {
                 </div>
             )
         }
-        if(role=="Lec"){
+        if(role==="Lec"){
             return (
                 <div>
                     <LecNavbar/>

@@ -5,7 +5,7 @@ import ViewDayOff from "../../components/ManageRequestsHOD/ViewDayOffRequests";
 export class ViewDayOffRequests extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <Navbar/>

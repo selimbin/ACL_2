@@ -8,7 +8,7 @@ import Updateprofile from "../components/Services/UpdateProfile";
 export class UpdateProfile extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>
@@ -16,7 +16,7 @@ export class UpdateProfile extends Component {
                 </div>
             )
         }
-        if(role=="HOD"){
+        if(role==="HOD"){
             return (
                 <div>
                     <HODNavbar/>
@@ -24,7 +24,7 @@ export class UpdateProfile extends Component {
                 </div>
             )
         }
-        if(role=="TA"){
+        if(role==="TA"){
             return (
                 <div>
                     <TANavbar/>
@@ -33,7 +33,7 @@ export class UpdateProfile extends Component {
             )
         }
 
-        if(role=="Lec"){
+        if(role==="Lec"){
             return (
                 <div>
                     <LecNavbar/>

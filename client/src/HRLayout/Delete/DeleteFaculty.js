@@ -5,7 +5,7 @@ import Deletefaculty from "../../components/DeletePages/DeleteFaculty";
 export class DeleteFaculty extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

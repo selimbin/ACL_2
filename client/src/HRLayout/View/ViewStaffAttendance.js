@@ -5,7 +5,7 @@ import Viewstaffattendance from "../../components/ViewPages/ViewStaffAttendance"
 export class ViewStaffAttendance extends Component {
     render() {
         const role = sessionStorage.getItem('role')
-        if(role=="HR"){
+        if(role==="HR"){
             return (
                 <div>
                     <Navbar/>

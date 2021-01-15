@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
-import Navbar from "./components/Navbar/Navbar";
 import viewprofile from './components/Images/View_Profile.jpeg';
 import signin from './components/Images/SignIn.jpg';
 import signout from './components/Images/SignOut.jpeg';
@@ -48,22 +47,22 @@ export class HrHome extends Component {
                     </div>
                     <div Class="viewattendancehr">
                     <a href="viewattendance">
-                        <img Class="viewattendancehr" src={viewattendance}/>
+                        <img Class="viewattendancehr" src={viewattendance} alt=""/>
                     </a>
                     </div>
                     <div Class="viewmissingdayshourshr">
                     <a href="viewmissingdayshours">
-                        <img Class="viewmissingdayshourshr" src={viewmissing}/>
+                        <img Class="viewmissingdayshourshr" src={viewmissing} alt=""/>
                     </a>
                     </div>
                 </div>
                 <div Class="flex-container2">
                 <ToastContainer />
                 <button Class="signinhr" onClick={this.onClicksignin}>
-                        <img Class="signinhr" src={signin}/>
+                        <img Class="signinhr" src={signin} alt=""/>
                     </button>
                 <button Class="signouthr" onClick={this.onClicksignout}>
-                        <img Class="signouthr" src={signout}/>
+                        <img Class="signouthr" src={signout} alt=""/>
                 </button>
                 </div>
             </div>
