@@ -174,7 +174,7 @@ function App() {
           </Route>
           <Route exact path ="/updateCourseAssignment" component = {UpdateCourseAssignment}>
           </Route>
-          <Route exact path ="/viewTeachingAssignments" component = {ViewAllDepStaff}>
+          <Route exact path ="/viewLecDepStaff" component = {ViewAllDepStaff}>
           </Route>
           <Route exact path ="/viewMyCoverage" component = {ViewCourseCoverageLec}>
           </Route>
