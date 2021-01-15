@@ -14,6 +14,8 @@ export class ViewAttendance extends Component {
     mySubmitHandler = event => {
         event.preventDefault();
 
+        toast.warning("Loading...",{position: toast.POSITION.TOP_CENTER})
+
         const month = {
             month: this.state.month
         };

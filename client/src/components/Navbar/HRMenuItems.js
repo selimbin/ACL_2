@@ -1,7 +1,7 @@
 export const MenuItems = [
     {
         title: 'Services',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
@@ -33,7 +33,7 @@ export const MenuItems = [
     },
     {
         title: 'View',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
@@ -50,7 +50,7 @@ export const MenuItems = [
     },
     {
         title: 'Add',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
@@ -87,7 +87,7 @@ export const MenuItems = [
     },
     {
         title: 'Update',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
@@ -124,7 +124,7 @@ export const MenuItems = [
     },
     {
         title: 'Delete',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {

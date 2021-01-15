@@ -1,7 +1,7 @@
 export const MenuItems = [
     {
         title: 'Services',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
@@ -33,7 +33,7 @@ export const MenuItems = [
     },
     {
         title: 'Manage Courses',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
@@ -80,7 +80,7 @@ export const MenuItems = [
     },
     {
         title: 'Request',
-        url: '#',
+        url: '',
         cName: 'nav-links',
         dropdown: [
             {
