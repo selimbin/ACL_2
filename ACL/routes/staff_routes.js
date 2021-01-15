@@ -51,6 +51,7 @@ require('dotenv').config()
 
 //------------------------------------------------------------------
 // Add a location --------------------------------------------------
+
 router.route('/AddLocation')
 .post(async (req, res)=>{
     const {Code,Building,Type,Capacity}=req.body;
@@ -2054,7 +2055,7 @@ router.route('/logout')
         const user=await staff_model.findById(req.user._id);
         user.token = null
         await staff_model.findOneAndUpdate({_id:req.user._id},user)
-        res.status(400).json({msg:"logged out"})
+        res.send("logged out")
     }
     catch(error){
         res.status(500).json({error:error.message});
@@ -2214,8 +2215,8 @@ router.route('/signIn')
         }
 
         await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
-        
-        res.send()
+        console.log(schedule_attendance)
+        res.send("Signed in successfully");
     }
     catch(error){
         res.status(500).json({error:error.message});
@@ -2280,7 +2281,7 @@ router.route('/signOut')
 
             await scheduleAttendance_model.findOneAndUpdate({"id":user.id,"month":tester},schedule_attendance)
 
-            res.send()
+            res.send("Signed out successfully")
         }
     }
     catch(error){
@@ -2431,10 +2432,62 @@ router.route('/viewschedule')
     try{
         const user= await staff_model.findById(req.user._id)
         if(user.role!='HR'){
-            const Schedule= await schedule_model.findOne({id:user.id})
-            res.send(Schedule)
+            const schedule= await schedule_model.findOne({id:user.id});
+            if(!schedule){
+                return res.status(400).json({msg:"You dont have a schedule yet"});
+            }
+            let finalresult = [];
+            for(var i = 0; i < 5; i++){
+                let saturday =[];
+                for(var j = 0;j < schedule.saturday[i].staff.length; j++){
+                    let course = schedule.saturday[i].course[j];
+                    let location = schedule.saturday[i].location[j];
+                    let final = course + " in " + location + " / ";
+                    saturday.push(final);
+                }
+                let sunday =[];
+                for(var j = 0;j < schedule.sunday[i].staff.length; j++){
+                    let course = schedule.sunday[i].course[j];
+                    let location = schedule.sunday[i].location[j];
+                    let final = course + " in " + location + " / ";
+                    sunday.push(final);
+                }
+                let monday =[];
+                for(var j = 0;j < schedule.monday[i].staff.length; j++){
+                    let course = schedule.monday[i].course[j];
+                    let location = schedule.monday[i].location[j];
+                    let final = course + " in " + location + " / ";
+                    monday.push(final);
+                }
+                let tuesday =[];
+                for(var j = 0;j < schedule.tuesday[i].staff.length; j++){
+                    let course = schedule.tuesday[i].course[j];
+                    let location = schedule.tuesday[i].location[j];
+                    let final = course + " in " + location + " / ";
+                    tuesday.push(final);
+                }
+                let wednesday =[];
+                for(var j = 0;j < schedule.wednesday[i].staff.length; j++){
+                    let course = schedule.wednesday[i].course[j];
+                    let location = schedule.wednesday[i].location[j];
+                    let final = course + " in " + location + " / ";
+                    wednesday.push(final);
+                }
+                let thursday =[];
+                for(var j = 0;j < schedule.thursday[i].staff.length; j++){
+                    let course = schedule.thursday[i].course[j];
+                    let location = schedule.thursday[i].location[j];
+                    let final = course + " in " + location + " / ";
+                    thursday.push(final);
+                }
+                let courseschedule = [];
+                courseschedule.push({saturday:saturday,sunday:sunday,monday:monday,tuesday:tuesday,wednesday:wednesday,thursday:thursday});
+                finalresult.push(courseschedule);
+                }
+
+                res.send(finalresult);
         }else
-        return res.status(400).json({msg:"Unauthorized Request"});
+        return res.status(401).json({msg:"Unauthorized Request"});
     }
     catch(error){
         return res.status(500).json({error:error.message});
@@ -3316,7 +3369,56 @@ router.route('/viewAssignments')
                     return res.status(400).json({msg:"Course Does Not Yet Have a Schedule"});
                 }
                 else{
-                    res.send(schedule)
+                    let finalresult = [];
+                    for(var i = 0; i < 5; i++){
+                        let saturday =[];
+                        for(var j = 0;j < schedule.saturday[i].staff.length; j++){
+                            let staff = schedule.saturday[i].staff[j];
+                            let location = schedule.saturday[i].location[j];
+                            let final = staff + " in " + location + " / ";
+                            saturday.push(final);
+                        }
+                        let sunday =[];
+                        for(var j = 0;j < schedule.sunday[i].staff.length; j++){
+                            let staff = schedule.sunday[i].staff[j];
+                            let location = schedule.sunday[i].location[j];
+                            let final = staff + " in " + location + " / ";
+                            sunday.push(final);
+                        }
+                        let monday =[];
+                        for(var j = 0;j < schedule.monday[i].staff.length; j++){
+                            let staff = schedule.monday[i].staff[j];
+                            let location = schedule.monday[i].location[j];
+                            let final = staff + " in " + location + " / ";
+                            monday.push(final);
+                        }
+                        let tuesday =[];
+                        for(var j = 0;j < schedule.tuesday[i].staff.length; j++){
+                            let staff = schedule.tuesday[i].staff[j];
+                            let location = schedule.tuesday[i].location[j];
+                            let final = staff + " in " + location + " / ";
+                            tuesday.push(final);
+                        }
+                        let wednesday =[];
+                        for(var j = 0;j < schedule.wednesday[i].staff.length; j++){
+                            let staff = schedule.wednesday[i].staff[j];
+                            let location = schedule.wednesday[i].location[j];
+                            let final = staff + " in " + location + " / ";
+                            wednesday.push(final);
+                        }
+                        let thursday =[];
+                        for(var j = 0;j < schedule.thursday[i].staff.length; j++){
+                            let staff = schedule.thursday[i].staff[j];
+                            let location = schedule.thursday[i].location[j];
+                            let final = staff + " in " + location + " / ";
+                            thursday.push(final);
+                        }
+                        let courseschedule = [];
+                        courseschedule.push({saturday:saturday,sunday:sunday,monday:monday,tuesday:tuesday,wednesday:wednesday,thursday:thursday});
+                        finalresult.push(courseschedule);
+                    }
+
+                    res.send(finalresult);
                 }
             }
         }

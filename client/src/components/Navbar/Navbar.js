@@ -10,10 +10,8 @@ class Navbar extends Component {
         this.setState({clicked: !this.state.clicked})
     }
 
-    logout = event => {
-        event.preventDefault();
-
-        axios.post("http://localhost:5000/staff/logout", {
+    logout = () => {
+        axios.post("http://localhost:5000/staff/logout", {}, {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/JSON",

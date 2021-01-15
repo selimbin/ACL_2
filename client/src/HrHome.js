@@ -1,48 +1,71 @@
 import React, { Component } from 'react';
+import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
 import Navbar from "./components/Navbar/Navbar";
-import viewprofile from './components/Images/View_Profile.png';
+import viewprofile from './components/Images/View_Profile.jpeg';
 import signin from './components/Images/SignIn.jpg';
-import signout from './components/Images/SignOut.jpg';
+import signout from './components/Images/SignOut.jpeg';
+import viewattendance from './components/Images/ViewAttendance.jpeg';
+import viewmissing from './components/Images/ViewMissing.jpg';
 import './HrHome.css'
 
 export class HrHome extends Component {
+
+    onClicksignin = () => {
+        axios.post("http://localhost:5000/staff/signIn", {},{
+            headers:
+            {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type":"application/JSON",
+                "token":sessionStorage.getItem('token')
+            }
+        })        
+        .then((res) => toast.success("Signed In successfully",{position: toast.POSITION.TOP_CENTER}))
+        .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
+    } 
+
+    onClicksignout = () =>{
+        axios.post("http://localhost:5000/staff/signOut", {},{
+            headers:
+            {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type":"application/JSON",
+                "token":sessionStorage.getItem('token')
+            }
+        })
+        .then((res) => toast.success("Signed Out successfully",{position: toast.POSITION.TOP_CENTER}))
+        .catch((err) => toast.error(err.response.data.msg,{position: toast.POSITION.TOP_CENTER}))
+    }
+
     render() {
         return (
             <div class="home">
                 <Navbar/>
                 <div Class="flex-container1">
-                    <div Class="viewprofile">
+                    <div Class="viewprofilehr">
                     <a href="viewprofile">
-                        <img Class="viewprofile" src={viewprofile} alt="profile"/>
+                        <img Class="viewprofilehr" src={viewprofile} alt="profile"/>
                     </a>
-                    <a href="viewprofile" Class="text1">View Profile</a>
                     </div>
-                    <div Class="viewattendance">
+                    <div Class="viewattendancehr">
                     <a href="viewattendance">
-                        <img Class="viewattendance" src={viewprofile}/>
+                        <img Class="viewattendancehr" src={viewattendance}/>
                     </a>
-                    <a href="viewattendance" Class="text2">View Attendance</a>
                     </div>
-                    <div Class="viewmissingdayshours">
+                    <div Class="viewmissingdayshourshr">
                     <a href="viewmissingdayshours">
-                        <img Class="viewmissingdayshours" src={viewprofile}/>
+                        <img Class="viewmissingdayshourshr" src={viewmissing}/>
                     </a>
-                    <a href="viewmissingdayshours" Class="text3">View Missing days/hours</a>
                     </div>
                 </div>
                 <div Class="flex-container2">
-                <div Class="signin">
-                    <a>
-                        <img Class="signin" src={signin}/>
-                    </a>
-                    <a Class="text4">SignIn</a>
-                    </div>
-                    <div Class="signout">
-                    <a>
-                        <img Class="signout" src={signout}/>
-                    </a>
-                    <a Class="text5">SignOut</a>
-                    </div>
+                <ToastContainer />
+                <button Class="signinhr" onClick={this.onClicksignin}>
+                        <img Class="signinhr" src={signin}/>
+                    </button>
+                <button Class="signouthr" onClick={this.onClicksignout}>
+                        <img Class="signouthr" src={signout}/>
+                </button>
                 </div>
             </div>
         )
